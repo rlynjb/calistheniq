@@ -27,6 +27,8 @@ In one chat/session, the app can:
 
 That's enough to feel "agentic" without being huge.
 
+---
+
 ### 2) Business workflow → agent workflow
 
 User flow (state machine)
@@ -34,6 +36,8 @@ User flow (state machine)
 Intake → Plan → Coach → Log → Reward → Next plan
 
 At each step, the system asks only what it needs, then moves on.
+
+---
 
 ### 3) Multi-agent MVP (3–4 agents, clean boundaries)
 
@@ -87,6 +91,8 @@ Outputs:
 - badge triggers
 - "next session suggestion" (not full plan yet)
 
+---
+
 ### 4) Tools & data you need (minimal but real)
 
 **Storage (DB)**
@@ -110,6 +116,8 @@ Tables:
 
 No web browsing needed for MVP.
 
+---
+
 ### 5) Exercise library (MVP list that fits your niche)
 
 Tag each with:
@@ -127,6 +135,8 @@ Tag each with:
 - **Core**: dead bug, hollow hold, plank, side plank
 - **Mobility**: hip flexor stretch, ankle rocks, thoracic rotations
 
+---
+
 ### 6) Orchestration: the simplest "multi-agent" controller
 
 Use a supervisor (router) that:
@@ -142,6 +152,8 @@ Use a supervisor (router) that:
 - If profile exists and no plan today → Program agent
 - If in-session → Technique agent
 - If session complete → Gamification agent
+
+---
 
 ### 7) Output contracts (JSON schemas) — the secret to making it robust
 
@@ -175,6 +187,8 @@ Use a supervisor (router) that:
 
 Your supervisor can reject/repair plans that violate equipment/time.
 
+---
+
 ### 8) Prompts (short, practical) for each agent
 
 #### Intake & Safety Agent (system-ish)
@@ -202,6 +216,8 @@ Your supervisor can reject/repair plans that violate equipment/time.
 - "Win the day" even if partial completion (adherence > intensity)
 - Suggest next session focus (push/pull/legs/core balance)
 
+---
+
 ### 9) A concrete MVP session (what it looks like)
 
 User: "I have 25 mins, beginner, knee discomfort sometimes, TRX + mini band."
@@ -211,6 +227,8 @@ User: "I have 25 mins, beginner, knee discomfort sometimes, TRX + mini band."
 3. **Technique Agent**: walks them through Block A round 1, asks RPE/pain, adjusts angle/tempo.
 4. **Log Tool**: saves sets.
 5. **Gamification Agent**: awards XP, streak + next suggestion.
+
+---
 
 ### 10) MVP build route (tech choices that match your background)
 
@@ -223,6 +241,8 @@ Since you're already comfortable with Next.js + serverless:
 - Start with **single LLM** but multiple agents (role prompts) + a router
 
 This is "real agentic architecture" without over-engineering.
+
+---
 
 ### 11) Optional upgrades after MVP (don't do first)
 
