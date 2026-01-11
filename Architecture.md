@@ -127,7 +127,11 @@ calistheniq/
 │       │   │   ├── session-tools.ts   # create_session, fetch_last_sessions
 │       │   │   ├── logging-tools.ts   # log_set, log_completion
 │       │   │   ├── gamification-tools.ts # award_xp, update_streak
-│       │   │   └── exercise-tools.ts  # exercise_library_lookup
+│       │   │   ├── exercise-tools.ts  # exercise_library_lookup
+│       │   │   ├── rag-tools.ts       # (PHASE 2) RAG-enhanced tools
+│       │   │   ├── semantic-search.ts # (PHASE 2) semantic_exercise_search
+│       │   │   ├── coaching-knowledge.ts # (PHASE 2) coaching_knowledge_lookup
+│       │   │   └── safety-retrieval.ts # (PHASE 2) safety_guidelines_retrieve
 │       │   │
 │       │   ├── domain/                # Domain Logic Layer
 │       │   │   ├── models/
@@ -142,7 +146,8 @@ calistheniq/
 │       │   │   │   ├── SessionService.ts # Session management logic
 │       │   │   │   ├── WorkoutService.ts # Workout planning logic
 │       │   │   │   ├── SafetyService.ts  # Safety validation logic
-│       │   │   │   └── ProgressService.ts # Progress tracking logic
+│       │   │   │   ├── ProgressService.ts # Progress tracking logic
+│       │   │   │   └── RAGService.ts     # (PHASE 2) RAG orchestration service
 │       │   │   │
 │       │   │   ├── validators/
 │       │   │   │   ├── schemas.ts     # Zod validation schemas
@@ -155,7 +160,8 @@ calistheniq/
 │       │   │       ├── UserRepository.ts # User data operations
 │       │   │       ├── SessionRepository.ts # Session data operations
 │       │   │       ├── ExerciseRepository.ts # Exercise library operations
-│       │   │       └── AchievementRepository.ts # Achievement operations
+│       │   │       ├── AchievementRepository.ts # Achievement operations
+│       │   │       └── VectorRepository.ts # (PHASE 2) Vector search operations
 │       │   │
 │       │   └── infrastructure/        # Infrastructure Layer
 │       │       ├── database/
@@ -164,16 +170,25 @@ calistheniq/
 │       │       │   │   ├── 001_initial.sql
 │       │       │   │   ├── 002_sessions.sql
 │       │       │   │   ├── 003_achievements.sql
-│       │       │   │   └── 004_indexes.sql
+│       │       │   │   ├── 004_indexes.sql
+│       │       │   │   └── 005_vector_tables.sql # (PHASE 2) Vector tables
 │       │       │   └── queries/       # Pre-built SQL queries
 │       │       │       ├── users.sql
 │       │       │       ├── sessions.sql
-│       │       │       └── achievements.sql
+│       │       │       ├── achievements.sql
+│       │       │       └── vector-search.sql # (PHASE 2) Vector queries
 │       │       │
 │       │       ├── openai/
 │       │       │   ├── client.ts      # OpenAI client configuration
 │       │       │   ├── agents-sdk.ts  # Agents SDK integration
-│       │       │   └── streaming.ts   # Streaming response handling
+│       │       │   ├── streaming.ts   # Streaming response handling
+│       │       │   └── embeddings.ts  # (PHASE 2) Embedding generation
+│       │       │
+│       │       ├── vector/            # (PHASE 2) Vector Database Layer
+│       │       │   ├── pgvector.ts    # pgvector integration
+│       │       │   ├── embeddings-manager.ts # Embedding management
+│       │       │   ├── similarity-search.ts  # Vector similarity search
+│       │       │   └── knowledge-ingestion.ts # Knowledge base ingestion
 │       │       │
 │       │       ├── external/
 │       │       │   └── netlify.ts     # Netlify-specific utilities
@@ -187,17 +202,27 @@ calistheniq/
 │           ├── exercises/
 │           │   ├── exercise-library.json # Exercise database
 │           │   ├── progressions.json     # Exercise progressions
-│           │   └── equipment-mapping.json # Equipment categories
+│           │   ├── equipment-mapping.json # Equipment categories
+│           │   ├── exercise-embeddings.json # (PHASE 2) Pre-computed embeddings
+│           │   └── coaching-cues.json    # (PHASE 2) Coaching knowledge base
 │           │
 │           ├── prompts/
 │           │   ├── system-prompts/       # System-level prompts
 │           │   ├── agent-prompts/        # Agent-specific prompts
-│           │   └── safety-prompts/       # Safety-related prompts
+│           │   ├── safety-prompts/       # Safety-related prompts
+│           │   └── rag-prompts/          # (PHASE 2) RAG-enhanced prompts
 │           │
-│           └── schemas/
-│               ├── workout-output.json   # Workout plan JSON schema
-│               ├── profile-output.json   # User profile JSON schema
-│               └── session-output.json   # Session log JSON schema
+│           ├── schemas/
+│           │   ├── workout-output.json   # Workout plan JSON schema
+│           │   ├── profile-output.json   # User profile JSON schema
+│           │   ├── session-output.json   # Session log JSON schema
+│           │   └── rag-schemas.json      # (PHASE 2) RAG response schemas
+│           │
+│           └── knowledge/                # (PHASE 2) RAG Knowledge Base
+│               ├── safety-guidelines/    # Medical/safety knowledge
+│               ├── coaching-methodology/ # Coaching best practices
+│               ├── exercise-science/     # Exercise science literature
+│               └── user-patterns/        # Anonymized user success patterns
 │
 ├── docs/                              # Documentation
 │   ├── api/
@@ -273,24 +298,36 @@ Four specialized agents with distinct responsibilities:
 - Collects user profile and safety constraints
 - Validates readiness for exercise
 - Identifies red flags requiring professional consultation
+- **(PHASE 2)** Retrieves medical guidelines for specific conditions via RAG
+- **(PHASE 2)** Performs evidence-based exercise restriction lookups
+- **(PHASE 2)** Pattern matches with similar user profiles for risk assessment
 
 #### B) Program Designer Agent
 
 - Creates personalized workout plans
 - Ensures equipment and time constraints are met
 - Includes progressions and regressions
+- **(PHASE 2)** Uses semantic search for intelligent exercise selection
+- **(PHASE 2)** Retrieves successful program templates for similar users
+- **(PHASE 2)** Optimizes equipment substitutions through knowledge lookup
 
 #### C) Technique Coach Agent
 
 - Provides real-time coaching during workouts
 - Monitors pain levels and adjusts exercises
 - Offers form cues and modifications
+- **(PHASE 2)** Retrieves contextual coaching cues based on user feedback
+- **(PHASE 2)** Accesses detailed regression/progression techniques
+- **(PHASE 2)** Uses pain response protocols from coaching knowledge base
 
 #### D) Gamification Agent
 
 - Awards experience points and tracks streaks
 - Triggers achievement badges
 - Suggests next session focus areas
+- **(PHASE 2)** Accesses diverse achievement templates through RAG
+- **(PHASE 2)** Retrieves context-appropriate motivational content
+- **(PHASE 2)** Personalizes encouragement based on user journey patterns
 
 ### 4. Tools Layer (`netlify/functions/core/tools/`)
 
@@ -301,6 +338,11 @@ Four specialized agents with distinct responsibilities:
 - **Logging Tools**: Exercise set and completion logging
 - **Gamification Tools**: XP, streaks, and achievement management
 - **Exercise Tools**: Exercise library lookups and filtering
+- **(PHASE 2) RAG Tools**: Semantic search and knowledge retrieval
+  - `semantic_exercise_search(query, constraints)`: Natural language exercise search
+  - `coaching_knowledge_lookup(context, user_feedback)`: Contextual coaching cues
+  - `safety_guidelines_retrieve(conditions, exercises)`: Medical safety guidelines
+  - `progression_recommendations(current_exercise, user_history)`: Smart progressions
 
 ### 5. Domain Layer (`netlify/functions/core/domain/`)
 
@@ -310,11 +352,14 @@ Four specialized agents with distinct responsibilities:
 - **Services**: Business logic implementation
 - **Validators**: Schema validation using Zod
 - **Repositories**: Data access patterns and abstractions
+- **(PHASE 2) RAG Service**: Orchestrates retrieval across different knowledge bases
+- **(PHASE 2) Vector Repository**: Handles vector search operations and similarity matching
 - **Responsibilities**:
   - Define core business entities
   - Implement domain-specific logic
   - Validate data integrity
   - Abstract data access patterns
+  - **(PHASE 2)** Semantic search and knowledge retrieval coordination
 
 ### 6. Infrastructure Layer (`netlify/functions/core/infrastructure/`)
 
@@ -322,11 +367,15 @@ Four specialized agents with distinct responsibilities:
 
 - **Database**: Postgres/Neon connection and query management
 - **OpenAI**: Agents SDK integration and streaming
+- **(PHASE 2) Vector Database**: pgvector integration for semantic search
+- **(PHASE 2) Embeddings**: OpenAI embedding generation and management
 - **External**: Third-party service integrations
 - **Config**: Environment and system configuration
 - **Responsibilities**:
   - Manage database connections and migrations
   - Handle OpenAI API communication
+  - **(PHASE 2)** Vector database operations and similarity search
+  - **(PHASE 2)** Knowledge base ingestion and embedding generation
   - Configure external service integrations
   - Manage environment variables and secrets
 
@@ -337,10 +386,18 @@ Four specialized agents with distinct responsibilities:
 - **Exercise Library**: Comprehensive exercise database with tags
 - **Prompts**: System and agent-specific prompt templates
 - **Schemas**: JSON schemas for output validation
+- **(PHASE 2) Knowledge Base**: Structured knowledge for RAG retrieval
+  - Safety guidelines and medical contraindications
+  - Coaching methodology and best practices
+  - Exercise science literature and evidence
+  - User success patterns (anonymized)
+- **(PHASE 2) Pre-computed Embeddings**: Cached embeddings for performance
 - **Responsibilities**:
   - Provide exercise metadata and progressions
   - Store prompt templates for agents
   - Define output structure contracts
+  - **(PHASE 2)** Maintain vectorized knowledge bases for semantic search
+  - **(PHASE 2)** Provide contextual coaching and safety information
 
 ## Key Architectural Benefits
 
@@ -351,6 +408,40 @@ Four specialized agents with distinct responsibilities:
 - **Agents** focus on AI decision-making without infrastructure concerns
 - **Domain** contains pure business logic
 - **Infrastructure** handles external systems
+
+### **(PHASE 2) RAG Architecture Benefits**
+
+- **Semantic Understanding**: Move beyond keyword matching to intent-based responses
+- **Dynamic Knowledge**: Access vast coaching knowledge without hardcoding rules
+- **Contextual Coaching**: Provide personalized guidance based on accumulated expertise
+- **Safety Intelligence**: Comprehensive contraindication checking through medical knowledge
+- **Adaptive Learning**: System improves through expanded knowledge base ingestion
+
+### RAG Technical Stack (PHASE 2)
+
+```
+Vector Database:
+- Primary: pgvector with Neon (integrated with existing DB)
+- Alternative: Pinecone/Weaviate for dedicated vector operations
+
+Embedding Generation:
+- OpenAI text-embedding-3-large for semantic understanding
+- Batch processing for knowledge base ingestion
+- Incremental updates for new content
+
+Knowledge Sources:
+- Exercise database (500+ exercises with rich metadata)
+- Coaching methodology database
+- Safety and contraindication guidelines
+- User pattern analysis (anonymized)
+- Exercise science literature
+
+Retrieval Pipeline:
+1. Query embedding generation
+2. Vector similarity search
+3. Context ranking and filtering
+4. Knowledge synthesis for agent consumption
+```
 
 ### Scalability & Maintainability
 
