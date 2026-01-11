@@ -46,18 +46,18 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="flex flex-col min-h-screen bg-secondary/10">
+    <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur">
+      <header className="border-b border-border bg-card/50 backdrop-blur">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="text-2xl font-bold gradient-bg bg-clip-text text-transparent">
+              <div className="text-2xl font-bold bg-gradient-to-r from-primary to-fitness-500 bg-clip-text text-transparent">
                 CalisthenIQ
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge variant="fitness" className="px-3 py-1">
+              <Badge variant="default" className="px-3 py-1 bg-success-500 hover:bg-success-600">
                 3-day streak 🔥
               </Badge>
               <div className="text-sm text-muted-foreground">
@@ -71,7 +71,7 @@ export default function HomePage() {
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome back! 👋</h1>
+          <h1 className="text-3xl font-bold mb-2 text-foreground">Welcome back! 👋</h1>
           <p className="text-muted-foreground">Ready for today's upper body workout?</p>
         </div>
 
@@ -101,17 +101,17 @@ export default function HomePage() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="space-y-1">
                     <div className="text-muted-foreground font-medium">Previous Session</div>
-                    <div className="bg-secondary/50 p-2 rounded">
-                      <div>{exercise.lastSession.sets} sets × {exercise.lastSession.reps} reps</div>
+                    <div className="bg-secondary/50 border border-border p-2 rounded">
+                      <div className="text-foreground">{exercise.lastSession.sets} sets × {exercise.lastSession.reps} reps</div>
                       <div className="text-xs text-muted-foreground">Tempo: {exercise.lastSession.tempo}</div>
                     </div>
                   </div>
                   
                   <div className="space-y-1">
-                    <div className="text-fitness-600 font-medium">Today's Goal</div>
-                    <div className="bg-fitness-50 border border-fitness-200 p-2 rounded">
-                      <div className="text-fitness-700">{exercise.nextGoal.sets} sets × {exercise.nextGoal.reps} reps</div>
-                      <div className="text-xs text-fitness-600">Tempo: {exercise.nextGoal.tempo}</div>
+                    <div className="text-primary font-medium">Today's Goal</div>
+                    <div className="bg-primary/10 border border-primary/20 p-2 rounded">
+                      <div className="text-primary">{exercise.nextGoal.sets} sets × {exercise.nextGoal.reps} reps</div>
+                      <div className="text-xs text-primary/70">Tempo: {exercise.nextGoal.tempo}</div>
                     </div>
                   </div>
                 </div>
@@ -135,12 +135,12 @@ export default function HomePage() {
                     className={`
                       w-12 h-12 rounded-full flex items-center justify-center text-sm font-medium border-2 mx-auto
                       ${day.isToday 
-                        ? 'border-fitness-500 bg-fitness-50 text-fitness-700' 
+                        ? 'border-primary bg-primary/10 text-primary' 
                         : day.completed 
                           ? day.streak 
                             ? 'border-success-500 bg-success-500 text-white' 
-                            : 'border-success-300 bg-success-100 text-success-700'
-                          : 'border-secondary bg-secondary/20 text-muted-foreground'
+                            : 'border-success-300 bg-success-500/20 text-success-300'
+                          : 'border-border bg-secondary/20 text-muted-foreground'
                       }
                     `}
                   >
@@ -153,7 +153,7 @@ export default function HomePage() {
               ))}
             </div>
             <div className="mt-4 flex justify-center">
-              <Badge variant="success" className="px-3 py-1">
+              <Badge variant="default" className="px-3 py-1 bg-success-500/20 text-success-300 border-success-500/30">
                 4/7 workouts this week
               </Badge>
             </div>
@@ -164,21 +164,21 @@ export default function HomePage() {
         <div className="grid grid-cols-3 gap-4">
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-2xl font-bold text-fitness-600">12</div>
+              <div className="text-2xl font-bold text-primary">12</div>
               <div className="text-sm text-muted-foreground">Total Workouts</div>
             </CardContent>
           </Card>
           
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-2xl font-bold text-success-600">3</div>
+              <div className="text-2xl font-bold text-success-400">3</div>
               <div className="text-sm text-muted-foreground">Current Streak</div>
             </CardContent>
           </Card>
           
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-2xl font-bold text-energy-600">245</div>
+              <div className="text-2xl font-bold text-energy-400">245</div>
               <div className="text-sm text-muted-foreground">Total XP</div>
             </CardContent>
           </Card>
@@ -188,8 +188,7 @@ export default function HomePage() {
       {/* Floating Chat Button */}
       <Button
         onClick={() => setIsChatOpen(true)}
-        className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg"
-        variant="fitness"
+        className="fixed bottom-6 right-6 rounded-full w-14 h-14 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground"
         size="icon"
       >
         💬
@@ -198,17 +197,17 @@ export default function HomePage() {
       {/* Chat Popup */}
       {isChatOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-end justify-end p-6 z-50">
-          <div className="bg-white rounded-lg shadow-2xl w-96 h-96 flex flex-col">
+          <div className="bg-card border border-border rounded-lg shadow-2xl w-96 h-96 flex flex-col">
             {/* Chat Header */}
-            <div className="border-b p-4 flex justify-between items-center bg-fitness-500 text-white rounded-t-lg">
+            <div className="border-b border-border p-4 flex justify-between items-center bg-primary text-primary-foreground rounded-t-lg">
               <div>
                 <h3 className="font-semibold">CalisthenIQ Coach</h3>
-                <p className="text-xs text-fitness-100">Your AI fitness coach</p>
+                <p className="text-xs text-primary-foreground/80">Your AI fitness coach</p>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white hover:bg-fitness-600 h-8 w-8 p-0"
+                className="text-primary-foreground hover:bg-primary-foreground/20 h-8 w-8 p-0"
                 onClick={() => setIsChatOpen(false)}
               >
                 ×
@@ -237,7 +236,7 @@ export default function HomePage() {
             </div>
 
             {/* Chat Input */}
-            <div className="border-t p-3">
+            <div className="border-t border-border p-3">
               <div className="flex gap-2 mb-2">
                 <Button variant="outline" size="sm" className="text-xs">
                   Log Progress
@@ -254,7 +253,7 @@ export default function HomePage() {
                   placeholder="Ask me anything..."
                   className="text-sm"
                 />
-                <Button variant="fitness" size="sm" className="px-3">
+                <Button className="px-3 bg-primary hover:bg-primary/90 text-primary-foreground" size="sm">
                   Send
                 </Button>
               </div>
