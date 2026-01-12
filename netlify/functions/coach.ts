@@ -1,8 +1,6 @@
 import { Handler, HandlerEvent, HandlerContext, HandlerResponse } from '@netlify/functions'
 import { supervisor, SupervisorRequest } from './core/orchestration/supervisor'
-
-// Shared types
-type SessionState = 'intake' | 'planning' | 'workout' | 'logging' | 'complete'
+import { SessionState } from './core/orchestration/state-machine'
 
 // Type definitions for the coach function
 interface CoachRequest {

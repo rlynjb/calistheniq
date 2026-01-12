@@ -6,7 +6,18 @@
 
 ## Overview
 
-This document outlines the **orchestration framework** implementation for CalisthenIQ's multi-agent architecture. The serverless functions provide the backend structure and routing logic, but still need integration with OpenAI Agents SDK and database persistence.
+This document outlines the **orchestration framework** implementation for Cali- **Frontend Integration**: Uses `/.netlify/functions/coach` endpoint
+
+- **Session Persistence**: Session management handled by SessionManager abstraction
+- **Error Handling**: Graceful fallbacks for function failures
+
+### Database Integration (Pending)
+
+- SessionManager interface designed for seamless database integration
+- **Current**: In-memory storage with automatic cleanup
+- **Needs**: Replace SessionManager's internal storage with Postgres/Neon connection
+- **Needs**: Persistent session, user profile, and workout data storage
+- **Ready**: All session operations already async and database-readymulti-agent architecture. The serverless functions provide the backend structure and routing logic, but still need integration with OpenAI Agents SDK and database persistence.
 
 **Current State**: Infrastructure and routing logic complete, but agents are placeholders returning mock responses.
 
@@ -32,8 +43,14 @@ netlify/
 ### Request Flow
 
 ```
-Frontend → coach.ts → Supervisor → State Machine → Agent Router → Response Handler → Frontend
+Frontend → coach.ts → Supervisor → SessionManager → State Machine → Agent Router → Response Handler → Frontend
 ```
+
+**Key Architecture Changes**:
+
+- **SessionManager Integration**: All session operations flow through SessionManager abstraction
+- **Clean Separation**: Supervisor focuses on orchestration, SessionManager handles persistence
+- **Async Operations**: All session operations are properly async for database readiness
 
 ---
 
@@ -49,7 +66,7 @@ Frontend → coach.ts → Supervisor → State Machine → Agent Router → Resp
 - ✅ CORS handling for frontend communication
 - ✅ Request validation and error handling
 - ✅ Integration with supervisor orchestration
-- ✅ Session ID generation and management
+- ✅ Session operations delegated to SessionManager
 - 🔄 **Ready for**: OpenAI Agents SDK integration
 
 **API Contract**:
@@ -112,17 +129,24 @@ interface CoachResponse {
 **Key Responsibilities**:
 
 - Route incoming requests to correct agents based on session state
-- Maintain session context across interactions
+- Coordinate with SessionManager for all session operations
 - Handle agent responses and state transitions
-- Manage session lifecycle and cleanup
+- Focus purely on orchestration logic
+
+**Architectural Improvements**:
+
+- ✅ **Removed Direct Session Storage**: No longer maintains internal session Map
+- ✅ **Delegates to SessionManager**: All session operations go through SessionManager abstraction
+- ✅ **Clean Separation of Concerns**: Orchestration logic separate from session management
+- ✅ **Async Session Operations**: All session operations are properly async
+- ✅ **Removed Wrapper Methods**: Direct access to sessionManager instead of thin wrappers
 
 **Features**:
 
 - ✅ Multi-agent routing logic
-- ✅ Session context management
+- ✅ Session context coordination via SessionManager
 - ✅ Error handling and fallbacks
-- ✅ Memory-based session storage (MVP)
-- ✅ Automatic session cleanup
+- ✅ Async session operations
 - 🔄 **Placeholder agents**: Not connected to OpenAI yet
 
 **Agent Handlers** (Currently Mock Responses):
@@ -132,27 +156,50 @@ interface CoachResponse {
 - `handleTechniqueAgent()` - Returns generic coaching responses
 - `handleGamificationAgent()` - Returns mock XP and achievements
 
+**Session Operations**:
+
+- Session creation/retrieval: `await sessionManager.getSession(sessionId)`
+- Session storage: `await sessionManager.saveSession(sessionId, context)`
+- Session ID generation: `sessionManager.generateSessionId()`
+
 ### 4. Session Manager (`/core/orchestration/session-manager.ts`)
 
-**Purpose**: Handles session persistence and lifecycle management
+**Purpose**: Centralized session persistence and lifecycle management abstraction
+
+**Architectural Improvements**:
+
+- ✅ **Centralized Session Logic**: All session-related operations in one place
+- ✅ **Session ID Generation**: Handles creation of unique session identifiers
+- ✅ **Public Cleanup Method**: Exposed manual cleanup alongside automatic cleanup
+- ✅ **Consistent API**: Unified interface for all session operations
+- ✅ **Database-Ready**: Abstraction layer ready for database integration
 
 **Features**:
 
 - ✅ In-memory session storage (temporary MVP solution)
 - ✅ Session CRUD operations
 - ✅ User session querying
-- ✅ Automatic cleanup of expired sessions
+- ✅ Automatic cleanup of expired sessions (via internal timer)
+- ✅ Manual cleanup trigger (`cleanupExpiredSessions()`)
+- ✅ Session ID generation
 - ✅ Session statistics and monitoring
 - 🔄 **Needs**: Database integration for persistence
 
-**Methods**:
+**Core Methods**:
 
-- `saveSession()` - Store session context
-- `getSession()` - Retrieve session by ID
-- `deleteSession()` - Remove session
-- `getUserSessions()` - Get all sessions for user
+- `generateSessionId()` - Create unique session identifier
+- `saveSession(sessionId, context)` - Store session context
+- `getSession(sessionId)` - Retrieve session by ID (returns null if not found)
+- `deleteSession(sessionId)` - Remove session
+- `getUserSessions(userId)` - Get all sessions for user
 - `getSessionStats()` - Session analytics
-- `cleanup()` - Remove expired sessions
+- `cleanupExpiredSessions(maxAgeHours)` - Manual cleanup trigger
+
+**Internal Features**:
+
+- Automatic cleanup timer (runs every hour)
+- Private `cleanup()` method for internal housekeeping
+- Console logging for session operations and cleanup activities
 
 ### 5. Response Handler (`/core/orchestration/response-handler.ts`)
 
@@ -319,14 +366,15 @@ curl -X POST http://localhost:8888/.netlify/functions/coach \
 ### Current Implementation
 
 - **Cold Start**: ~200-500ms (typical for serverless)
-- **Memory Usage**: Minimal (in-memory sessions)
+- **Memory Usage**: Minimal (SessionManager handles in-memory sessions efficiently)
 - **Concurrent Sessions**: Limited by Netlify function concurrency
-- **Session Cleanup**: Automatic hourly cleanup
+- **Session Cleanup**: Automatic hourly cleanup + manual cleanup via SessionManager
+- **Session Operations**: All async, ready for database integration
 
 ### Optimization Opportunities
 
-- **Database Integration**: Move from in-memory to persistent storage
-- **Connection Pooling**: For database connections
+- **Database Integration**: Replace SessionManager's in-memory storage with persistent storage
+- **Connection Pooling**: For database connections when integrated
 - **Caching**: Response caching for static data
 - **Streaming**: Real-time response streaming with OpenAI
 
@@ -334,16 +382,17 @@ curl -X POST http://localhost:8888/.netlify/functions/coach \
 
 ## 🔮 Next Steps
 
-### Week 3-4: Core Orchestration (75% Complete)
+### Week 3-4: Core Orchestration (85% Complete)
 
-- ✅ Supervisor/router implementation - **Framework Complete**
+- ✅ Supervisor/router implementation - **Architecture Refined**
 - ✅ State machine logic - **Framework Complete**
-- ✅ Session management - **In-memory Complete, Needs Database**
+- ✅ Session management - **Abstraction Complete, Ready for Database**
+- ✅ Clean separation of concerns - **Supervisor ↔ SessionManager decoupling**
 - 🔄 Response handling & streaming - **Structure Ready, Needs OpenAI SDK**
 
 ### Immediate Priorities (Week 5-6)
 
-1. **Database Schema**: Set up Postgres/Neon database and replace in-memory storage
+1. **Database Schema**: Integrate Postgres/Neon with SessionManager (minimal changes needed)
 2. **OpenAI Agents SDK**: Replace placeholder agent handlers with real AI agents
 3. **Function Calling Tools**: Implement `save_profile`, `create_session`, `log_set` tools
 4. **Real Agent Implementation**: Build the 4 specialized agents with proper prompts
@@ -355,20 +404,22 @@ curl -X POST http://localhost:8888/.netlify/functions/coach \
 
 ### Current Limitations
 
-- **In-Memory Storage**: Sessions lost on function restart (temporary MVP solution)
+- **In-Memory Storage**: SessionManager uses in-memory storage (ready for database swap)
 - **Mock Agents**: Placeholder responses, not connected to OpenAI Agents SDK
-- **No Database**: All data temporary, no persistence
+- **No Database**: SessionManager abstraction ready, needs database implementation
 - **No Function Tools**: Database operation tools not implemented yet
 - **No Streaming**: Response structure ready but no real streaming implementation
 - **No Authentication**: User identification via sessionId only (MVP acceptable)
 
 ### Planned Resolutions (Week 5-6)
 
-- **Database integration**: Postgres/Neon for persistent storage
+- **Database integration**: Simple SessionManager storage swap to Postgres/Neon
 - **OpenAI Agents SDK integration**: Replace all placeholder agents
 - **Function calling tools**: Implement database operation tools
 - **Real streaming responses**: Connect OpenAI SDK streaming
 - **Authentication system**: User management (post-MVP)
+
+**Architecture Benefits**: Clean separation means database integration requires minimal changes - just swap SessionManager's internal storage implementation.
 
 ---
 

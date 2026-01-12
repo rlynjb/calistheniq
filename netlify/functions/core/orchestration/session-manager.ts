@@ -15,6 +15,13 @@ export class SessionManager {
   }
 
   /**
+   * Generate unique session ID
+   */
+  generateSessionId(): string {
+    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
+
+  /**
    * Store session context
    */
   async saveSession(sessionId: string, context: SessionContext): Promise<void> {
@@ -103,6 +110,13 @@ export class SessionManager {
     if (deletedCount > 0) {
       console.log(`Cleaned up ${deletedCount} expired sessions`)
     }
+  }
+
+  /**
+   * Manually trigger session cleanup (public method)
+   */
+  async cleanupExpiredSessions(maxAgeHours: number = 24): Promise<void> {
+    this.cleanup(maxAgeHours)
   }
 
   /**

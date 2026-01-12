@@ -1,4 +1,5 @@
 import { SessionContext, SessionState, AgentType, StateMachine } from './state-machine'
+import { sessionManager } from './session-manager'
 
 export interface SupervisorRequest {
   message: string
@@ -21,19 +22,17 @@ export interface SupervisorResponse {
  * Routes requests to appropriate agents based on session state
  */
 export class Supervisor {
-  private sessions: Map<string, SessionContext> = new Map()
-
   /**
    * Process incoming request and route to appropriate agent
    */
   async processRequest(request: SupervisorRequest): Promise<SupervisorResponse> {
     // Get or create session context
-    const sessionId = request.sessionId || this.generateSessionId()
-    let context = this.sessions.get(sessionId)
+    const sessionId = request.sessionId || sessionManager.generateSessionId()
+    let context = await sessionManager.getSession(sessionId)
     
     if (!context) {
       context = StateMachine.createInitialContext(sessionId, request.userId)
-      this.sessions.set(sessionId, context)
+      await sessionManager.saveSession(sessionId, context)
     }
 
     // Override state if explicitly provided
@@ -59,7 +58,7 @@ export class Supervisor {
       })
 
       // Store updated context
-      this.sessions.set(sessionId, context)
+      await sessionManager.saveSession(sessionId, context)
 
       return {
         message: agentResponse.message,
@@ -148,40 +147,6 @@ export class Supervisor {
       sessionData: { xpEarned: 15, streakDay: 3 },
       data: { agent: 'gamification', step: context.metadata.stepCount + 1 }
     }
-  }
-
-  /**
-   * Generate unique session ID
-   */
-  private generateSessionId(): string {
-    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-  }
-
-  /**
-   * Get session context by ID
-   */
-  getSession(sessionId: string): SessionContext | undefined {
-    return this.sessions.get(sessionId)
-  }
-
-  /**
-   * Clean up old sessions (basic memory management)
-   */
-  cleanupSessions(olderThanHours: number = 24): void {
-    const cutoffTime = Date.now() - (olderThanHours * 60 * 60 * 1000)
-    
-    const sessionsToDelete: string[] = []
-    
-    this.sessions.forEach((context, sessionId) => {
-      const sessionTime = new Date(context.metadata.startTime).getTime()
-      if (sessionTime < cutoffTime) {
-        sessionsToDelete.push(sessionId)
-      }
-    })
-    
-    sessionsToDelete.forEach(sessionId => {
-      this.sessions.delete(sessionId)
-    })
   }
 }
 
