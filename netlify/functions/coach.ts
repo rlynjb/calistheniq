@@ -1,20 +1,15 @@
 import { Handler, HandlerEvent, HandlerContext, HandlerResponse } from '@netlify/functions'
 import { supervisor, SupervisorRequest } from './core/orchestration/supervisor'
 
+// Shared types
+type SessionState = 'intake' | 'planning' | 'workout' | 'logging' | 'complete'
+
 // Type definitions for the coach function
 interface CoachRequest {
   message: string
   sessionId?: string
   userId?: string
-  sessionState?: 'intake' | 'planning' | 'workout' | 'logging' | 'complete'
-}
-
-interface CoachResponse {
-  message: string
-  sessionId: string
-  sessionState: 'intake' | 'planning' | 'workout' | 'logging' | 'complete'
-  currentAgent: 'intake' | 'program' | 'coach' | 'gamification'
-  data?: any
+  sessionState?: SessionState
 }
 
 // Main coach orchestrator function
