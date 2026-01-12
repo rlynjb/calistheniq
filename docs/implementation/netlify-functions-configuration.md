@@ -61,6 +61,21 @@ Frontend → coach.ts → ResponseHandler → Supervisor → SessionManager → 
 
 **Purpose**: Primary API endpoint for all chat interactions
 
+**Technical Pattern**: **API Gateway / Backend for Frontend (BFF)**
+
+- **Pattern Type**: Single entry point for external requests with internal service orchestration
+- **Role**: Acts as facade between external HTTP clients and internal domain services
+- **Responsibilities**: Request validation, protocol translation, response aggregation, cross-cutting concerns
+- **Architecture Position**: `External Client → [API Gateway: coach.ts] → Internal Services (supervisor) → Business Logic`
+
+**Key Characteristics**:
+
+- **Single Entry Point**: All external requests funnel through this endpoint
+- **Request Orchestration**: Transforms HTTP requests into domain objects (`SupervisorRequest`)
+- **Response Aggregation**: Enhances internal responses (`SupervisorResponse`) with metadata and formatting
+- **Cross-Cutting Concerns**: CORS, validation, error handling, logging, processing time tracking
+- **Protocol Translation**: HTTP ↔ Domain object conversion
+
 **Key Features**:
 
 - ✅ TypeScript integration with `@netlify/functions`
@@ -113,39 +128,92 @@ interface FormattedResponse {
 
 **Purpose**: Manages session states and determines agent routing
 
-**Session States**:
+**Technical Pattern**: **Finite State Machine (FSM) + Context Pattern**
 
-- `intake` → Intake & Safety Agent
-- `planning` → Program Designer Agent
-- `workout` → Technique Coach Agent
-- `logging` → Gamification Agent
-- `complete` → Session end state
+- **Pattern Type**: Computational model with finite states, deterministic transitions, and context preservation
+- **FSM Implementation**: Defines workflow progression through distinct fitness coaching phases
+- **Context Pattern**: Maintains session state and accumulated data throughout the workflow
+- **State Validation**: Explicit transition guards prevent invalid state changes
+
+**State Diagram**:
+
+```
+intake → planning → workout → logging → complete
+   ↑         ↑                              ↓
+   └─────────┴──────────────────────────────┘
+                    (startNew)
+```
+
+**Session States & Workflow**:
+
+- `intake` → Intake & Safety Agent (User onboarding and safety assessment)
+- `planning` → Program Designer Agent (Personalized workout creation)
+- `workout` → Technique Coach Agent (Exercise execution with coaching)
+- `logging` → Gamification Agent (Performance tracking and gamification)
+- `complete` → Session end state (Session wrap-up and continuation options)
+
+**FSM Characteristics**:
+
+- **Finite States**: Fixed set of 5 workflow phases
+- **Deterministic Transitions**: Rule-based state progression via `getNextState()`
+- **Transition Guards**: Validation via `isValidTransition()` prevents invalid moves
+- **State-to-Action Mapping**: Each state maps to specific agent via `getAgentForState()`
+- **Context Preservation**: `SessionContext` maintains workflow state and accumulated data
+- **Immutable Updates**: `updateContext()` creates new context instances
 
 **Key Classes**:
 
-- `StateMachine` - Core state management logic
-- `SessionContext` - Session data structure
-- State transition validation
-- Agent mapping logic
+- `StateMachine` - Core FSM logic and transition rules
+- `SessionContext` - Context pattern implementation for state preservation
+- State transition validation and business rule enforcement
+- Agent mapping logic based on current state
 
 **Features**:
 
-- ✅ Deterministic state transitions
-- ✅ Session context tracking
-- ✅ Metadata management (timestamps, step counts)
-- ✅ State validation and error handling
-- 🔄 **Ready for**: Agent integration
+- ✅ **Deterministic state transitions** with business rule validation
+- ✅ **Session context tracking** with immutable updates
+- ✅ **Metadata management** (timestamps, step counts, audit trail)
+- ✅ **State validation and error handling** via transition guards
+- ✅ **Workflow modeling** of complete fitness coaching process
+- 🔄 **Ready for**: Agent integration with predictable state management
 
 ### 3. Supervisor (`/core/orchestration/supervisor.ts`)
 
 **Purpose**: Main orchestrator that routes requests to appropriate agents
 
+**Technical Pattern**: **Orchestrator Pattern + Strategy Pattern**
+
+- **Primary Pattern**: Orchestrator/Process Manager - Centralized coordinator for complex business processes
+- **Supporting Pattern**: Strategy Pattern - Runtime agent selection based on session state
+- **Process Management**: Manages multi-step workflows with state persistence and error recovery
+- **Service Coordination**: Orchestrates StateMachine, SessionManager, ResponseHandler, and multiple agents
+
+**Orchestrator Process Flow**:
+
+```
+1. Receive Request → 2. Load/Create Session Context → 3. Validate State Transitions
+4. Determine Current Agent (via StateMachine) → 5. Route to Agent (Strategy Pattern)
+6. Process Agent Response → 7. Calculate Next State → 8. Update Context & Persist
+9. Format Response (via ResponseHandler) → 10. Return Coordinated Response
+```
+
 **Key Responsibilities**:
 
-- Route incoming requests to correct agents based on session state
-- Coordinate with SessionManager for all session operations
-- Handle agent responses and state transitions
-- Focus purely on orchestration logic
+- **Centralized Process Coordination**: Single point of control for fitness coaching workflow
+- **State Management & Persistence**: Maintains workflow state across multiple interactions
+- **Multi-Service Coordination**: Orchestrates interactions between StateMachine, SessionManager, ResponseHandler
+- **Process Flow Control**: Controls workflow progression based on business rules and agent responses
+- **Error Handling & Compensation**: Centralized error handling with structured recovery logic
+
+**Strategy Pattern Implementation**:
+
+```typescript
+// Context: The Supervisor
+// Strategy Interface: Agent handlers (handleIntakeAgent, handleProgramAgent, etc.)
+// Concrete Strategies: Different agent implementations
+// Runtime Selection: Agent chosen based on current session state
+private async routeToAgent(agent: AgentType, message: string, context: SessionContext)
+```
 
 **Architectural Improvements**:
 
@@ -155,70 +223,112 @@ interface FormattedResponse {
 - ✅ **Enhanced Mock Agents**: Professional, context-aware responses without debug prefixes
 - ✅ **Message Sanitization**: All agent responses sanitized for security
 - ✅ **Clean Separation of Concerns**: Orchestration logic separate from session management
-- ✅ **Async Session Operations**: All session operations are properly async
-- ✅ **Improved Error Handling**: Structured error responses with detailed context
+- ✅ **Process Isolation**: Each workflow instance is independent with consistent state management
+- ✅ **Service Decoupling**: Agents don't know about each other or the workflow
+- ✅ **Comprehensive Error Recovery**: Centralized error handling and compensation logic
 
 **Features**:
 
-- ✅ Multi-agent routing logic
-- ✅ Session context coordination via SessionManager
-- ✅ **Professional agent responses** with coaching tone
-- ✅ **Consistent error formatting** via ResponseHandler
-- ✅ **Message enhancement and sanitization**
-- ✅ **Processing context tracking**
+- ✅ **Multi-agent routing logic** with runtime strategy selection
+- ✅ **Session context coordination** via SessionManager with state consistency
+- ✅ **Professional agent responses** with coaching tone and context awareness
+- ✅ **Consistent error formatting** via ResponseHandler with structured recovery
+- ✅ **Message enhancement and sanitization** for security and user experience
+- ✅ **Process state management** with audit trails and observability
 - 🔄 **Placeholder agents**: Enhanced but not connected to OpenAI yet
 
 **Agent Handlers** (Enhanced Mock Responses):
 
-- `handleIntakeAgent()` - **Welcome flow with progressive questioning**
-- `handleProgramAgent()` - **Personalized workout planning with time options**
-- `handleTechniqueAgent()` - **Context-aware coaching with form feedback**
-- `handleGamificationAgent()` - **Engaging XP/streak system with achievements**
+- `handleIntakeAgent()` - **Welcome flow with progressive questioning** (Strategy: User Onboarding)
+- `handleProgramAgent()` - **Personalized workout planning with time options** (Strategy: Workout Design)
+- `handleTechniqueAgent()` - **Context-aware coaching with form feedback** (Strategy: Exercise Coaching)
+- `handleGamificationAgent()` - **Engaging XP/streak system with achievements** (Strategy: Motivation & Progress)
 
-**Session Operations**:
+**Orchestration Benefits**:
 
-- Session creation/retrieval: `await sessionManager.getSession(sessionId)`
-- Session storage: `await sessionManager.saveSession(sessionId, context)`
-- Session ID generation: `sessionManager.generateSessionId()`
+- **Process Isolation**: Each workflow instance maintains independent state
+- **Extensibility**: Easy to add new agents or modify workflow without breaking existing logic
+- **Observability**: Single point for monitoring entire fitness coaching process
+- **Transaction Boundaries**: Consistent state updates with rollback capabilities
 
 ### 4. Session Manager (`/core/orchestration/session-manager.ts`)
 
 **Purpose**: Centralized session persistence and lifecycle management abstraction
 
+**Technical Pattern**: **Repository Pattern + Data Access Object (DAO) + Singleton**
+
+- **Repository Pattern**: Encapsulates session storage logic with a domain-oriented interface
+- **DAO Pattern**: Provides abstract interface for database operations (CRUD + lifecycle management)
+- **Singleton Pattern**: Single instance manages all session operations across the application
+- **Data Access Abstraction**: Clean separation between business logic and data persistence layer
+
+**Repository Characteristics**:
+
+- **Domain-Oriented Interface**: Methods like `saveSession()`, `getUserSessions()` reflect business operations
+- **Storage Abstraction**: Hides implementation details (currently in-memory Map, future database)
+- **Query Methods**: Supports both single session retrieval and user-based queries
+- **Lifecycle Management**: Handles creation, persistence, expiration, and cleanup
+
+**DAO Implementation**:
+
+```typescript
+// CRUD Operations
+async saveSession(sessionId: string, context: SessionContext): Promise<void>
+async getSession(sessionId: string): Promise<SessionContext | null>
+async deleteSession(sessionId: string): Promise<void>
+
+// Bulk Operations
+async getUserSessions(userId: string): Promise<SessionContext[]>
+exportSessions(): Record<string, SessionContext>
+importSessions(sessions: Record<string, SessionContext>): void
+
+// Lifecycle Management
+async cleanupExpiredSessions(maxAgeHours: number): Promise<void>
+getSessionStats(): { totalSessions, activeStates, averageStepCount }
+```
+
 **Architectural Improvements**:
 
-- ✅ **Centralized Session Logic**: All session-related operations in one place
+- ✅ **Centralized Session Logic**: All session-related operations in one place via Repository pattern
 - ✅ **Session ID Generation**: Handles creation of unique session identifiers
+- ✅ **Storage Abstraction**: DAO pattern hides storage implementation from business logic
 - ✅ **Public Cleanup Method**: Exposed manual cleanup alongside automatic cleanup
 - ✅ **Consistent API**: Unified interface for all session operations
-- ✅ **Database-Ready**: Abstraction layer ready for database integration
+- ✅ **Database-Ready**: Abstraction layer ready for seamless database integration
+- ✅ **Lifecycle Management**: Complete session lifecycle from creation to expiration
+- ✅ **Backup/Migration**: Export/import capabilities for data management
 
 **Features**:
 
-- ✅ In-memory session storage (temporary MVP solution)
-- ✅ Session CRUD operations
-- ✅ User session querying
-- ✅ Automatic cleanup of expired sessions (via internal timer)
-- ✅ Manual cleanup trigger (`cleanupExpiredSessions()`)
-- ✅ Session ID generation
-- ✅ Session statistics and monitoring
-- 🔄 **Needs**: Database integration for persistence
+- ✅ **In-memory session storage** (temporary MVP solution via Repository abstraction)
+- ✅ **Session CRUD operations** with async DAO interface
+- ✅ **User session querying** with business-oriented methods
+- ✅ **Automatic cleanup of expired sessions** (via internal timer and lifecycle management)
+- ✅ **Manual cleanup trigger** (`cleanupExpiredSessions()`)
+- ✅ **Session ID generation** with collision avoidance
+- ✅ **Session statistics and monitoring** for operational insights
+- ✅ **Data export/import** for backup and migration scenarios
+- 🔄 **Needs**: Database integration (simple storage layer swap due to abstraction)
 
-**Core Methods**:
+**Core Methods** (Repository Interface):
 
-- `generateSessionId()` - Create unique session identifier
-- `saveSession(sessionId, context)` - Store session context
+- `generateSessionId()` - Create unique session identifier with timestamp and randomness
+- `saveSession(sessionId, context)` - Persist session context with immutable copy
 - `getSession(sessionId)` - Retrieve session by ID (returns null if not found)
-- `deleteSession(sessionId)` - Remove session
-- `getUserSessions(userId)` - Get all sessions for user
-- `getSessionStats()` - Session analytics
-- `cleanupExpiredSessions(maxAgeHours)` - Manual cleanup trigger
+- `deleteSession(sessionId)` - Remove session with confirmation logging
+- `getUserSessions(userId)` - Query all sessions for specific user
+- `getSessionStats()` - Aggregate statistics for monitoring and analytics
+- `cleanupExpiredSessions(maxAgeHours)` - Manual cleanup trigger with age threshold
+- `exportSessions()` / `importSessions()` - Backup and migration operations
 
-**Internal Features**:
+**Repository Benefits**:
 
-- Automatic cleanup timer (runs every hour)
-- Private `cleanup()` method for internal housekeeping
-- Console logging for session operations and cleanup activities
+- **Storage Independence**: Business logic doesn't depend on storage implementation
+- **Easy Testing**: Repository interface can be mocked for unit tests
+- **Database Migration**: Swap storage implementation without changing business logic
+- **Query Flexibility**: Support for various query patterns (by ID, by user, by criteria)
+- **Transaction Support**: Ready for database transaction boundaries
+- **Caching Layer**: Can be enhanced with caching without interface changes
 
 ### 5. Response Handler (`/core/orchestration/response-handler.ts`)
 
