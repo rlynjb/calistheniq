@@ -339,14 +339,6 @@ function WeeklyProgress() {
 export default function DashboardPage() {
   return (
     <div className="container mx-auto px-4 py-6 max-w-6xl">
-      {/* Welcome Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Welcome back! 👋</h1>
-        <p className="text-muted-foreground">
-          Ready for your next calisthenics session? Let's keep building that strength!
-        </p>
-      </div>
-
       {/* Weekly Progress */}
       <WeeklyProgress />
 
