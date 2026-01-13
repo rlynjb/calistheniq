@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Link from 'next/link'
 import './globals.css'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -10,7 +12,11 @@ export const metadata: Metadata = {
   description: 'AI-powered calisthenics coach focused on helping beginners build strength safely through proper form, controlled progressions, and body awareness.',
   keywords: ['calisthenics', 'fitness', 'AI coach', 'bodyweight', 'strength training'],
   authors: [{ name: 'CalisthenIQ Team' }],
-  viewport: 'width=device-width, initial-scale=1',
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -25,6 +31,27 @@ export default function RootLayout({
         inter.className
       )}>
         <div className="relative flex min-h-screen flex-col">
+          <header className="border-b">
+            <div className="container mx-auto px-4 py-3">
+              <nav className="flex items-center justify-between">
+                <Link href="/" className="font-bold text-xl">
+                  CalisthenIQ
+                </Link>
+                <div className="flex items-center gap-4">
+                  <Link href="/chat">
+                    <Button variant="ghost" size="sm">
+                      Coach
+                    </Button>
+                  </Link>
+                  <Link href="/workout">
+                    <Button variant="ghost" size="sm">
+                      Workout
+                    </Button>
+                  </Link>
+                </div>
+              </nav>
+            </div>
+          </header>
           <div className="flex-1">{children}</div>
         </div>
       </body>

@@ -11,7 +11,8 @@
 
 [dev]
   command = "npm run dev"
-  port = 3000
+  framework = "next"
+  targetPort = 3000
 
 [[headers]]
   for = "/*"
