@@ -29,7 +29,7 @@ export default function RootLayout({
       <body className={cn(
         "min-h-screen bg-background font-sans antialiased text-foreground",
         inter.className
-      )}>
+      )} suppressHydrationWarning>
         <div className="relative flex min-h-screen flex-col">
           <header className="border-b">
             <div className="container mx-auto px-4 py-3">

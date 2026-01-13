@@ -67,6 +67,33 @@ const mockTodaysWorkout = {
   ]
 }
 
+// Mock data for weekly progress - deterministic based on date
+const generateWeeklyProgress = () => {
+  const today = new Date()
+  const weekDays = []
+  
+  // Get the past 7 days
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today)
+    date.setDate(today.getDate() - i)
+    
+    // Deterministic completion based on date (to avoid hydration mismatch)
+    // Use day of month to create consistent pattern
+    const dayNum = date.getDate()
+    const completed = (dayNum % 3 !== 0) && i !== 0 && i !== 1 // Skip today and yesterday, pattern based on date
+    
+    weekDays.push({
+      date,
+      day: date.toLocaleDateString('en-US', { weekday: 'short' }),
+      dayNum: dayNum,
+      completed,
+      isToday: i === 0,
+    })
+  }
+  
+  return weekDays
+}
+
 function ExerciseHistory() {
   const [showHistory, setShowHistory] = useState(true)
 
@@ -188,33 +215,9 @@ function ExerciseHistory() {
     </Card>
   )
 }
-const generateWeeklyProgress = () => {
-  const today = new Date()
-  const weekDays = []
-  
-  // Get the past 7 days
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today)
-    date.setDate(today.getDate() - i)
-    
-    // Deterministic completion based on date (to avoid hydration mismatch)
-    // Use day of month to create consistent pattern
-    const dayNum = date.getDate()
-    const completed = (dayNum % 3 !== 0) && i !== 0 && i !== 1 // Skip today and yesterday, pattern based on date
-    
-    weekDays.push({
-      date,
-      day: date.toLocaleDateString('en-US', { weekday: 'short' }),
-      dayNum: dayNum,
-      completed,
-      isToday: i === 0,
-    })
-  }
-  
-  return weekDays
-}
 
-function WeeklyProgress() {
+function ConsolidatedProgress() {
+  const [activeTab, setActiveTab] = useState('progress')
   const [weekDays, setWeekDays] = useState<any[]>([])
   const [isClient, setIsClient] = useState(false)
 
@@ -223,114 +226,238 @@ function WeeklyProgress() {
     setWeekDays(generateWeeklyProgress())
   }, [])
 
-  // Don't render until client-side to avoid hydration mismatch
-  if (!isClient || weekDays.length === 0) {
-    return (
-      <Card className="mb-6">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                📅 Weekly Progress
-              </CardTitle>
-              <CardDescription>
-                Loading your weekly progress...
-              </CardDescription>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-primary">-</div>
-              <div className="text-sm text-muted-foreground">Day Streak</div>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-7 gap-2">
-            {Array.from({ length: 7 }, (_, index) => (
-              <div
-                key={index}
-                className="flex flex-col items-center p-3 rounded-lg border-2 border-border bg-card animate-pulse"
-              >
-                <div className="text-xs text-muted-foreground mb-1">-</div>
-                <div className="text-sm font-medium mb-2">-</div>
-                <div className="flex items-center justify-center w-6 h-6">
-                  <div className="w-3 h-3 border-2 border-muted-foreground/30 rounded-full"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
   const completedDays = weekDays.filter(day => day.completed).length
-  const reversedWeekDays = [...weekDays].reverse() // Create a copy for display
+  const reversedWeekDays = [...weekDays].reverse()
   const currentStreak = reversedWeekDays.findIndex(day => !day.completed)
-  const streakCount = currentStreak === -1 ? weekDays.length - 1 : currentStreak // Exclude today from streak count
+  const streakCount = currentStreak === -1 ? weekDays.length - 1 : currentStreak
+
+  const tabs = [
+    { id: 'progress', label: '📅 Weekly Progress' },
+    { id: 'last', label: '📋 Last Session' },
+    { id: 'today', label: '🎯 Today\'s Plan' }
+  ]
 
   return (
     <Card className="mb-6">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              📅 Weekly Progress
-            </CardTitle>
-            <CardDescription>
-              {completedDays}/7 workouts completed this week
-            </CardDescription>
-          </div>
-          <div className="text-right">
-            <div className="text-2xl font-bold text-primary">{streakCount}</div>
-            <div className="text-sm text-muted-foreground">Day Streak</div>
+        {/* Tab Navigation */}
+        <div className="flex items-center justify-center border-b">
+          <div className="flex items-center gap-1 p-1 bg-secondary rounded-lg mb-4">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                  activeTab === tab.id 
+                    ? 'bg-primary text-primary-foreground shadow-sm' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/80'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
       </CardHeader>
+      
       <CardContent>
-        <div className="grid grid-cols-7 gap-2">
-          {reversedWeekDays.map((day, index) => (
-            <div
-              key={index}
-              className={`flex flex-col items-center p-3 rounded-lg border-2 transition-all ${
-                day.isToday
-                  ? 'border-primary bg-primary/10'
-                  : day.completed
-                    ? 'border-green-200 bg-green-50'
-                    : 'border-border bg-card'
-              }`}
-            >
-              <div className="text-xs text-muted-foreground mb-1">{day.day}</div>
-              <div className="text-sm font-medium mb-2">{day.dayNum}</div>
-              <div className="flex items-center justify-center w-6 h-6">
-                {day.completed ? (
-                  <div className="text-green-600 text-lg">✓</div>
-                ) : day.isToday ? (
-                  <div className="w-3 h-3 bg-primary rounded-full"></div>
-                ) : (
-                  <div className="w-3 h-3 border-2 border-muted-foreground/30 rounded-full"></div>
-                )}
+        {/* Weekly Progress Tab */}
+        {activeTab === 'progress' && (
+          <div>
+            {!isClient || weekDays.length === 0 ? (
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <CardDescription>Loading your weekly progress...</CardDescription>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-primary">-</div>
+                    <div className="text-sm text-muted-foreground">Day Streak</div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-7 gap-2">
+                  {Array.from({ length: 7 }, (_, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-col items-center p-3 rounded-lg border-2 border-border bg-card animate-pulse"
+                    >
+                      <div className="text-xs text-muted-foreground mb-1">-</div>
+                      <div className="text-sm font-medium mb-2">-</div>
+                      <div className="flex items-center justify-center w-6 h-6">
+                        <div className="w-3 h-3 border-2 border-muted-foreground/30 rounded-full"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
+            ) : (
+              <div>
+                <div className="grid grid-cols-7 gap-2">
+                  {reversedWeekDays.map((day, index) => (
+                    <div
+                      key={index}
+                      className={`flex flex-col items-center p-3 rounded-lg border-2 transition-all ${
+                        day.isToday
+                          ? 'border-primary bg-primary/10'
+                          : day.completed
+                            ? 'border-green-200 bg-green-50'
+                            : 'border-border bg-card'
+                      }`}
+                    >
+                      <div className="text-xs text-muted-foreground mb-1">{day.day}</div>
+                      <div className="text-sm font-medium mb-2">{day.dayNum}</div>
+                      <div className="flex items-center justify-center w-6 h-6">
+                        {day.completed ? (
+                          <div className="text-green-600 text-lg">✓</div>
+                        ) : day.isToday ? (
+                          <div className="w-3 h-3 bg-primary rounded-full"></div>
+                        ) : (
+                          <div className="w-3 h-3 border-2 border-muted-foreground/30 rounded-full"></div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Quick Stats */}
+                <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                  <div className="flex items-center gap-4">
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      🔥 {streakCount} day streak
+                    </Badge>
+                    <Badge variant="outline" className="flex items-center gap-1">
+                      💪 {completedDays * 15} XP earned
+                    </Badge>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {completedDays === 7 
+                      ? "Perfect week! 🎉" 
+                      : `${7 - completedDays} more to complete the week`
+                    }
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Last Session Tab */}
+        {activeTab === 'last' && (
+          <div>
+            <div className="text-sm text-muted-foreground mb-4">
+              {mockLastWorkout.date.toLocaleDateString('en-US', { 
+                weekday: 'long',
+                month: 'short', 
+                day: 'numeric' 
+              })} • {mockLastWorkout.duration} minutes
             </div>
-          ))}
-        </div>
-        
-        {/* Quick Stats */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t">
-          <div className="flex items-center gap-4">
-            <Badge variant="secondary" className="flex items-center gap-1">
-              � {streakCount} day streak
-            </Badge>
-            <Badge variant="outline" className="flex items-center gap-1">
-              💪 {completedDays * 15} XP earned
-            </Badge>
+            <div className="space-y-4">
+              {mockLastWorkout.exercises.map((exercise, exerciseIndex) => (
+                <div key={exerciseIndex} className="border rounded-lg p-4">
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    {exercise.name}
+                    <Badge variant="outline" className="ml-auto">
+                      {exercise.sets.filter(s => s.completed).length}/{exercise.sets.length} completed
+                    </Badge>
+                  </h4>
+                  <div className="space-y-2">
+                    {exercise.sets.map((set, setIndex) => (
+                      <div key={setIndex} className="flex items-center gap-4 text-sm">
+                        <div className="w-12 text-center font-medium text-muted-foreground">
+                          Set {setIndex + 1}
+                        </div>
+                        <div className="flex-1 grid grid-cols-4 gap-4">
+                          <div>
+                            <span className="text-muted-foreground">Reps: </span>
+                            <span className="font-medium">
+                              {'reps' in set ? set.reps : `${set.duration}s`}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Tempo: </span>
+                            <span className="font-medium">{set.tempo}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Rest: </span>
+                            <span className="font-medium">{set.rest}s</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {set.completed ? (
+                              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                ✓ Done
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-orange-600 border-orange-200">
+                                Skipped
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="text-sm text-muted-foreground">
-            {completedDays === 7 
-              ? "Perfect week! 🎉" 
-              : `${7 - completedDays} more to complete the week`
-            }
+        )}
+
+        {/* Today's Plan Tab */}
+        {activeTab === 'today' && (
+          <div>
+            <div className="text-sm text-muted-foreground mb-4">
+              Based on your progress from last session
+            </div>
+            <div className="space-y-4">
+              {mockTodaysWorkout.exercises.map((exercise, exerciseIndex) => (
+                <div key={exerciseIndex} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium">{exercise.name}</h4>
+                    <Badge className="bg-blue-100 text-blue-800">
+                      {exercise.targetSets.length} sets
+                    </Badge>
+                  </div>
+                  
+                  <div className="mb-3 p-2 bg-blue-50 rounded-md">
+                    <div className="text-xs text-blue-600 font-medium mb-1">PROGRESSION NOTE</div>
+                    <div className="text-sm text-blue-800">{exercise.progression}</div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {exercise.targetSets.map((set, setIndex) => (
+                      <div key={setIndex} className="flex items-center gap-4 text-sm">
+                        <div className="w-12 text-center font-medium text-muted-foreground">
+                          Set {setIndex + 1}
+                        </div>
+                        <div className="flex-1 grid grid-cols-3 gap-4">
+                          <div>
+                            <span className="text-muted-foreground">Target: </span>
+                            <span className="font-medium">
+                              {'reps' in set ? `${set.reps} reps` : `${set.duration}s`}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Tempo: </span>
+                            <span className="font-medium">{set.tempo}</span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Rest: </span>
+                            <span className="font-medium">{set.rest}s</span>
+                          </div>
+                        </div>
+                        <div className="w-16">
+                          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                            Pending
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   )
@@ -338,28 +465,18 @@ function WeeklyProgress() {
 
 export default function DashboardPage() {
   return (
-    <div className="container mx-auto px-4 py-6 max-w-6xl">
-      {/* Weekly Progress */}
-      <WeeklyProgress />
+    <div className="container mx-auto px-4 py-6 max-w-4xl">
+      {/* Consolidated Progress */}
+      <ConsolidatedProgress />
 
-      {/* Main Dashboard Content */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Chat Interface - Takes up 2/3 of the width */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardContent className="p-0">
-              <div className="h-[600px]">
-                <ChatInterface />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Side Panel - Exercise Progress */}
-        <div className="space-y-6">
-          <ExerciseHistory />
-        </div>
-      </div>
+      {/* Chat Interface */}
+      <Card>
+        <CardContent className="p-0">
+          <div className="h-[600px]">
+            <ChatInterface />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
