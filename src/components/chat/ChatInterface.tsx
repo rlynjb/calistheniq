@@ -179,16 +179,16 @@ export default function ChatInterface() {
               <div className="text-4xl mb-2">🤸‍♂️</div>
               <h3 className="text-lg font-semibold mb-2">Welcome to CalisthenIQ!</h3>
               <p className="max-w-md mx-auto">
-                I'm your AI coach, ready to help you build strength safely with calisthenics. 
-                Let's start with understanding your goals and available time.
+                Welcome! Here is your current workout for today. You are at Level 1 with Push/Pull and Level 0 with Squat muscle groups. 
+                How are your muscles feeling? Any discomfort or pain? Let me know so I can decrease the level or suggest lighter exercises for you today.
               </p>
             </div>
             <div className="bg-muted rounded-lg p-4 max-w-md mx-auto">
               <p className="text-sm font-medium mb-2">Try saying:</p>
               <ul className="text-sm space-y-1">
-                <li>"I'm a beginner looking to build upper body strength"</li>
-                <li>"I have 20 minutes for a full body workout"</li>
-                <li>"I want to work on my core strength today"</li>
+                <li>"My knees are feeling stiff today"</li>
+                <li>"I feel ready for today's workout"</li>
+                <li>"Can you modify today's squat exercises?"</li>
               </ul>
             </div>
           </div>
