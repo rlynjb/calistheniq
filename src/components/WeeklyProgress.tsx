@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import type { WeekDay } from '@/types'
 
-const generateWeeklyProgress = () => {
+const generateWeeklyProgress = (): WeekDay[] => {
   const today = new Date()
-  const weekDays = []
+  const weekDays: WeekDay[] = []
   
   // Get the past 7 days
   for (let i = 6; i >= 0; i--) {
@@ -31,7 +32,7 @@ const generateWeeklyProgress = () => {
 }
 
 export default function WeeklyProgress() {
-  const [weekDays, setWeekDays] = useState<any[]>([])
+  const [weekDays, setWeekDays] = useState<WeekDay[]>([])
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {

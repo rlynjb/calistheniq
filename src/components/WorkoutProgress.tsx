@@ -1,9 +1,13 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
+import type { 
+  CompletedWorkout, 
+  PlannedWorkout
+} from '@/types'
 
 // Mock data for exercise history and current workout
-const mockLastWorkout = {
+const mockLastWorkout: CompletedWorkout = {
   date: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
   duration: 18,
   exercises: [
@@ -33,7 +37,7 @@ const mockLastWorkout = {
   ]
 }
 
-const mockTodaysWorkout = {
+const mockTodaysWorkout: PlannedWorkout = {
   exercises: [
     {
       name: "Push-ups",
@@ -181,11 +185,11 @@ export default function WorkoutProgress() {
             if (!lastExercise) return null
             
             const lastTotal = lastExercise.sets.reduce((sum, set) => {
-              return sum + ('reps' in set ? set.reps : set.duration)
+              return sum + ('reps' in set ? (set.reps || 0) : (set.duration || 0))
             }, 0)
             
             const todayTotal = todayExercise.targetSets.reduce((sum, set) => {
-              return sum + ('reps' in set ? set.reps : set.duration)
+              return sum + ('reps' in set ? (set.reps || 0) : (set.duration || 0))
             }, 0)
             
             const improvement = todayTotal - lastTotal

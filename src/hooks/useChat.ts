@@ -2,25 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { API_ENDPOINTS } from '@/lib/constants'
-
-export interface ChatMessage {
-  id: string
-  content: string
-  role: 'user' | 'assistant'
-  timestamp: Date
-  agent?: string
-  sessionState?: string
-}
-
-export interface ChatResponse {
-  message: string
-  sessionId: string
-  sessionState: string
-  currentAgent: string
-  data?: any
-  context?: any
-  processingTimeMs?: number
-}
+import type { ChatMessage, ChatResponse } from '@/types'
 
 export interface ChatError {
   message: string

@@ -1,13 +1,18 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
+import type { 
+  WorkoutLevels, 
+  CurrentUserLevels,
+  MovementCategory,
+  Exercise 
+} from '@/types'
 
 // Mock data for workout levels - Progressive calisthenics exercises
-const workoutLevels = {
+const workoutLevels: WorkoutLevels = {
   0: {
     name: "Foundation",
     description: "Stability, control, and knee-friendly movements",
-    equipment: "Mini band required",
     exercises: {
       Push: [
         { name: "Wall Push-ups with Band Resistance", sets: [{ reps: 5 }, { reps: 4 }, { reps: 3 }], tempo: "3-2-3-1", rest: 90, equipment: "Mini band around back" },
@@ -127,7 +132,7 @@ const workoutLevels = {
 }
 
 // Mock data for current user levels per category
-const currentUserLevels = {
+const currentUserLevels: CurrentUserLevels = {
   Push: 1,
   Pull: 1,
   Squat: 0
@@ -142,8 +147,8 @@ export default function CurrentLevel() {
       
       <div className="grid gap-4 md:grid-cols-3 mb-6">
         {Object.entries(currentUserLevels).map(([category, level]) => {
-          const levelInfo = workoutLevels[level as keyof typeof workoutLevels]
-          const nextLevel = workoutLevels[(level + 1) as keyof typeof workoutLevels]
+          const levelInfo = workoutLevels[level.toString()]
+          const nextLevel = workoutLevels[(level + 1).toString()]
           
           return (
             <div key={category} className="border rounded-lg p-4">
@@ -160,23 +165,17 @@ export default function CurrentLevel() {
                   <span className="font-medium">{levelInfo.name}</span>
                 </div>
                 
-                {(levelInfo as any).description && (
-                  <p className="text-xs text-muted-foreground">{(levelInfo as any).description}</p>
-                )}
-                
-                {(levelInfo as any).equipment && (
-                  <Badge variant="secondary" className="text-xs">
-                    📦 {(levelInfo as any).equipment}
-                  </Badge>
+                {levelInfo?.description && (
+                  <p className="text-xs text-muted-foreground">{levelInfo.description}</p>
                 )}
                 
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-muted-foreground">Current Exercises:</h4>
-                  {levelInfo.exercises[category as keyof typeof levelInfo.exercises]?.map((exercise: any, index: number) => (
+                  {levelInfo?.exercises[category as MovementCategory]?.map((exercise: Exercise, index: number) => (
                     <div key={index} className="bg-secondary/30 rounded p-2">
                       <div className="text-sm font-medium">{exercise.name}</div>
                       <div className="text-xs text-muted-foreground">
-                        {exercise.sets.length} Sets: {exercise.sets.map((set: any) => 
+                        {exercise.sets.length} Sets: {exercise.sets.map((set) => 
                           'reps' in set ? set.reps : `${set.duration}s`
                         ).join(' → ')}
                       </div>
@@ -225,14 +224,18 @@ export default function CurrentLevel() {
             <div className="text-sm">
               <span className="text-muted-foreground">Strongest Area: </span>
               <span className="font-medium text-green-600">
-                {Object.entries(currentUserLevels).reduce((a, b) => currentUserLevels[a[0] as keyof typeof currentUserLevels] > currentUserLevels[b[0] as keyof typeof currentUserLevels] ? a : b)[0]}
+                {Object.entries(currentUserLevels).reduce((a, b) => 
+                  currentUserLevels[a[0] as MovementCategory] > currentUserLevels[b[0] as MovementCategory] ? a : b
+                )[0]}
               </span>
             </div>
             
             <div className="text-sm">
               <span className="text-muted-foreground">Focus Area: </span>
               <span className="font-medium text-orange-600">
-                {Object.entries(currentUserLevels).reduce((a, b) => currentUserLevels[a[0] as keyof typeof currentUserLevels] < currentUserLevels[b[0] as keyof typeof currentUserLevels] ? a : b)[0]}
+                {Object.entries(currentUserLevels).reduce((a, b) => 
+                  currentUserLevels[a[0] as MovementCategory] < currentUserLevels[b[0] as MovementCategory] ? a : b
+                )[0]}
               </span>
             </div>
           </div>
@@ -270,7 +273,9 @@ export default function CurrentLevel() {
             <p>• Start with Level 0 Squat exercises focusing on stability and mini band assistance</p>
           )}
           {Math.min(...Object.values(currentUserLevels)) < Math.max(...Object.values(currentUserLevels)) && (
-            <p>• Focus on balancing your weakest area ({Object.entries(currentUserLevels).reduce((a, b) => currentUserLevels[a[0] as keyof typeof currentUserLevels] < currentUserLevels[b[0] as keyof typeof currentUserLevels] ? a : b)[0]}) to improve overall strength</p>
+            <p>• Focus on balancing your weakest area ({Object.entries(currentUserLevels).reduce((a, b) => 
+              currentUserLevels[a[0] as MovementCategory] < currentUserLevels[b[0] as MovementCategory] ? a : b
+            )[0]}) to improve overall strength</p>
           )}
           <p>• Master your current level exercises before advancing to prevent injury</p>
           <p>• Consider working with your AI coach to create a balanced progression plan</p>

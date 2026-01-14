@@ -1,13 +1,19 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
+import type {
+  Exercise,
+  ExerciseSet,
+  ExercisesByCategory,
+  WorkoutLevel,
+  WorkoutLevels
+} from '@/types'
 
 // Mock data for workout levels - Progressive calisthenics exercises
-const workoutLevels = {
+const workoutLevels: WorkoutLevels = {
   0: {
     name: "Foundation",
     description: "Stability, control, and knee-friendly movements",
-    equipment: "Mini band required",
     exercises: {
       Push: [
         { name: "Wall Push-ups with Band Resistance", sets: [{ reps: 5 }, { reps: 4 }, { reps: 3 }], tempo: "3-2-3-1", rest: 90, equipment: "Mini band around back" },
@@ -143,16 +149,8 @@ export default function WorkoutLevels() {
               <h3 className="text-lg font-semibold">{level.name}</h3>
             </div>
             
-            {(level as any).description && (
-              <p className="text-sm text-muted-foreground mb-2">{(level as any).description}</p>
-            )}
-            
-            {(level as any).equipment && (
-              <div className="mb-4">
-                <Badge variant="secondary" className="text-xs">
-                  📦 {(level as any).equipment}
-                </Badge>
-              </div>
+            {level.description && (
+              <p className="text-sm text-muted-foreground mb-2">{level.description}</p>
             )}
             
             <div className="grid gap-4 md:grid-cols-3">
@@ -163,14 +161,14 @@ export default function WorkoutLevels() {
                   </h4>
                   
                   <div className="space-y-3">
-                    {exercises.map((exercise, exerciseIndex) => (
+                    {exercises.map((exercise: Exercise, exerciseIndex: number) => (
                       <div key={exerciseIndex} className="bg-secondary/30 rounded-md p-3">
                         <h5 className="font-medium text-sm mb-2">{exercise.name}</h5>
                         
-                        {(exercise as any).equipment && (
+                        {exercise.equipment && (
                           <div className="mb-2">
                             <Badge variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
-                              {(exercise as any).equipment}
+                              {exercise.equipment}
                             </Badge>
                           </div>
                         )}
@@ -180,7 +178,7 @@ export default function WorkoutLevels() {
                           <div className="text-xs">
                             <span className="text-muted-foreground">{exercise.sets.length} Sets: </span>
                             <span className="font-medium">
-                              {exercise.sets.map((set, index) => 
+                              {exercise.sets.map((set: ExerciseSet, index: number) => 
                                 'reps' in set ? set.reps : `${set.duration}s`
                               ).join(' → ')}
                             </span>
