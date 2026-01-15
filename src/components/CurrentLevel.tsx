@@ -5,7 +5,7 @@ import type {
   WorkoutLevel, 
   BaseExercise as Exercise 
 } from '@/types'
-import { workoutLevels } from '@/lib/mock'
+import { workoutLevels, getLevelByIndex } from '@/lib/mock'
 
 // Local types for this component
 interface CurrentUserLevels {
@@ -32,8 +32,8 @@ export default function CurrentLevel() {
       
       <div className="grid gap-4 md:grid-cols-3 mb-6">
         {Object.entries(currentUserLevels).map(([category, level]) => {
-          const levelInfo = workoutLevels[level]
-          const nextLevel = workoutLevels[level + 1]
+          const levelInfo = getLevelByIndex(level)
+          const nextLevel = getLevelByIndex(level + 1)
           
           return (
             <div key={category} className="border rounded-lg p-4">

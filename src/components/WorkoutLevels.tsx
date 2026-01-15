@@ -16,8 +16,8 @@ export default function WorkoutLevels() {
       </div>
       
       <div className="space-y-6">
-        {workoutLevels.map((level, levelIndex) => (
-          <div key={levelIndex} className="border rounded-lg p-4">
+        {Object.entries(workoutLevels).map(([levelKey, level], levelIndex) => (
+          <div key={levelKey} className="border rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <Badge variant="outline" className="text-lg px-3 py-1">
                 Level {levelIndex}

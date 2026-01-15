@@ -1,4 +1,4 @@
-import type { BaseExercise, WorkoutLevel, ExercisesByCategory } from '@/types'
+import type { BaseExercise, WorkoutLevel, WorkoutLevels, ExercisesByCategory } from '@/types'
 
 // All exercises flattened into a single array with metadata
 export interface ExerciseWithMetadata extends BaseExercise {
@@ -760,8 +760,8 @@ export const exerciseCategorization: ExerciseCategorization = {
 }
 
 // Workout levels using the original structure but sourced from our exercise data
-export const workoutLevels: WorkoutLevel[] = [
-  {
+export const workoutLevels: WorkoutLevels = {
+  foundation: {
     name: "Foundation",
     description: "Stability, control, and knee-friendly movements",
     exercises: {
@@ -791,7 +791,7 @@ export const workoutLevels: WorkoutLevel[] = [
       }))
     }
   },
-  {
+  beginner: {
     name: "Beginner",
     exercises: {
       Push: exerciseCategorization.byLevel[1].exercises.filter(ex => ex.category === 'Push').map(ex => ({
@@ -820,7 +820,7 @@ export const workoutLevels: WorkoutLevel[] = [
       }))
     }
   },
-  {
+  novice: {
     name: "Novice",
     exercises: {
       Push: exerciseCategorization.byLevel[2].exercises.filter(ex => ex.category === 'Push').map(ex => ({
@@ -849,7 +849,7 @@ export const workoutLevels: WorkoutLevel[] = [
       }))
     }
   },
-  {
+  intermediate: {
     name: "Intermediate",
     exercises: {
       Push: exerciseCategorization.byLevel[3].exercises.filter(ex => ex.category === 'Push').map(ex => ({
@@ -878,7 +878,7 @@ export const workoutLevels: WorkoutLevel[] = [
       }))
     }
   },
-  {
+  advanced: {
     name: "Advanced",
     exercises: {
       Push: exerciseCategorization.byLevel[4].exercises.filter(ex => ex.category === 'Push').map(ex => ({
@@ -907,7 +907,7 @@ export const workoutLevels: WorkoutLevel[] = [
       }))
     }
   },
-  {
+  expert: {
     name: "Expert",
     exercises: {
       Push: exerciseCategorization.byLevel[5].exercises.filter(ex => ex.category === 'Push').map(ex => ({
@@ -936,7 +936,7 @@ export const workoutLevels: WorkoutLevel[] = [
       }))
     }
   }
-]
+}
 
 // Statistics and insights
 export const exerciseStats = {
@@ -962,3 +962,19 @@ export const exerciseStats = {
     explosive: exerciseCategorization.byMovementType.explosive.length
   }
 }
+
+// Utility functions for workout levels
+export const workoutLevelKeys = Object.keys(workoutLevels) as Array<keyof typeof workoutLevels>
+export const workoutLevelsArray = Object.values(workoutLevels)
+
+// Get level by key
+export const getLevelByKey = (key: keyof typeof workoutLevels) => workoutLevels[key]
+
+// Get level by index (0-based)
+export const getLevelByIndex = (index: number) => workoutLevelsArray[index]
+
+// Get level key by index  
+export const getLevelKeyByIndex = (index: number) => workoutLevelKeys[index]
+
+// Get index by level key
+export const getIndexByLevelKey = (key: keyof typeof workoutLevels) => workoutLevelKeys.indexOf(key)
