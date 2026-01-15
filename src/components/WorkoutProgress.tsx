@@ -1,117 +1,15 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import type { 
-  BaseExerciseSet,
-  BaseExercise
-} from '@/types'
-
-// Local types for completed workout tracking
-interface CompletedSet extends BaseExerciseSet {
-  completed: boolean
-}
-
-interface CompletedExercise extends BaseExercise {
-  sets: CompletedSet[]
-}
-
-interface CompletedWorkout {
-  date: Date
-  duration: number
-  exercises: CompletedExercise[]
-}
-
-// Local types for planned workout functionality
-interface TargetSet extends BaseExerciseSet {}
-
-interface PlannedExercise {
-  name: string
-  tempo?: string
-  rest?: number
-  equipment?: string
-  notes?: string
-  targetSets: TargetSet[]
-}
-
-interface PlannedWorkout {
-  exercises: PlannedExercise[]
-}
-
-// Mock data for exercise history and current workout
-const mockLastWorkout: CompletedWorkout = {
-  date: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
-  duration: 18,
-  exercises: [
-    {
-      name: "Push-ups",
-      tempo: "2-1-2-1",
-      rest: 60,
-      sets: [
-        { reps: 8, completed: true },
-        { reps: 6, completed: true },
-        { reps: 5, completed: true }
-      ]
-    },
-    {
-      name: "Pike Push-ups",
-      tempo: "2-1-2-1",
-      rest: 90,
-      sets: [
-        { reps: 5, completed: true },
-        { reps: 4, completed: true },
-        { reps: 3, completed: false }
-      ]
-    },
-    {
-      name: "Plank Hold",
-      tempo: "hold",
-      rest: 60,
-      sets: [
-        { duration: 45, completed: true },
-        { duration: 35, completed: true }
-      ]
-    }
-  ]
-}
-
-const mockTodaysWorkout: PlannedWorkout = {
-  exercises: [
-    {
-      name: "Push-ups",
-      tempo: "2-1-2-1",
-      rest: 60,
-      targetSets: [
-        { reps: 10 },
-        { reps: 8 },
-        { reps: 6 }
-      ],
-      notes: "Increase reps by 2 from last session"
-    },
-    {
-      name: "Pike Push-ups",
-      tempo: "2-1-2-1", 
-      rest: 90,
-      targetSets: [
-        { reps: 6 },
-        { reps: 5 },
-        { reps: 4 }
-      ],
-      notes: "Focus on completing all sets"
-    },
-    {
-      name: "Plank Hold",
-      tempo: "hold",
-      rest: 60,
-      targetSets: [
-        { duration: 50 },
-        { duration: 45 }
-      ],
-      notes: "Hold 5 seconds longer than last time"
-    }
-  ]
-}
+import { workoutProgressData } from '@/data/WorkoutProgress'
 
 export default function WorkoutProgress() {
+  const { 
+    lastWorkout, 
+    todaysWorkout, 
+    progressComparisons
+  } = workoutProgressData
+
   return (
     <div>
       <div className="text-sm text-muted-foreground mb-4">
@@ -126,16 +24,16 @@ export default function WorkoutProgress() {
               📋 Last Session
             </Badge>
             <div className="text-sm text-muted-foreground">
-              {mockLastWorkout.date.toLocaleDateString('en-US', { 
+              {lastWorkout.date.toLocaleDateString('en-US', { 
                 weekday: 'short',
                 month: 'short', 
                 day: 'numeric' 
-              })} • {mockLastWorkout.duration} min
+              })} • {lastWorkout.duration} min
             </div>
           </div>
           
           <div className="space-y-3">
-            {mockLastWorkout.exercises.map((exercise, exerciseIndex) => (
+            {lastWorkout.exercises.map((exercise, exerciseIndex) => (
               <div key={exerciseIndex} className="bg-secondary/20 rounded-lg p-3">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium text-sm">{exercise.name}</h4>
@@ -180,7 +78,7 @@ export default function WorkoutProgress() {
           </div>
           
           <div className="space-y-3">
-            {mockTodaysWorkout.exercises.map((exercise, exerciseIndex) => (
+            {todaysWorkout.exercises.map((exercise, exerciseIndex) => (
               <div key={exerciseIndex} className="bg-blue-50/50 rounded-lg p-3">
                 <div className="mb-2">
                   <h4 className="font-medium text-sm">{exercise.name}</h4>
@@ -223,50 +121,34 @@ export default function WorkoutProgress() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {mockTodaysWorkout.exercises.map((todayExercise, index) => {
-            const lastExercise = mockLastWorkout.exercises.find(ex => ex.name === todayExercise.name)
-            if (!lastExercise) return null
-            
-            const lastTotal = lastExercise.sets.reduce((sum, set) => {
-              return sum + ('reps' in set ? (set.reps || 0) : (set.duration || 0))
-            }, 0)
-            
-            const todayTotal = todayExercise.targetSets.reduce((sum, set) => {
-              return sum + ('reps' in set ? (set.reps || 0) : (set.duration || 0))
-            }, 0)
-            
-            const improvement = todayTotal - lastTotal
-            const improvementPercent = Math.round((improvement / lastTotal) * 100)
-            
-            return (
-              <div key={index} className="bg-white/50 rounded p-3">
-                <div className="text-sm font-medium mb-2">{todayExercise.name}</div>
-                <div className="space-y-1">
-                  <div className="text-xs">
-                    <span className="text-muted-foreground">Last: </span>
-                    <span className="font-medium">{lastTotal}</span>
-                    <span className="text-muted-foreground ml-2">Target: </span>
-                    <span className="font-medium">{todayTotal}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {improvement > 0 ? (
-                      <Badge variant="default" className="text-xs bg-green-100 text-green-700">
-                        +{improvement} ({improvementPercent > 0 ? `+${improvementPercent}` : improvementPercent}%)
-                      </Badge>
-                    ) : improvement < 0 ? (
-                      <Badge variant="outline" className="text-xs bg-orange-100 text-orange-700">
-                        {improvement} ({improvementPercent}%)
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-xs">
-                        Maintain
-                      </Badge>
-                    )}
-                  </div>
+          {progressComparisons.map((comparison, index) => (
+            <div key={index} className="bg-white/50 rounded p-3">
+              <div className="text-sm font-medium mb-2">{comparison.exerciseName}</div>
+              <div className="space-y-1">
+                <div className="text-xs">
+                  <span className="text-muted-foreground">Last: </span>
+                  <span className="font-medium">{comparison.lastTotal}</span>
+                  <span className="text-muted-foreground ml-2">Target: </span>
+                  <span className="font-medium">{comparison.todayTotal}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {comparison.hasImprovement ? (
+                    <Badge variant="default" className="text-xs bg-green-100 text-green-700">
+                      +{comparison.improvement} ({comparison.improvementPercent > 0 ? `+${comparison.improvementPercent}` : comparison.improvementPercent}%)
+                    </Badge>
+                  ) : comparison.isDecline ? (
+                    <Badge variant="outline" className="text-xs bg-orange-100 text-orange-700">
+                      {comparison.improvement} ({comparison.improvementPercent}%)
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary" className="text-xs">
+                      Maintain
+                    </Badge>
+                  )}
                 </div>
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
       </div>
       

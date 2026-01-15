@@ -6,24 +6,15 @@ import type {
   BaseExercise as Exercise 
 } from '@/types'
 import { getLevelByIndex } from '@/data/WorkoutLevels'
-
-// Local types for this component
-interface CurrentUserLevels {
-  Push: number
-  Pull: number
-  Squat: number
-}
-
-type MovementCategory = keyof CurrentUserLevels
-
-// Mock data for user's current progress
-const currentUserLevels: CurrentUserLevels = {
-  Push: 1,
-  Pull: 1,
-  Squat: 0
-}
+import { currentLevelData, type MovementCategory } from '@/data/CurrentLevel'
 
 export default function CurrentLevel() {
+  const { 
+    currentLevels, 
+    progressStats, 
+    personalizedRecommendations 
+  } = currentLevelData
+
   return (
     <div>
       <div className="text-sm text-muted-foreground mb-4">
@@ -31,7 +22,7 @@ export default function CurrentLevel() {
       </div>
       
       <div className="grid gap-4 md:grid-cols-3 mb-6">
-        {Object.entries(currentUserLevels).map(([category, level]) => {
+        {Object.entries(currentLevels).map(([category, level]) => {
           const levelInfo = getLevelByIndex(level)
           const nextLevel = getLevelByIndex(level + 1)
           
@@ -101,42 +92,30 @@ export default function CurrentLevel() {
           <div className="space-y-2">
             <div className="text-sm">
               <span className="text-muted-foreground">Overall Level: </span>
-              <span className="font-medium">
-                {Math.round((currentUserLevels.Push + currentUserLevels.Pull + currentUserLevels.Squat) / 3 * 10) / 10}
-              </span>
+              <span className="font-medium">{progressStats.overallLevel}</span>
             </div>
             
             <div className="text-sm">
               <span className="text-muted-foreground">Strongest Area: </span>
-              <span className="font-medium text-green-600">
-                {Object.entries(currentUserLevels).reduce((a, b) => 
-                  currentUserLevels[a[0] as MovementCategory] > currentUserLevels[b[0] as MovementCategory] ? a : b
-                )[0]}
-              </span>
+              <span className="font-medium text-green-600">{progressStats.strongestArea}</span>
             </div>
             
             <div className="text-sm">
               <span className="text-muted-foreground">Focus Area: </span>
-              <span className="font-medium text-orange-600">
-                {Object.entries(currentUserLevels).reduce((a, b) => 
-                  currentUserLevels[a[0] as MovementCategory] < currentUserLevels[b[0] as MovementCategory] ? a : b
-                )[0]}
-              </span>
+              <span className="font-medium text-orange-600">{progressStats.focusArea}</span>
             </div>
           </div>
           
           <div className="space-y-2">
             <div className="text-sm">
               <span className="text-muted-foreground">Total Progression: </span>
-              <span className="font-medium">
-                {Math.round((currentUserLevels.Push + currentUserLevels.Pull + currentUserLevels.Squat) / 15 * 100)}%
-              </span>
+              <span className="font-medium">{progressStats.progressToMastery}%</span>
             </div>
             
             <div className="w-full bg-secondary rounded-full h-2">
               <div 
                 className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(currentUserLevels.Push + currentUserLevels.Pull + currentUserLevels.Squat) / 15 * 100}%` }}
+                style={{ width: `${progressStats.progressToMastery}%` }}
               ></div>
             </div>
             
@@ -154,16 +133,9 @@ export default function CurrentLevel() {
           <div className="text-sm font-medium text-green-800">Personalized Recommendations</div>
         </div>
         <div className="text-xs text-green-700 space-y-1">
-          {currentUserLevels.Squat === 0 && (
-            <p>• Start with Level 0 Squat exercises focusing on stability and mini band assistance</p>
-          )}
-          {Math.min(...Object.values(currentUserLevels)) < Math.max(...Object.values(currentUserLevels)) && (
-            <p>• Focus on balancing your weakest area ({Object.entries(currentUserLevels).reduce((a, b) => 
-              currentUserLevels[a[0] as MovementCategory] < currentUserLevels[b[0] as MovementCategory] ? a : b
-            )[0]}) to improve overall strength</p>
-          )}
-          <p>• Master your current level exercises before advancing to prevent injury</p>
-          <p>• Consider working with your AI coach to create a balanced progression plan</p>
+          {personalizedRecommendations.map((recommendation, index) => (
+            <p key={index}>• {recommendation}</p>
+          ))}
         </div>
       </div>
     </div>

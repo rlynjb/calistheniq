@@ -3,55 +3,24 @@
 import { useState, useEffect } from 'react'
 import { CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-
-// Types for weekly progress tracking
-interface WeekDay {
-  date: Date
-  day: string
-  dayNum: number
-  completed: boolean
-  isToday: boolean
-}
-
-const generateWeeklyProgress = (): WeekDay[] => {
-  const today = new Date()
-  const weekDays: WeekDay[] = []
-  
-  // Get the past 7 days
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today)
-    date.setDate(today.getDate() - i)
-    
-    // Deterministic completion based on date (to avoid hydration mismatch)
-    // Use day of month to create consistent pattern
-    const dayNum = date.getDate()
-    const completed = (dayNum % 3 !== 0) && i !== 0 && i !== 1 // Skip today and yesterday, pattern based on date
-    
-    weekDays.push({
-      date,
-      day: date.toLocaleDateString('en-US', { weekday: 'short' }),
-      dayNum: dayNum,
-      completed,
-      isToday: i === 0,
-    })
-  }
-  
-  return weekDays
-}
+import { 
+  weeklyProgressData, 
+  generateCompleteWeeklyProgress,
+  type WeekDay 
+} from '@/data/WeeklyProgress'
 
 export default function WeeklyProgress() {
-  const [weekDays, setWeekDays] = useState<WeekDay[]>([])
+  const [progressData, setProgressData] = useState(weeklyProgressData)
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
-    setWeekDays(generateWeeklyProgress())
+    // Regenerate data on client to ensure fresh dates
+    setProgressData(generateCompleteWeeklyProgress())
   }, [])
 
-  const completedDays = weekDays.filter(day => day.completed).length
+  const { weekDays, stats, motivationalMessage, achievements } = progressData
   const reversedWeekDays = [...weekDays].reverse()
-  const currentStreak = reversedWeekDays.findIndex(day => !day.completed)
-  const streakCount = currentStreak === -1 ? weekDays.length - 1 : currentStreak
 
   return (
     <div>
@@ -84,7 +53,7 @@ export default function WeeklyProgress() {
       ) : (
         <div>
           <div className="grid grid-cols-7 gap-2">
-            {reversedWeekDays.map((day, index) => (
+            {reversedWeekDays.map((day: WeekDay, index: number) => (
               <div
                 key={index}
                 className={`flex flex-col items-center p-3 rounded-lg border-2 transition-all ${
@@ -114,19 +83,37 @@ export default function WeeklyProgress() {
           <div className="flex items-center justify-between mt-4 pt-4 border-t">
             <div className="flex items-center gap-4">
               <Badge variant="secondary" className="flex items-center gap-1">
-                🔥 {streakCount} day streak
+                🔥 {stats.streakCount} day streak
               </Badge>
               <Badge variant="outline" className="flex items-center gap-1">
-                💪 {completedDays * 15} XP earned
+                💪 {stats.xpEarned} XP earned
               </Badge>
             </div>
             <div className="text-sm text-muted-foreground">
-              {completedDays === 7 
+              {stats.completedDays === 7 
                 ? "Perfect week! 🎉" 
-                : `${7 - completedDays} more to complete the week`
+                : `${7 - stats.completedDays} more to complete the week`
               }
             </div>
           </div>
+          
+          {/* Motivational Message */}
+          {motivationalMessage && (
+            <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="text-sm font-medium text-blue-800">{motivationalMessage}</div>
+            </div>
+          )}
+          
+          {/* Achievements */}
+          {achievements.length > 0 && (
+            <div className="mt-3 space-y-1">
+              {achievements.slice(0, 2).map((achievement, index) => (
+                <div key={index} className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded-full inline-block mr-2">
+                  {achievement}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
