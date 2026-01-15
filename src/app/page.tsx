@@ -2,56 +2,67 @@
 
 import { useState } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Modal } from '@/components/ui/modal'
 import ChatInterface from '@/components/chat/ChatInterface'
 import WeeklyProgress from '@/components/WeeklyProgress'
 import CurrentLevel from '@/components/CurrentLevel'
 import WorkoutLevels from '@/components/WorkoutLevels'
 
 function ProgressPanel() {
-  const [activeTab, setActiveTab] = useState('progress')
-
-  const tabs = [
-    { id: 'progress', label: '📅 Weekly Progress' },
-    { id: 'current', label: '🎯 Current Level' },
-    { id: 'levels', label: '🏆 Workout Levels' }
-  ]
+  const [isCurrentLevelModalOpen, setIsCurrentLevelModalOpen] = useState(false)
+  const [isWorkoutLevelsModalOpen, setIsWorkoutLevelsModalOpen] = useState(false)
 
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <div className="flex items-center justify-center border-b">
-          <div className="flex items-center gap-1 p-1 bg-secondary rounded-lg mb-4">
-            {tabs.map(tab => (
+    <>
+      <Card className="mb-6">
+        <CardHeader>
+          <div className="flex items-center justify-between border-b pb-4">
+            {/* Left side - Weekly Progress title */}
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-medium">📅 Weekly Progress</span>
+            </div>
+            
+            {/* Right side - Action buttons */}
+            <div className="flex items-center gap-2">
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                  activeTab === tab.id 
-                    ? 'bg-primary text-primary-foreground shadow-sm' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/80'
-                }`}
+                onClick={() => setIsCurrentLevelModalOpen(true)}
+                className="px-3 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
               >
-                {tab.label}
+                🎯 Current Level
               </button>
-            ))}
+              <button
+                onClick={() => setIsWorkoutLevelsModalOpen(true)}
+                className="px-3 py-2 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:bg-secondary/80 transition-colors"
+              >
+                🏆 Workout Levels
+              </button>
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent>
-        {activeTab === 'progress' && (
+        </CardHeader>
+        
+        <CardContent>
           <WeeklyProgress />
-        )}
+        </CardContent>
+      </Card>
 
-        {activeTab === 'current' && (
-          <CurrentLevel />
-        )}
+      {/* Current Level Modal */}
+      <Modal 
+        isOpen={isCurrentLevelModalOpen} 
+        onClose={() => setIsCurrentLevelModalOpen(false)}
+        title="🎯 Current Level"
+      >
+        <CurrentLevel />
+      </Modal>
 
-        {activeTab === 'levels' && (
-          <WorkoutLevels />
-        )}
-      </CardContent>
-    </Card>
+      {/* Workout Levels Modal */}
+      <Modal 
+        isOpen={isWorkoutLevelsModalOpen} 
+        onClose={() => setIsWorkoutLevelsModalOpen(false)}
+        title="🏆 Workout Levels"
+      >
+        <WorkoutLevels />
+      </Modal>
+    </>
   )
 }
 
