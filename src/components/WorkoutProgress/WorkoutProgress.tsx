@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge'
 import { workoutProgressData } from '@/data/WorkoutProgress'
+import './WorkoutProgress.css'
 
 export default function WorkoutProgress() {
   const { 

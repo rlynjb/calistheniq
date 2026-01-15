@@ -1,0 +1,111 @@
+/* WeeklyProgress Component Styles */
+
+.weekly-progress {
+  width: 100%;
+}
+
+.weekly-progress__loading {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.weekly-progress__week-header {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.weekly-progress__day-label {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0;
+  color: rgb(107 114 128);
+}
+
+.weekly-progress__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.weekly-progress__day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 2px solid;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.weekly-progress__day--today {
+  border-color: hsl(var(--primary));
+  background-color: hsl(var(--primary) / 0.1);
+}
+
+.weekly-progress__day--completed {
+  border-color: rgb(22 163 74);
+  background-color: rgb(22 163 74 / 0.1);
+}
+
+.weekly-progress__day--completed:hover {
+  background-color: rgb(22 163 74 / 0.2);
+}
+
+.weekly-progress__day--with-workout:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.weekly-progress__day-name {
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+  color: rgb(107 114 128);
+}
+
+.weekly-progress__day-number {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.weekly-progress__day-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.weekly-progress__day-indicator--completed {
+  color: rgb(22 163 74);
+  font-size: 1.125rem;
+}
+
+.weekly-progress__day-indicator--today {
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: hsl(var(--primary));
+  border-radius: 50%;
+}
+
+.weekly-progress__day-indicator--default {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid rgb(156 163 175 / 0.3);
+  border-radius: 50%;
+}
+
+.weekly-progress__exercise-count {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.weekly-progress__exercise-count--completed {
+  color: rgb(22 163 74);
+}
+
+.weekly-progress__exercise-count--planned {
+  color: rgb(37 99 235);
+}

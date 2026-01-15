@@ -7,11 +7,9 @@ import { Modal } from '@/components/ui/modal'
 import { 
   weeklyProgressData, 
   generateCompleteWeeklyProgress,
-  getTodaysWorkoutPreview,
-  getRecentWorkoutSummary,
   type WeekDay,
-  type WorkoutSession
 } from '@/data/WeeklyProgress'
+import './WeeklyProgress.css'
 
 export default function WeeklyProgress() {
   const [progressData, setProgressData] = useState(weeklyProgressData)
@@ -26,9 +24,6 @@ export default function WeeklyProgress() {
   }, [])
 
   const { weekDays, stats, motivationalMessage, achievements } = progressData
-  const reversedWeekDays = [...weekDays].reverse()
-  const todaysWorkout = getTodaysWorkoutPreview(weekDays)
-  const recentWorkouts = getRecentWorkoutSummary(weekDays)
 
   const handleDayClick = (day: WeekDay) => {
     if (day.workoutSession || day.plannedWorkout) {
@@ -72,15 +67,24 @@ export default function WeeklyProgress() {
         </div>
       ) : (
         <div>
+          {/* Week header (optional visual improvement) */}
+          <div className="grid grid-cols-7 gap-2 mb-2">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((dayLabel, index) => (
+              <div key={index} className="text-center text-xs text-muted-foreground font-medium py-1">
+                {dayLabel}
+              </div>
+            ))}
+          </div>
+          
           <div className="grid grid-cols-7 gap-2">
-            {reversedWeekDays.map((day: WeekDay, index: number) => (
+            {weekDays.map((day: WeekDay, index: number) => (
               <div
                 key={index}
                 className={`flex flex-col items-center p-3 rounded-lg border-2 transition-all cursor-pointer ${
                   day.isToday
                     ? 'border-primary bg-primary/10'
                     : day.completed
-                      ? 'border-green-200 bg-green-50 hover:bg-green-100'
+                      ? 'border-green-600 bg-green-600/10 hover:bg-green-600/20'
                       : 'border-border bg-card'
                 } ${(day.workoutSession || day.plannedWorkout) ? 'hover:shadow-md' : ''}`}
                 onClick={() => handleDayClick(day)}
@@ -111,61 +115,6 @@ export default function WeeklyProgress() {
               </div>
             ))}
           </div>
-          
-          {/* Quick Stats */}
-          <div className="flex items-center justify-between mt-4 pt-4 border-t">
-            <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="flex items-center gap-1">
-                🔥 {stats.streakCount} day streak
-              </Badge>
-              <Badge variant="outline" className="flex items-center gap-1">
-                💪 {stats.xpEarned} XP earned
-              </Badge>
-              <Badge variant="outline" className="flex items-center gap-1">
-                🎯 {stats.totalExercises} exercises
-              </Badge>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {stats.completedDays === 7 
-                ? "Perfect week! 🎉" 
-                : `${7 - stats.completedDays} more to complete the week`
-              }
-            </div>
-          </div>
-          
-          {/* Today's Workout Preview */}
-          {todaysWorkout.length > 0 && (
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="text-blue-600">🎯</div>
-                <div className="text-sm font-medium text-blue-800">Today's Workout Plan</div>
-              </div>
-              <div className="space-y-1">
-                {todaysWorkout.map((exercise, index) => (
-                  <div key={index} className="text-xs text-blue-700">
-                    • {exercise}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Recent Workout Summary */}
-          {recentWorkouts.length > 0 && (
-            <div className="mt-4 p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="text-green-600">📈</div>
-                <div className="text-sm font-medium text-green-800">Recent Workouts</div>
-              </div>
-              <div className="space-y-1">
-                {recentWorkouts.map((workout, index) => (
-                  <div key={index} className="text-xs text-green-700">
-                    • {workout}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
           
           {/* Exercise Details Modal */}
           <Modal 
@@ -263,33 +212,6 @@ export default function WeeklyProgress() {
               </div>
             )}
           </Modal>
-          
-          {/* Click instruction for days with workouts */}
-          {weekDays.some(day => day.workoutSession || day.plannedWorkout) && (
-            <div className="mt-3 text-center">
-              <div className="text-xs text-muted-foreground">
-                💡 Click on days with workouts to see exercise details
-              </div>
-            </div>
-          )}
-          
-          {/* Motivational Message */}
-          {motivationalMessage && (
-            <div className="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
-              <div className="text-sm font-medium text-purple-800">{motivationalMessage}</div>
-            </div>
-          )}
-          
-          {/* Achievements */}
-          {achievements.length > 0 && (
-            <div className="mt-3 space-y-1">
-              {achievements.slice(0, 3).map((achievement, index) => (
-                <div key={index} className="text-xs text-green-700 bg-green-50 px-2 py-1 rounded-full inline-block mr-2">
-                  {achievement}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       )}
     </div>

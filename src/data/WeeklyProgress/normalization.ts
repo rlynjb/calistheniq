@@ -4,7 +4,7 @@
 import { WeekDay, WeeklyStats, WeeklyProgressData, mockWeeklyProgressData, sampleWorkouts, todaysPlannedWorkout, WorkoutSession } from './mock'
 
 /**
- * Generate weekly progress data for the past 7 days
+ * Generate weekly progress data for the current week (Sunday to Saturday)
  * Creates deterministic completion pattern to avoid hydration mismatch
  * Now includes workout session data for completed and planned workouts
  */
@@ -12,16 +12,26 @@ export function generateWeeklyProgress(): WeekDay[] {
   const today = new Date()
   const weekDays: WeekDay[] = []
   
-  // Get the past 7 days
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today)
-    date.setDate(today.getDate() - i)
+  // Get the start of the current week (Sunday)
+  const currentDay = today.getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  const startOfWeek = new Date(today)
+  startOfWeek.setDate(today.getDate() - currentDay)
+  
+  // Generate all 7 days of the week (Sunday to Saturday)
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(startOfWeek)
+    date.setDate(startOfWeek.getDate() + i)
+    
+    // Check if this date is today
+    const isToday = date.toDateString() === today.toDateString()
+    
+    // Check if this date is in the past (for completion logic)
+    const isPast = date < today
     
     // Deterministic completion based on date (to avoid hydration mismatch)
-    // Use day of month to create consistent pattern
+    // Use day of month to create consistent pattern, but only for past days
     const dayNum = date.getDate()
-    const completed = (dayNum % 3 !== 0) && i !== 0 && i !== 1 // Skip today and yesterday, pattern based on date
-    const isToday = i === 0
+    const completed = isPast && (dayNum % 3 !== 0) // Pattern based on date, only for past days
     
     // Assign workout sessions based on day pattern
     let workoutSession: WorkoutSession | undefined
@@ -29,7 +39,7 @@ export function generateWeeklyProgress(): WeekDay[] {
     
     if (completed) {
       // Assign a workout session based on the day index to create variety
-      const workoutIndex = (6 - i) % sampleWorkouts.length
+      const workoutIndex = i % sampleWorkouts.length
       workoutSession = sampleWorkouts[workoutIndex]
     }
     
@@ -57,9 +67,33 @@ export function generateWeeklyProgress(): WeekDay[] {
  */
 export function calculateWeeklyStats(weekDays: WeekDay[]): WeeklyStats {
   const completedDays = weekDays.filter(day => day.completed).length
-  const reversedWeekDays = [...weekDays].reverse()
-  const currentStreak = reversedWeekDays.findIndex(day => !day.completed)
-  const streakCount = currentStreak === -1 ? weekDays.length - 1 : currentStreak
+  
+  // Calculate current streak (counting backwards from today or most recent completed day)
+  const today = new Date()
+  let streakCount = 0
+  
+  // Find today's index in the week
+  const todayIndex = weekDays.findIndex(day => day.isToday)
+  
+  if (todayIndex !== -1) {
+    // Count backwards from today to find current streak
+    for (let i = todayIndex - 1; i >= 0; i--) {
+      if (weekDays[i].completed) {
+        streakCount++
+      } else {
+        break
+      }
+    }
+  } else {
+    // If today is not in this week, count from the end
+    for (let i = weekDays.length - 1; i >= 0; i--) {
+      if (weekDays[i].completed) {
+        streakCount++
+      } else {
+        break
+      }
+    }
+  }
   
   // Calculate total exercises and XP from completed workouts
   let totalExercises = 0

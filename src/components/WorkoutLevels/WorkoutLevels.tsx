@@ -6,6 +6,7 @@ import type {
   BaseExerciseSet,
 } from '@/types'
 import { workoutLevels } from '@/data/WorkoutLevels'
+import './WorkoutLevels.css'
 
 export default function WorkoutLevels() {
   return (

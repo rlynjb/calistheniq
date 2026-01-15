@@ -7,6 +7,7 @@ import type {
 } from '@/types'
 import { getLevelByIndex } from '@/data/WorkoutLevels'
 import { currentLevelData, type MovementCategory } from '@/data/CurrentLevel'
+import './CurrentLevel.css'
 
 export default function CurrentLevel() {
   const { 
