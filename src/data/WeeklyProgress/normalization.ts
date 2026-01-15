@@ -1,7 +1,7 @@
 // WeeklyProgress Normalization Functions
 // Business logic for processing weekly progress data
 
-import { WeekDay, WeeklyProgressData, mockWeeklyProgressData, sampleWorkouts, todaysPlannedWorkout, WorkoutSession } from './mock'
+import { WeekDay, WeeklyProgressData, mockWeeklyProgressData, sampleWorkouts, todaysTodayWorkout, WorkoutSession } from './mock'
 
 /**
  * Generate weekly progress data for the current week (Sunday to Saturday)
@@ -32,9 +32,9 @@ export function generateWeeklyProgress(): WeekDay[] {
     )
     
     // Find planned workouts for this day (including today)
-    let plannedWorkout: WorkoutSession | undefined
-    if (isToday && todaysPlannedWorkout.date.toDateString() === date.toDateString()) {
-      plannedWorkout = todaysPlannedWorkout
+    let todayWorkout: WorkoutSession | undefined
+    if (isToday && todaysTodayWorkout.date.toDateString() === date.toDateString()) {
+      todayWorkout = todaysTodayWorkout
     }
     
     const completed = !!completedWorkout
@@ -44,7 +44,7 @@ export function generateWeeklyProgress(): WeekDay[] {
       completed,
       isToday,
       completedWorkout,
-      plannedWorkout
+      todayWorkout
     })
   }
   
@@ -56,9 +56,9 @@ export function generateWeeklyProgress(): WeekDay[] {
  */
 export function getTodaysWorkoutPreview(weekDays: WeekDay[]): string[] {
   const today = weekDays.find(day => day.isToday)
-  if (!today?.plannedWorkout) return []
+  if (!today?.todayWorkout) return []
   
-  return today.plannedWorkout.exercises.map(exercise => 
+  return today.todayWorkout.exercises.map(exercise => 
     `${exercise.name} (${exercise.sets.length} sets)`
   )
 }

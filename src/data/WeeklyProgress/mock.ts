@@ -16,7 +16,7 @@ export interface WeekDay {
   completed: boolean
   isToday: boolean
   completedWorkout?: WorkoutSession // Completed workout data
-  plannedWorkout?: WorkoutSession // What's planned for today/future
+  todayWorkout?: WorkoutSession // What's planned for today/future
 }
 
 export interface WeeklyProgressData {
@@ -122,7 +122,7 @@ const sampleWorkouts: WorkoutSession[] = [
 ]
 
 // Today's planned workout
-const todaysPlannedWorkout: WorkoutSession = {
+const todaysTodayWorkout: WorkoutSession = {
   exercises: [
     {
       name: "Incline Push-ups",
@@ -159,4 +159,4 @@ const mockWeeklyProgressData: WeeklyProgressData = {
   weekDays: [] // Will be generated dynamically
 }
 
-export { mockWeeklyProgressData, sampleWorkouts, todaysPlannedWorkout }
+export { mockWeeklyProgressData, sampleWorkouts, todaysTodayWorkout }

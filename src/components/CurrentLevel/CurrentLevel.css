@@ -55,10 +55,6 @@
   font-size: 0.875rem;
 }
 
-.current-level__current-label {
-  color: rgb(107 114 128);
-}
-
 .current-level__current-value {
   font-weight: 500;
 }
@@ -72,12 +68,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
-
-.current-level__exercises-title {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: rgb(107 114 128);
 }
 
 .current-level__exercises-grid {

@@ -36,7 +36,6 @@ export default function CurrentLevel() {
               
               <div className="current-level__category-content">
                 <div className="current-level__current-info">
-                  <span className="current-level__current-label">Current: </span>
                   <span className="current-level__current-value">{levelInfo.name}</span>
                 </div>
                 
@@ -45,7 +44,6 @@ export default function CurrentLevel() {
                 )}
                 
                 <div className="current-level__exercises">
-                  <h4 className="current-level__exercises-title">Current Exercises:</h4>
                   <div className="current-level__exercises-grid">
                     {levelInfo?.exercises[category as MovementCategory]?.map((exercise: Exercise, index: number) => (
                       <ExerciseCard 

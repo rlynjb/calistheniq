@@ -25,7 +25,7 @@ export default function WeeklyProgress() {
   const { weekDays } = progressData
 
   const handleDayClick = (day: WeekDay) => {
-    if (day.completedWorkout || day.plannedWorkout) {
+    if (day.completedWorkout || day.todayWorkout) {
       setSelectedDay(day)
       setIsModalOpen(true)
     }
@@ -85,7 +85,7 @@ export default function WeeklyProgress() {
                     : day.completed
                       ? 'weekly-progress__day--completed'
                       : 'weekly-progress__day--default'
-                } ${(day.completedWorkout || day.plannedWorkout) ? 'weekly-progress__day--with-workout' : ''}`}
+                } ${(day.completedWorkout || day.todayWorkout) ? 'weekly-progress__day--with-workout' : ''}`}
                 onClick={() => handleDayClick(day)}
               >
                 <div className="weekly-progress__day-name">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
@@ -106,9 +106,9 @@ export default function WeeklyProgress() {
                     {day.completedWorkout.exercises.length} ex
                   </div>
                 )}
-                {day.plannedWorkout && (
+                {day.todayWorkout && (
                   <div className="weekly-progress__exercise-count weekly-progress__exercise-count--planned">
-                    {day.plannedWorkout.exercises.length} planned
+                    {day.todayWorkout.exercises.length} planned
                   </div>
                 )}
               </div>
@@ -123,14 +123,8 @@ export default function WeeklyProgress() {
           >
             {selectedDay && (
               <div className="weekly-progress__modal-content">
-                <div className="weekly-progress__modal-badges">
-                  {selectedDay.completed && <Badge variant="outline" className="weekly-progress__modal-badge">Completed</Badge>}
-                  {selectedDay.isToday && <Badge variant="default" className="weekly-progress__modal-badge">Today</Badge>}
-                </div>
-                
                 {selectedDay.completedWorkout && (
                   <div className="weekly-progress__workout-section weekly-progress__workout-section--completed">
-                    <h3 className="weekly-progress__workout-title weekly-progress__workout-title--completed">Completed Workout</h3>
                     <div className="weekly-progress__workout-meta weekly-progress__workout-meta--completed">
                       Completed: {selectedDay.completedWorkout.date.toLocaleString('en-US', { 
                         weekday: 'short', 
@@ -155,11 +149,10 @@ export default function WeeklyProgress() {
                   </div>
                 )}
                 
-                {selectedDay.plannedWorkout && (
+                {selectedDay.todayWorkout && (
                   <div className="weekly-progress__workout-section weekly-progress__workout-section--planned">
-                    <h3 className="weekly-progress__workout-title weekly-progress__workout-title--planned">Planned Workout</h3>
                     <div className="weekly-progress__workout-meta weekly-progress__workout-meta--planned">
-                      Planned for: {selectedDay.plannedWorkout.date.toLocaleString('en-US', { 
+                      Today: {selectedDay.todayWorkout.date.toLocaleString('en-US', { 
                         weekday: 'short', 
                         month: 'short', 
                         day: 'numeric', 
@@ -167,11 +160,11 @@ export default function WeeklyProgress() {
                         minute: '2-digit',
                         hour12: true 
                       })} | 
-                      Duration: {selectedDay.plannedWorkout.duration}min | 
-                      Categories: {selectedDay.plannedWorkout.categories.join(', ')}
+                      Duration: {selectedDay.todayWorkout.duration}min | 
+                      Categories: {selectedDay.todayWorkout.categories.join(', ')}
                     </div>
                     <div className="weekly-progress__exercise-list">
-                      {selectedDay.plannedWorkout.exercises.map((exercise, exIndex) => (
+                      {selectedDay.todayWorkout.exercises.map((exercise, exIndex) => (
                         <ExerciseCard 
                           key={exIndex}
                           exercise={exercise}
