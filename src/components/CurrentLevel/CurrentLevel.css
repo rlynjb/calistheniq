@@ -80,20 +80,10 @@
   color: rgb(107 114 128);
 }
 
-.current-level__exercise-item {
-  background-color: hsl(var(--secondary) / 0.3);
-  border-radius: 0.25rem;
-  padding: 0.5rem;
-}
-
-.current-level__exercise-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.current-level__exercise-sets {
-  font-size: 0.75rem;
-  color: rgb(107 114 128);
+.current-level__exercises-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .current-level__next-level {

@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Modal } from '@/components/ui/modal'
+import { Badge, ExerciseCard, Modal } from '@/components/ui'
 import { 
   weeklyProgressData, 
   generateCompleteWeeklyProgress,
@@ -146,29 +145,11 @@ export default function WeeklyProgress() {
                     </div>
                     <div className="weekly-progress__exercise-list">
                       {selectedDay.completedWorkout.exercises.map((exercise, exIndex) => (
-                        <div key={exIndex} className="weekly-progress__exercise-item weekly-progress__exercise-item--completed">
-                          <div className="weekly-progress__exercise-name weekly-progress__exercise-name--completed">{exercise.name}</div>
-                          <div className="weekly-progress__exercise-sets weekly-progress__exercise-sets--completed">
-                            {exercise.sets.map((set, setIndex) => 
-                              'reps' in set ? `${set.reps} reps` : `${set.duration}s`
-                            ).join(' → ')}
-                          </div>
-                          {exercise.equipment && (
-                            <div className="weekly-progress__exercise-detail weekly-progress__exercise-detail--completed">
-                              Equipment: {exercise.equipment}
-                            </div>
-                          )}
-                          {exercise.tempo && (
-                            <div className="weekly-progress__exercise-detail weekly-progress__exercise-detail--completed">
-                              Tempo: {exercise.tempo}
-                            </div>
-                          )}
-                          {exercise.rest && (
-                            <div className="weekly-progress__exercise-detail weekly-progress__exercise-detail--completed">
-                              Rest: {exercise.rest}s
-                            </div>
-                          )}
-                        </div>
+                        <ExerciseCard 
+                          key={exIndex}
+                          exercise={exercise}
+                          className="weekly-progress__exercise-card weekly-progress__exercise-card--completed"
+                        />
                       ))}
                     </div>
                   </div>
@@ -191,34 +172,11 @@ export default function WeeklyProgress() {
                     </div>
                     <div className="weekly-progress__exercise-list">
                       {selectedDay.plannedWorkout.exercises.map((exercise, exIndex) => (
-                        <div key={exIndex} className="weekly-progress__exercise-item weekly-progress__exercise-item--planned">
-                          <div className="weekly-progress__exercise-name weekly-progress__exercise-name--planned">{exercise.name}</div>
-                          <div className="weekly-progress__exercise-sets weekly-progress__exercise-sets--planned">
-                            {exercise.sets.map((set, setIndex) => 
-                              'reps' in set ? `${set.reps} reps` : `${set.duration}s`
-                            ).join(' → ')}
-                          </div>
-                          {exercise.equipment && (
-                            <div className="weekly-progress__exercise-detail weekly-progress__exercise-detail--planned">
-                              Equipment: {exercise.equipment}
-                            </div>
-                          )}
-                          {exercise.tempo && (
-                            <div className="weekly-progress__exercise-detail weekly-progress__exercise-detail--planned">
-                              Tempo: {exercise.tempo}
-                            </div>
-                          )}
-                          {exercise.rest && (
-                            <div className="weekly-progress__exercise-detail weekly-progress__exercise-detail--planned">
-                              Rest: {exercise.rest}s
-                            </div>
-                          )}
-                          {exercise.notes && (
-                            <div className="weekly-progress__exercise-notes weekly-progress__exercise-notes--planned">
-                              💡 {exercise.notes}
-                            </div>
-                          )}
-                        </div>
+                        <ExerciseCard 
+                          key={exIndex}
+                          exercise={exercise}
+                          className="weekly-progress__exercise-card weekly-progress__exercise-card--planned"
+                        />
                       ))}
                     </div>
                   </div>

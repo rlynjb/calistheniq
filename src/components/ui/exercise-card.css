@@ -1,0 +1,68 @@
+/* ExerciseCard Component Styles */
+
+.exercise-card {
+  background-color: hsl(var(--secondary) / 0.3);
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+}
+
+.exercise-card__name {
+  font-weight: 500;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.exercise-card__equipment-badge {
+  margin-bottom: 0.5rem;
+}
+
+.exercise-card__equipment-badge-inner {
+  font-size: 0.75rem;
+  background-color: rgb(31 41 55);
+  color: rgb(209 213 219);
+  border-color: rgb(75 85 99);
+}
+
+.exercise-card__sets-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.exercise-card__sets-row {
+  font-size: 0.75rem;
+}
+
+.exercise-card__sets-label {
+  color: rgb(107 114 128);
+}
+
+.exercise-card__sets-list {
+  font-weight: 500;
+}
+
+.exercise-card__exercise-meta {
+  font-size: 0.75rem;
+}
+
+.exercise-card__meta-label {
+  color: rgb(107 114 128);
+}
+
+.exercise-card__meta-label--spaced {
+  margin-left: 0.75rem;
+}
+
+.exercise-card__meta-value {
+  font-weight: 500;
+}
+
+.exercise-card__notes {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgb(31 41 55);
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  color: rgb(156 163 175);
+  border-left: 3px solid rgb(59 130 246);
+}

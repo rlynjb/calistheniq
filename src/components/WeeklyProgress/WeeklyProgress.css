@@ -246,66 +246,16 @@
   gap: 0.5rem;
 }
 
-.weekly-progress__exercise-item {
-  padding: 0.75rem;
-  border-radius: 0.5rem;
+.weekly-progress__exercise-card {
   border-left: 4px solid;
 }
 
-.weekly-progress__exercise-item--completed {
+.weekly-progress__exercise-card--completed {
   background-color: rgb(20 83 45 / 0.1);
   border-left-color: rgb(34 197 94);
 }
 
-.weekly-progress__exercise-item--planned {
+.weekly-progress__exercise-card--planned {
   background-color: rgb(30 58 138 / 0.1);
   border-left-color: rgb(96 165 250);
-}
-
-.weekly-progress__exercise-name {
-  font-weight: 500;
-}
-
-.weekly-progress__exercise-name--completed {
-  color: rgb(74 222 128);
-}
-
-.weekly-progress__exercise-name--planned {
-  color: rgb(129 140 248);
-}
-
-.weekly-progress__exercise-sets {
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
-.weekly-progress__exercise-sets--completed {
-  color: rgb(34 197 94);
-}
-
-.weekly-progress__exercise-sets--planned {
-  color: rgb(96 165 250);
-}
-
-.weekly-progress__exercise-detail {
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-.weekly-progress__exercise-detail--completed {
-  color: rgb(34 197 94);
-}
-
-.weekly-progress__exercise-detail--planned {
-  color: rgb(96 165 250);
-}
-
-.weekly-progress__exercise-notes {
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  font-style: italic;
-}
-
-.weekly-progress__exercise-notes--planned {
-  color: rgb(96 165 250);
 }

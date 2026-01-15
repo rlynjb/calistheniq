@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
+import { Badge, ExerciseCard } from '@/components/ui'
 import type { 
   BaseExercise as Exercise 
 } from '@/types'
@@ -46,16 +46,15 @@ export default function CurrentLevel() {
                 
                 <div className="current-level__exercises">
                   <h4 className="current-level__exercises-title">Current Exercises:</h4>
-                  {levelInfo?.exercises[category as MovementCategory]?.map((exercise: Exercise, index: number) => (
-                    <div key={index} className="current-level__exercise-item">
-                      <div className="current-level__exercise-name">{exercise.name}</div>
-                      <div className="current-level__exercise-sets">
-                        {exercise.sets.length} Sets: {exercise.sets.map((set) => 
-                          'reps' in set ? set.reps : `${set.duration}s`
-                        ).join(' → ')}
-                      </div>
-                    </div>
-                  ))}
+                  <div className="current-level__exercises-grid">
+                    {levelInfo?.exercises[category as MovementCategory]?.map((exercise: Exercise, index: number) => (
+                      <ExerciseCard 
+                        key={index}
+                        exercise={exercise}
+                        className="current-level__exercise-card"
+                      />
+                    ))}
+                  </div>
                 </div>
                 
                 {nextLevel && (

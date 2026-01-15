@@ -1,10 +1,7 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import type {
-  BaseExercise,
-  BaseExerciseSet,
-} from '@/types'
+import { Badge, ExerciseCard } from '@/components/ui'
+import type { BaseExercise, BaseExerciseSet } from '@/types'
 import { workoutLevels } from '@/data/WorkoutLevels'
 import './WorkoutLevels.css'
 
@@ -38,36 +35,11 @@ export default function WorkoutLevels() {
                   
                   <div className="workout-levels__exercises">
                     {exercises.map((exercise: BaseExercise, exerciseIndex: number) => (
-                      <div key={exerciseIndex} className="workout-levels__exercise-card">
-                        <h5 className="workout-levels__exercise-name">{exercise.name}</h5>
-                        
-                        {exercise.equipment && (
-                          <div className="workout-levels__equipment-badge">
-                            <Badge variant="outline" className="workout-levels__equipment-badge-inner">
-                              {exercise.equipment}
-                            </Badge>
-                          </div>
-                        )}
-                        
-                        <div className="workout-levels__sets-info">
-                          {/* Sets, Tempo, and Rest in one line */}
-                          <div className="workout-levels__sets-row">
-                            <span className="workout-levels__sets-label">{exercise.sets.length} Sets: </span>
-                            <span className="workout-levels__sets-list">
-                              {exercise.sets.map((set: BaseExerciseSet, index: number) => 
-                                'reps' in set ? set.reps : `${set.duration}s`
-                              ).join(' → ')}
-                            </span>
-                          </div>
-                          
-                          <div className="workout-levels__exercise-meta">
-                            <span className="workout-levels__meta-label">Tempo: </span>
-                            <span className="workout-levels__meta-value">{exercise.tempo}</span>
-                            <span className="workout-levels__meta-label workout-levels__meta-label--spaced">Rest: </span>
-                            <span className="workout-levels__meta-value">{exercise.rest}s</span>
-                          </div>
-                        </div>
-                      </div>
+                      <ExerciseCard 
+                        key={exerciseIndex} 
+                        exercise={exercise}
+                        className="workout-levels__exercise-card"
+                      />
                     ))}
                   </div>
                 </div>
