@@ -4,9 +4,8 @@ import { Badge } from '@/components/ui/badge'
 import type {
   BaseExercise,
   BaseExerciseSet,
-  WorkoutLevel
 } from '@/types'
-import { workoutLevels } from '@/lib/mock'
+import { workoutLevels } from '@/data/WorkoutLevels'
 
 export default function WorkoutLevels() {
   return (

@@ -5,7 +5,7 @@ import type {
   WorkoutLevel, 
   BaseExercise as Exercise 
 } from '@/types'
-import { workoutLevels, getLevelByIndex } from '@/lib/mock'
+import { getLevelByIndex } from '@/data/WorkoutLevels'
 
 // Local types for this component
 interface CurrentUserLevels {
