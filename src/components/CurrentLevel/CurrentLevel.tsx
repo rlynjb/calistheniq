@@ -2,7 +2,6 @@
 
 import { Badge } from '@/components/ui/badge'
 import type { 
-  WorkoutLevel, 
   BaseExercise as Exercise 
 } from '@/types'
 import { getLevelByIndex } from '@/data/WorkoutLevels'
@@ -12,7 +11,6 @@ import './CurrentLevel.css'
 export default function CurrentLevel() {
   const { 
     currentLevels, 
-    progressStats, 
     personalizedRecommendations 
   } = currentLevelData
 
@@ -80,51 +78,6 @@ export default function CurrentLevel() {
             </div>
           )
         })}
-      </div>
-      
-      {/* Progress Summary */}
-      <div className="current-level__progress-summary">
-        <div className="current-level__progress-header">
-          <div className="current-level__progress-icon">📊</div>
-          <h3 className="current-level__progress-title">Progress Summary</h3>
-        </div>
-        
-        <div className="current-level__progress-grid">
-          <div className="current-level__progress-stats">
-            <div className="current-level__stat-item">
-              <span className="current-level__stat-label">Overall Level: </span>
-              <span className="current-level__stat-value">{progressStats.overallLevel}</span>
-            </div>
-            
-            <div className="current-level__stat-item">
-              <span className="current-level__stat-label">Strongest Area: </span>
-              <span className="current-level__stat-value current-level__stat-value--strong">{progressStats.strongestArea}</span>
-            </div>
-            
-            <div className="current-level__stat-item">
-              <span className="current-level__stat-label">Focus Area: </span>
-              <span className="current-level__stat-value current-level__stat-value--focus">{progressStats.focusArea}</span>
-            </div>
-          </div>
-          
-          <div className="current-level__progress-chart">
-            <div className="current-level__progress-info">
-              <span className="current-level__progress-label">Total Progression: </span>
-              <span className="current-level__progress-value">{progressStats.progressToMastery}%</span>
-            </div>
-            
-            <div className="current-level__progress-bar">
-              <div 
-                className="current-level__progress-fill"
-                style={{ width: `${progressStats.progressToMastery}%` }}
-              ></div>
-            </div>
-            
-            <div className="current-level__progress-caption">
-              Progress to mastery (Level 5 in all categories)
-            </div>
-          </div>
-        </div>
       </div>
       
       {/* Recommendations */}
