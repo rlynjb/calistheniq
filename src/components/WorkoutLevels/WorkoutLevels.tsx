@@ -3,50 +3,89 @@
 import { Badge, ExerciseCard } from '@/components/ui'
 import type { BaseExercise, BaseExerciseSet } from '@/types'
 import { workoutLevels } from '@/data/WorkoutLevels'
+import { currentLevelData } from '@/data/CurrentLevel'
 import './WorkoutLevels.css'
 
 export default function WorkoutLevels() {
+  const { currentLevels } = currentLevelData
+  
   return (
     <div className="workout-levels">
       <div className="workout-levels__description">
         Progressive calisthenics exercises organized by difficulty levels
       </div>
       
-      <div className="workout-levels__container">
-        {Object.entries(workoutLevels).map(([levelKey, level], levelIndex) => (
-          <div key={levelKey} className="workout-levels__level-card">
-            <div className="workout-levels__level-header">
-              <Badge variant="outline" className="workout-levels__level-badge">
-                Level {levelIndex}
+      {/* Current Levels Overview */}
+      <div className="workout-levels__overview">
+        <div className="workout-levels__overview-header">
+          <div className="workout-levels__overview-icon">📊</div>
+          <div className="workout-levels__overview-title">Your Current Levels</div>
+        </div>
+        <div className="workout-levels__overview-grid">
+          {Object.entries(currentLevels).map(([category, level]) => (
+            <div key={category} className="workout-levels__overview-item">
+              <div className="workout-levels__overview-category">{category}</div>
+              <Badge variant="default" className="workout-levels__overview-badge">
+                Level {level}
               </Badge>
-              <h3 className="workout-levels__level-title">{level.name}</h3>
             </div>
-            
-            {level.description && (
-              <p className="workout-levels__level-description">{level.description}</p>
-            )}
-            
-            <div className="workout-levels__categories-grid">
-              {Object.entries(level.exercises).map(([category, exercises]) => (
-                <div key={category} className="workout-levels__category">
-                  <h4 className="workout-levels__category-title">
-                    {category}
-                  </h4>
+          ))}
+        </div>
+      </div>
+      
+      <div className="workout-levels__container">
+        {Object.entries(workoutLevels).map(([levelKey, level], levelIndex) => {
+          // Check if this is a current level for any category
+          const isCurrentLevel = Object.values(currentLevels).includes(levelIndex)
+          
+          return (
+            <div key={levelKey} className={`workout-levels__level-card ${isCurrentLevel ? 'workout-levels__level-card--current' : ''}`}>
+              <div className="workout-levels__level-header">
+                <Badge variant={isCurrentLevel ? "default" : "outline"} className="workout-levels__level-badge">
+                  Level {levelIndex}
+                </Badge>
+                <h3 className="workout-levels__level-title">{level.name}</h3>
+                {isCurrentLevel && (
+                  <Badge variant="secondary" className="workout-levels__current-indicator">
+                    Current
+                  </Badge>
+                )}
+              </div>
+              
+              {level.description && (
+                <p className="workout-levels__level-description">{level.description}</p>
+              )}
+              
+              <div className="workout-levels__categories-grid">
+                {Object.entries(level.exercises).map(([category, exercises]) => {
+                  // Check if this category is at current level
+                  const isCategoryAtCurrentLevel = currentLevels[category as keyof typeof currentLevels] === levelIndex
                   
-                  <div className="workout-levels__exercises">
-                    {exercises.map((exercise: BaseExercise, exerciseIndex: number) => (
-                      <ExerciseCard 
-                        key={exerciseIndex} 
-                        exercise={exercise}
-                        className="workout-levels__exercise-card"
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
+                  return (
+                    <div key={category} className={`workout-levels__category ${isCategoryAtCurrentLevel ? 'workout-levels__category--current' : ''}`}>
+                      <h4 className="workout-levels__category-title">
+                        {category}
+                        {isCategoryAtCurrentLevel && (
+                          <span className="workout-levels__category-indicator">● Current</span>
+                        )}
+                      </h4>
+                      
+                      <div className="workout-levels__exercises">
+                        {exercises.map((exercise: BaseExercise, exerciseIndex: number) => (
+                          <ExerciseCard 
+                            key={exerciseIndex} 
+                            exercise={exercise}
+                            className={`workout-levels__exercise-card ${isCategoryAtCurrentLevel ? 'workout-levels__exercise-card--current' : ''}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
       
       {/* Level Guidelines */}

@@ -19,7 +19,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       />
       
       {/* Modal Content */}
-      <div className="relative z-10 w-full max-w-2xl max-h-[80vh] mx-4 bg-gray-900 text-white rounded-lg shadow-xl overflow-hidden">
+      <div className="relative z-10 w-full max-w-4xl max-h-[80vh] mx-4 bg-gray-900 text-white rounded-lg shadow-xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <h2 className="text-lg font-semibold text-white">{title}</h2>
