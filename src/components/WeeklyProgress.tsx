@@ -3,7 +3,15 @@
 import { useState, useEffect } from 'react'
 import { CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import type { WeekDay } from '@/types'
+
+// Types for weekly progress tracking
+interface WeekDay {
+  date: Date
+  day: string
+  dayNum: number
+  completed: boolean
+  isToday: boolean
+}
 
 const generateWeeklyProgress = (): WeekDay[] => {
   const today = new Date()

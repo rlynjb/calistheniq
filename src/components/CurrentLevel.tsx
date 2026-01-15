@@ -3,10 +3,17 @@
 import { Badge } from '@/components/ui/badge'
 import type { 
   WorkoutLevels, 
-  CurrentUserLevels,
-  MovementCategory,
-  Exercise 
+  BaseExercise as Exercise 
 } from '@/types'
+
+// Local types for this component
+interface CurrentUserLevels {
+  Push: number
+  Pull: number
+  Squat: number
+}
+
+type MovementCategory = keyof CurrentUserLevels
 
 // Mock data for workout levels - Progressive calisthenics exercises
 const workoutLevels: WorkoutLevels = {

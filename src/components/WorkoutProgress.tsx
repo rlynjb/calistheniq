@@ -2,9 +2,40 @@
 
 import { Badge } from '@/components/ui/badge'
 import type { 
-  CompletedWorkout, 
-  PlannedWorkout
+  BaseExerciseSet,
+  BaseExercise
 } from '@/types'
+
+// Local types for completed workout tracking
+interface CompletedSet extends BaseExerciseSet {
+  completed: boolean
+}
+
+interface CompletedExercise extends BaseExercise {
+  sets: CompletedSet[]
+}
+
+interface CompletedWorkout {
+  date: Date
+  duration: number
+  exercises: CompletedExercise[]
+}
+
+// Local types for planned workout functionality
+interface TargetSet extends BaseExerciseSet {}
+
+interface PlannedExercise {
+  name: string
+  tempo?: string
+  rest?: number
+  equipment?: string
+  notes?: string
+  targetSets: TargetSet[]
+}
+
+interface PlannedWorkout {
+  exercises: PlannedExercise[]
+}
 
 // Mock data for exercise history and current workout
 const mockLastWorkout: CompletedWorkout = {
@@ -13,25 +44,31 @@ const mockLastWorkout: CompletedWorkout = {
   exercises: [
     {
       name: "Push-ups",
+      tempo: "2-1-2-1",
+      rest: 60,
       sets: [
-        { reps: 8, tempo: "2-1-2-1", rest: 60, completed: true },
-        { reps: 6, tempo: "2-1-2-1", rest: 60, completed: true },
-        { reps: 5, tempo: "2-1-2-1", rest: 60, completed: true }
+        { reps: 8, completed: true },
+        { reps: 6, completed: true },
+        { reps: 5, completed: true }
       ]
     },
     {
       name: "Pike Push-ups",
+      tempo: "2-1-2-1",
+      rest: 90,
       sets: [
-        { reps: 5, tempo: "2-1-2-1", rest: 90, completed: true },
-        { reps: 4, tempo: "2-1-2-1", rest: 90, completed: true },
-        { reps: 3, tempo: "2-1-2-1", rest: 90, completed: false }
+        { reps: 5, completed: true },
+        { reps: 4, completed: true },
+        { reps: 3, completed: false }
       ]
     },
     {
       name: "Plank Hold",
+      tempo: "hold",
+      rest: 60,
       sets: [
-        { duration: 45, tempo: "hold", rest: 60, completed: true },
-        { duration: 35, tempo: "hold", rest: 60, completed: true }
+        { duration: 45, completed: true },
+        { duration: 35, completed: true }
       ]
     }
   ]
@@ -41,29 +78,35 @@ const mockTodaysWorkout: PlannedWorkout = {
   exercises: [
     {
       name: "Push-ups",
+      tempo: "2-1-2-1",
+      rest: 60,
       targetSets: [
-        { reps: 10, tempo: "2-1-2-1", rest: 60 },
-        { reps: 8, tempo: "2-1-2-1", rest: 60 },
-        { reps: 6, tempo: "2-1-2-1", rest: 60 }
+        { reps: 10 },
+        { reps: 8 },
+        { reps: 6 }
       ],
-      progression: "Increase reps by 2 from last session"
+      notes: "Increase reps by 2 from last session"
     },
     {
-      name: "Pike Push-ups", 
+      name: "Pike Push-ups",
+      tempo: "2-1-2-1", 
+      rest: 90,
       targetSets: [
-        { reps: 6, tempo: "2-1-2-1", rest: 90 },
-        { reps: 5, tempo: "2-1-2-1", rest: 90 },
-        { reps: 4, tempo: "2-1-2-1", rest: 90 }
+        { reps: 6 },
+        { reps: 5 },
+        { reps: 4 }
       ],
-      progression: "Focus on completing all sets"
+      notes: "Focus on completing all sets"
     },
     {
       name: "Plank Hold",
+      tempo: "hold",
+      rest: 60,
       targetSets: [
-        { duration: 50, tempo: "hold", rest: 60 },
-        { duration: 45, tempo: "hold", rest: 60 }
+        { duration: 50 },
+        { duration: 45 }
       ],
-      progression: "Hold 5 seconds longer than last time"
+      notes: "Hold 5 seconds longer than last time"
     }
   ]
 }
@@ -115,9 +158,9 @@ export default function WorkoutProgress() {
                   
                   <div className="text-xs">
                     <span className="text-muted-foreground">Tempo: </span>
-                    <span className="font-medium">{exercise.sets[0].tempo}</span>
+                    <span className="font-medium">{exercise.tempo}</span>
                     <span className="text-muted-foreground ml-3">Rest: </span>
-                    <span className="font-medium">{exercise.sets[0].rest}s</span>
+                    <span className="font-medium">{exercise.rest}s</span>
                   </div>
                 </div>
               </div>
@@ -156,15 +199,15 @@ export default function WorkoutProgress() {
                   
                   <div className="text-xs">
                     <span className="text-muted-foreground">Tempo: </span>
-                    <span className="font-medium">{exercise.targetSets[0].tempo}</span>
+                    <span className="font-medium">{exercise.tempo}</span>
                     <span className="text-muted-foreground ml-3">Rest: </span>
-                    <span className="font-medium">{exercise.targetSets[0].rest}s</span>
+                    <span className="font-medium">{exercise.rest}s</span>
                   </div>
                 </div>
                 
                 <div className="mt-2 p-2 bg-blue-100/50 rounded text-xs">
                   <div className="text-xs text-blue-600 font-medium mb-1">PROGRESSION NOTE</div>
-                  <div className="text-blue-800">{exercise.progression}</div>
+                  <div className="text-blue-800">{exercise.notes}</div>
                 </div>
               </div>
             ))}

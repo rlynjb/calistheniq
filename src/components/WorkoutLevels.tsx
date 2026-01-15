@@ -2,10 +2,8 @@
 
 import { Badge } from '@/components/ui/badge'
 import type {
-  Exercise,
-  ExerciseSet,
-  ExercisesByCategory,
-  WorkoutLevel,
+  BaseExercise,
+  BaseExerciseSet,
   WorkoutLevels
 } from '@/types'
 
@@ -161,7 +159,7 @@ export default function WorkoutLevels() {
                   </h4>
                   
                   <div className="space-y-3">
-                    {exercises.map((exercise: Exercise, exerciseIndex: number) => (
+                    {exercises.map((exercise: BaseExercise, exerciseIndex: number) => (
                       <div key={exerciseIndex} className="bg-secondary/30 rounded-md p-3">
                         <h5 className="font-medium text-sm mb-2">{exercise.name}</h5>
                         
@@ -178,7 +176,7 @@ export default function WorkoutLevels() {
                           <div className="text-xs">
                             <span className="text-muted-foreground">{exercise.sets.length} Sets: </span>
                             <span className="font-medium">
-                              {exercise.sets.map((set: ExerciseSet, index: number) => 
+                              {exercise.sets.map((set: BaseExerciseSet, index: number) => 
                                 'reps' in set ? set.reps : `${set.duration}s`
                               ).join(' → ')}
                             </span>
