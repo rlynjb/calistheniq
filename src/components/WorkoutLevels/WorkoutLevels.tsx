@@ -1,7 +1,7 @@
 'use client'
 
 import { Badge, ExerciseCard } from '@/components/ui'
-import type { BaseExercise, BaseExerciseSet } from '@/types'
+import type { BaseExercise, BaseExerciseSet, WorkoutLevel } from '@/types'
 import { workoutLevels } from '@/data/WorkoutLevels'
 import { currentLevelData } from '@/data/CurrentLevel'
 import './WorkoutLevels.css'
@@ -34,7 +34,7 @@ export default function WorkoutLevels() {
       </div>
       
       <div className="workout-levels__container">
-        {Object.entries(workoutLevels).map(([levelKey, level], levelIndex) => {
+        {(Object.entries(workoutLevels) as [string, WorkoutLevel][]).map(([levelKey, level], levelIndex) => {
           // Check if this is a current level for any category
           const isCurrentLevel = Object.values(currentLevels).includes(levelIndex)
           
