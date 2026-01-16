@@ -121,7 +121,7 @@ const sampleWorkouts: WorkoutSession[] = [
   }
 ]
 
-// Today's planned workout
+//Today's planned workout
 const todaysTodayWorkout: WorkoutSession = {
   exercises: [
     {
@@ -154,9 +154,4 @@ const todaysTodayWorkout: WorkoutSession = {
   date: new Date('2026-01-15T18:00:00') // Today - planned for evening
 }
 
-// Mock weekly progress data - simulates a realistic workout week
-const mockWeeklyProgressData: WeeklyProgressData = {
-  weekDays: [] // Will be generated dynamically
-}
-
-export { mockWeeklyProgressData, sampleWorkouts, todaysTodayWorkout }
+export { sampleWorkouts, todaysTodayWorkout }

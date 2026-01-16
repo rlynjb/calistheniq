@@ -4,26 +4,11 @@
 // Raw data and types
 export {
   mockCurrentUserLevels,
-  mockUserProgress,
-  mockUserMilestones,
   type CurrentUserLevels,
-  type MovementCategory,
-  type UserProgress,
-  type ProgressStats
+  type MovementCategory
 } from './mock'
 
-// Processed data and utilities
+// Processed data
 export {
-  currentLevelData,
-  
-  // Analysis functions
-  calculateOverallLevel,
-  findStrongestArea,
-  findFocusArea,
-  calculateProgressToMastery,
-  generateProgressStats,
-  generatePersonalizedRecommendations,
-  calculateDaysTraining,
-  calculateAverageWorkoutsPerWeek,
-  getNextLevelGoals
+  currentLevelData
 } from './normalization'
