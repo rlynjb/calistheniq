@@ -10,7 +10,6 @@ CalisthenIQ will be developed in three distinct phases, each building upon the p
 
 ## Phase 1: MVP - Core Multi-Agent Architecture
 
-**Timeline**: 8-12 weeks  
 **Goal**: Buildable, functional multi-agent calisthenics coach
 
 ### Core Features
@@ -27,18 +26,19 @@ CalisthenIQ will be developed in three distinct phases, each building upon the p
 ### Technical Implementation
 
 ```
-Week 1-2: Project Setup & Infrastructure
-- ✅ Next.js app with Tailwind CSS
-- ✅ Netlify Functions configuration
+### Project Setup & Infrastructure
+
+- ✅ Next.js app with Tailwind CSS - [Frontend Setup Guide](implementation/frontend/frontend-setup.md)
+- ✅ Netlify Functions configuration - [Netlify Functions Guide](implementation/backend/netlify-functions-configuration.md)
   - ✅ Supervisor/router implementation (basic structure)
   - ✅ State machine logic (basic transitions)
   - ⏸️ Session management (in-memory, needs database integration)
-- ✅ Type System & Data Modeling
+- ✅ Type System & Data Modeling - [Type System Guide](implementation/frontend/type-system-data-modeling.md)
   - ✅ Consolidate inline types into centralized definitions
   - ✅ Extract data patterns from mock data across components
   - ✅ Design normalized database entity relationships
   - ✅ Create type-to-schema mapping strategy
-- ✅ Database Schema Design & Implementation
+- ✅ Database Schema Design & Implementation - [Database Schema](implementation/backend/database-schema-design.md) | [Infrastructure](implementation/backend/database-infrastructure.md) | [Setup Guide](implementation/backend/database-setup.md)
   - ✅ Convert mock data structures to production database tables
   - ✅ Implement proper foreign key relationships and constraints
   - ✅ Set up database connection pooling and query optimization
@@ -46,7 +46,7 @@ Week 1-2: Project Setup & Infrastructure
   - ✅ Set up Neon/Postgres database instance
   - ✅ Create tables and initial database structure (10 tables operational)
   - ✅ Configure database connection and environment variables
-- ✅ Frontend Data Service Layer
+- ✅ Frontend Data Service Layer - [Data Service Guide](implementation/frontend/data-service-layer.md)
   - ✅ Create unified data service interface in src/lib/data-service/
   - ✅ Implement mock/production data switching with feature flags
   - ✅ Build API client with automatic fallbacks and error handling
@@ -54,13 +54,30 @@ Week 1-2: Project Setup & Infrastructure
   - ✅ Create React hooks for data service integration (useWorkoutLevels, useCurrentLevels)
   - ✅ Add environment-based configuration and gradual migration strategy
   - ✅ Implement placeholder API endpoints ready for netlify functions integration
+- ✅ Exercises API Endpoint Implementation - [Exercises Endpoint Guide](implementation/backend/exercises-endpoint.md)
+  - ✅ Create /.netlify/functions/exercises endpoint with flexible filtering
+  - ✅ Support flat and grouped response formats for different use cases
+  - ✅ Implement query parameter filtering (level, category, grouped)
+  - ✅ Integrate with existing database queries (getExercisesWithDifficulty)
+  - ✅ Add comprehensive error handling and CORS configuration
+  - ✅ Document API specification and integration patterns
+  - ✅ Maintain backward compatibility with automatic fallbacks to mock data
+- ⏸️ Frontend Integration & Code Quality
+  - ⏸️ Wire up exercises endpoint to data service layer (ExerciseService)
+  - ⏸️ Update frontend components to use API instead of mock data
+  - ⏸️ Test end-to-end integration (database → API → frontend)
+  - ⏸️ Review and refactor codebase for consistency and maintainability
+  - ⏸️ Clean up unused imports and deprecated mock data dependencies
+  - ⏸️ Remove unnecessary code and consolidate duplicate logic
+  - ⏸️ Verify type safety across all layers (database → API → frontend)
 - ⏸️ OpenAI setup and configuration
   - ✅ Set up OpenAI API account and billing
   - ✅ Configure OpenAI API keys and environment variables
   - ✅ Install OpenAI SDK dependencies
   - ⏸️ Basic OpenAI connection testing and validation
 
-Week 3-4: Core Integration
+### Core Integration
+
 - ⏸️ Database integration (replace in-memory storage)
   - ⏸️ Replace Map<string, SessionContext> with Postgres tables
   - ⏸️ Implement persistent session storage and user profiles
@@ -72,22 +89,26 @@ Week 3-4: Core Integration
   - ⏸️ Response handling & streaming implementation
 - ⏸️ Function calling tools implementation
 
-Week 5-6: Agent Implementation
+### Agent Implementation
+
 - ⏸️ Intake & Safety Agent + save_profile tool
 - ⏸️ Program Designer Agent + create_session tool
 - ✅ Basic exercise library (static JSON) *(in database)*
 
-Week 7-8: Workout Execution
+### Workout Execution
+
 - ⏸️ Technique Coach Agent + log_set tool
 - ⏸️ Gamification Agent + award_xp tool
 - ⏸️ Frontend workout card interface
 
-Week 9-10: Integration & Testing
+### Integration & Testing
+
 - ⏸️ End-to-end user flows
 - ⏸️ Error handling and edge cases
 - ⏸️ Performance optimization
 
-Week 11-12: Polish & Deploy
+### Polish & Deploy
+
 - ⏸️ UI/UX refinements
 - ⏸️ Documentation
 - ⏸️ Production deployment
