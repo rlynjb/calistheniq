@@ -2,24 +2,28 @@
 
 import { useState, useEffect } from 'react'
 import { CardDescription } from '@/components/ui/card'
-import { Badge, ExerciseCard, Modal } from '@/components/ui'
+import { ExerciseCard, Modal } from '@/components/ui'
 import { 
-  weeklyProgressData, 
-  generateCompleteWeeklyProgress,
   type WeekDay,
 } from '@/lib/data-service/mock-data/WeeklyProgress'
+import { dataService } from '@/lib/data-service'
 import './WeeklyProgress.css'
 
 export default function WeeklyProgress() {
-  const [progressData, setProgressData] = useState(weeklyProgressData)
+  const [progressData, setProgressData] = useState<{ weekDays: WeekDay[] }>({ weekDays: [] })
   const [isClient, setIsClient] = useState(false)
   const [selectedDay, setSelectedDay] = useState<WeekDay | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
-    // Regenerate data on client to ensure fresh dates
-    setProgressData(generateCompleteWeeklyProgress())
+    
+    const fetchProgress = async () => {
+      const data = await dataService.userProgress.getWeeklyProgress()
+      setProgressData(data)
+    }
+    
+    fetchProgress()
   }, [])
 
   const { weekDays } = progressData
