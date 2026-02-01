@@ -1,7 +1,7 @@
 // WeeklyProgress Mock Data
 // Raw data types and mock data for weekly progress tracking
 
-import type { BaseExercise } from '@/types'
+import type { BaseExercise } from '@/lib/data-service/ExerciseService/mocks/types'
 import type { WorkoutSession, WeekDay, WeeklyProgressData } from './types'
 
 // Sample workout sessions for mock data

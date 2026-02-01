@@ -1,7 +1,7 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import type { BaseExercise, BaseExerciseSet } from '@/types'
+import type { BaseExercise, BaseExerciseSet } from '@/lib/data-service/ExerciseService/mocks/types'
 import './exercise-card.css'
 
 /**

@@ -1,34 +1,55 @@
 /**
  * Exercise Data Service - Handles exercise and workout level data
+ * 
+ * Configure data source via: NEXT_PUBLIC_EXERCISE_SOURCE
+ * Options: 'mock' | 'api'
+ * Default: 'mock' (dev) | 'api' (prod)
  */
 
-import { apiClient } from '../api-client'
-import { DATA_SOURCE_CONFIG } from '../config'
+import { Api } from './api'
 
 // Import existing mock data
 import { workoutLevels } from './mocks'
 
 // Import types
-import type { BaseExercise } from '@/types'
-import type { WorkoutLevels, WorkoutLevel } from './mocks/types'
+import type { BaseExercise, WorkoutLevels, WorkoutLevel } from './mocks/types'
+
+// Data source type
+type DataSource = 'mock' | 'api'
 
 export class ExerciseService {
+  private static get dataSource(): DataSource {
+    const envSource = process.env.NEXT_PUBLIC_EXERCISE_SOURCE as DataSource | undefined
+    
+    // Use environment variable if specified
+    if (envSource) {
+      return envSource
+    }
+    
+    // Default: mock (dev) | api (prod)
+    return process.env.NODE_ENV === 'production' ? 'api' : 'mock'
+  }
+
   /**
    * Get all workout levels with exercises organized by difficulty
    */
   static async getWorkoutLevels(): Promise<WorkoutLevels> {
-    if (DATA_SOURCE_CONFIG.USE_MOCK_DATA || !DATA_SOURCE_CONFIG.FEATURES.USE_DATABASE_EXERCISES) {
-      // Return mock data
-      return Promise.resolve(workoutLevels)
-    }
+    const dataSource = this.dataSource
 
-    try {
-      // TODO: Replace with actual API endpoint
-      const response = await apiClient.get<WorkoutLevels>('/.netlify/functions/exercises/levels')
-      return response.data
-    } catch (error) {
-      console.warn('Failed to fetch workout levels from API, falling back to mock data:', error)
-      return workoutLevels
+    switch (dataSource) {
+      case 'mock':
+        return workoutLevels
+
+      case 'api':
+        try {
+          return await Api.getWorkoutLevels()
+        } catch (error) {
+          console.warn('API failed, falling back to mock:', error)
+          return workoutLevels
+        }
+
+      default:
+        return workoutLevels
     }
   }
 
@@ -36,30 +57,30 @@ export class ExerciseService {
    * Get exercises by level and category
    */
   static async getExercisesByLevel(level: number, category?: string): Promise<BaseExercise[]> {
-    if (DATA_SOURCE_CONFIG.USE_MOCK_DATA || !DATA_SOURCE_CONFIG.FEATURES.USE_DATABASE_EXERCISES) {
-      // Filter mock data
-      const levelData = workoutLevels[`level${level}` as keyof WorkoutLevels]
-      if (!levelData) return []
-      
-      if (category) {
-        return (levelData.exercises as any)[category] || []
-      }
-      
-      // Return all exercises for the level
-      return Object.values(levelData.exercises).flat() as BaseExercise[]
-    }
+    const dataSource = this.dataSource
 
-    try {
-      // TODO: Replace with actual API endpoint
-      const params: Record<string, string> = { level: level.toString() }
-      if (category) params.category = category
-      
-      const response = await apiClient.get<BaseExercise[]>('/.netlify/functions/exercises', params)
-      return response.data
-    } catch (error) {
-      console.warn('Failed to fetch exercises from API, falling back to mock data:', error)
-      const levelData = workoutLevels[`level${level}` as keyof WorkoutLevels]
-      return levelData ? Object.values(levelData.exercises).flat() as BaseExercise[] : []
+    switch (dataSource) {
+      case 'mock':
+        const levelData = workoutLevels[`level${level}` as keyof WorkoutLevels]
+        if (!levelData) return []
+        
+        if (category) {
+          return (levelData.exercises as any)[category] || []
+        }
+        
+        return Object.values(levelData.exercises).flat() as BaseExercise[]
+
+      case 'api':
+        try {
+          return await Api.getExercisesByLevel(level, category)
+        } catch (error) {
+          console.warn('API failed, falling back to mock:', error)
+          const fallbackLevel = workoutLevels[`level${level}` as keyof WorkoutLevels]
+          return fallbackLevel ? Object.values(fallbackLevel.exercises).flat() as BaseExercise[] : []
+        }
+
+      default:
+        return []
     }
   }
 
@@ -67,30 +88,32 @@ export class ExerciseService {
    * Search exercises by query
    */
   static async searchExercises(query: string): Promise<BaseExercise[]> {
-    if (DATA_SOURCE_CONFIG.USE_MOCK_DATA || !DATA_SOURCE_CONFIG.FEATURES.USE_DATABASE_EXERCISES) {
-      // Simple mock search - filter by name
-      const allExercises: BaseExercise[] = Object.values(workoutLevels).flatMap((level: WorkoutLevel) => 
-        Object.values(level.exercises).flat()
-      ) as BaseExercise[]
-      return allExercises.filter((exercise: BaseExercise) => 
-        exercise.name.toLowerCase().includes(query.toLowerCase())
-      )
-    }
+    const dataSource = this.dataSource
 
-    try {
-      // TODO: Replace with actual API endpoint
-      const response = await apiClient.get<BaseExercise[]>('/.netlify/functions/exercises/search', {
-        q: query
-      })
-      return response.data
-    } catch (error) {
-      console.warn('Failed to search exercises from API, falling back to mock data:', error)
-      const allExercises: BaseExercise[] = Object.values(workoutLevels).flatMap((level: WorkoutLevel) => 
-        Object.values(level.exercises).flat()
-      ) as BaseExercise[]
-      return allExercises.filter((exercise: BaseExercise) => 
-        exercise.name.toLowerCase().includes(query.toLowerCase())
-      )
+    switch (dataSource) {
+      case 'mock':
+        const allExercises: BaseExercise[] = Object.values(workoutLevels).flatMap((level: WorkoutLevel) => 
+          Object.values(level.exercises).flat()
+        ) as BaseExercise[]
+        return allExercises.filter((exercise: BaseExercise) => 
+          exercise.name.toLowerCase().includes(query.toLowerCase())
+        )
+
+      case 'api':
+        try {
+          return await Api.searchExercises(query)
+        } catch (error) {
+          console.warn('API failed, falling back to mock:', error)
+          const fallbackExercises: BaseExercise[] = Object.values(workoutLevels).flatMap((level: WorkoutLevel) => 
+            Object.values(level.exercises).flat()
+          ) as BaseExercise[]
+          return fallbackExercises.filter((exercise: BaseExercise) => 
+            exercise.name.toLowerCase().includes(query.toLowerCase())
+          )
+        }
+
+      default:
+        return []
     }
   }
 }

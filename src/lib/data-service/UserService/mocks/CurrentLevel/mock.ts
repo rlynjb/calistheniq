@@ -1,4 +1,4 @@
-import type { CurrentUserLevels, MovementCategory } from './types'
+import type { CurrentUserLevels } from './types'
 
 // Mock data for user's current progress
 export const mockCurrentUserLevels: CurrentUserLevels = {

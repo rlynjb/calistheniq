@@ -2,7 +2,21 @@
  * Types specific to WorkoutLevels mock data
  */
 
-import type { BaseExercise } from '@/types'
+// Base exercise set structure - can be extended for specific use cases
+export interface BaseExerciseSet {
+  reps?: number
+  duration?: number
+}
+
+// Base exercise structure
+export interface BaseExercise {
+  name: string
+  tempo?: string
+  rest?: number
+  equipment?: string
+  notes?: string
+  sets: BaseExerciseSet[]
+}
 
 // Exercise with additional metadata for organization
 export interface ExerciseWithMetadata extends BaseExercise {

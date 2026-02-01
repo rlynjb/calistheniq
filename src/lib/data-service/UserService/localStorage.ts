@@ -42,7 +42,7 @@ export interface UserProgressData {
   lastUpdated: string
 }
 
-export class UserProgressLocalStorageService {
+export class LocalStorage {
   private static readonly STORAGE_KEY = 'calistheniq_user_progress'
   
   /**

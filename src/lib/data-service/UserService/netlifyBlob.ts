@@ -11,9 +11,9 @@ import type {
   UserProgressData, 
   CompletedWorkout, 
   LevelProgressData 
-} from './user-progress-localStorage-service'
+} from './localStorage'
 
-export class UserProgressNetlifyBlobService {
+export class NetlifyBlob {
   private static readonly API_ENDPOINT = '/.netlify/functions/user-progress'
   private static readonly TIMEOUT_MS = 10000 // 10 second timeout
   

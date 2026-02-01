@@ -3,24 +3,22 @@
  */
 
 import { ExerciseService } from './ExerciseService'
-import { UserProgressService } from './UserProgressService'
+import { UserService } from './UserService'
 import { apiClient } from './api-client'
-import { DATA_SOURCE_CONFIG } from './config'
 
 /**
  * Main Data Service - Unified access point
  */
 export const dataService = {
   exercises: ExerciseService,
-  userProgress: UserProgressService,
-  
-  // Utility methods
-  isUsingMockData: () => DATA_SOURCE_CONFIG.USE_MOCK_DATA,
-  getConfig: () => DATA_SOURCE_CONFIG,
-  
+  userProgress: UserService,
+
   // Health check
   async healthCheck(): Promise<boolean> {
-    if (DATA_SOURCE_CONFIG.USE_MOCK_DATA) {
+    const useMockData = process.env.NODE_ENV === 'development' || 
+                        process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
+    
+    if (useMockData) {
       return Promise.resolve(true)
     }
     

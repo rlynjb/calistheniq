@@ -2,7 +2,7 @@
  * Types specific to WeeklyProgress mock data
  */
 
-import type { BaseExercise } from '@/types'
+import type { BaseExercise } from '@/lib/data-service/ExerciseService/mocks/types'
 
 // Single workout session data
 export interface WorkoutSession {

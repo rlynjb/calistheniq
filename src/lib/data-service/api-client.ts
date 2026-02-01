@@ -1,8 +1,10 @@
 /**
  * API Client for making HTTP requests to backend services
+ * 
+ * Configure via environment variables:
+ * - NEXT_PUBLIC_API_BASE_URL: Base URL for API endpoints
+ * - NEXT_PUBLIC_API_TIMEOUT: Request timeout in milliseconds (default: 10000)
  */
-
-import { DATA_SOURCE_CONFIG } from './config'
 
 /**
  * NOTE:
@@ -26,8 +28,8 @@ class ApiClient {
   private timeout: number
 
   constructor() {
-    this.baseUrl = DATA_SOURCE_CONFIG.API_BASE_URL
-    this.timeout = DATA_SOURCE_CONFIG.TIMEOUT
+    this.baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || ''
+    this.timeout = Number(process.env.NEXT_PUBLIC_API_TIMEOUT) || 10000
   }
 
   private async request<T>(
