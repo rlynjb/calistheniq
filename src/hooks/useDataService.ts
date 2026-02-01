@@ -1,5 +1,7 @@
 /**
  * React hooks for data service integration
+ * TODO:
+ * Review if this hook is necessary.
  */
 
 'use client'
