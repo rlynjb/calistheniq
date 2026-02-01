@@ -7,7 +7,7 @@ import {
   weeklyProgressData, 
   generateCompleteWeeklyProgress,
   type WeekDay,
-} from '@/data/WeeklyProgress'
+} from '@/lib/data-service/mock-data/WeeklyProgress'
 import './WeeklyProgress.css'
 
 export default function WeeklyProgress() {

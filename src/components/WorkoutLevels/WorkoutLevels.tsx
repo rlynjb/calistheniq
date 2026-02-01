@@ -2,8 +2,8 @@
 
 import { Badge, ExerciseCard } from '@/components/ui'
 import type { BaseExercise, BaseExerciseSet, WorkoutLevel } from '@/types'
-import { workoutLevels } from '@/data/WorkoutLevels'
-import { currentLevelData } from '@/data/CurrentLevel'
+import { workoutLevels } from '@/lib/data-service/mock-data/WorkoutLevels'
+import { currentLevelData } from '@/lib/data-service/mock-data/CurrentLevel'
 import './WorkoutLevels.css'
 
 export default function WorkoutLevels() {

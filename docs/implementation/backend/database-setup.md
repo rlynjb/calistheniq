@@ -122,7 +122,7 @@ Create `netlify/functions/core/infrastructure/database/seed-exercises.ts`:
 
 ```typescript
 import { sql } from "./connection";
-import { allExercises } from "../../../../../src/data/WorkoutLevels/mock";
+import { allExercises } from "../../../../../src/lib/data-service/mock-data/WorkoutLevels/mock";
 
 export async function seedExercises() {
   try {
@@ -185,7 +185,7 @@ Create `netlify/functions/core/infrastructure/database/seed-user-progress.ts`:
 
 ```typescript
 import { sql } from "./connection";
-import { mockCurrentUserLevels } from "../../../../../src/data/CurrentLevel/mock";
+import { mockCurrentUserLevels } from "../../../../../src/lib/data-service/mock-data/CurrentLevel/mock";
 
 export async function seedUserProgress() {
   try {
@@ -325,7 +325,7 @@ Example of what comes next:
 
 ```typescript
 // Replace this in components:
-import { workoutLevels } from "@/data/WorkoutLevels";
+import { workoutLevels } from "@/lib/data-service/mock-data/WorkoutLevels";
 
 // With this:
 import { getWorkoutLevels } from "@/netlify/functions/core/infrastructure/database/queries";
