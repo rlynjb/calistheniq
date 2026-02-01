@@ -2,12 +2,12 @@
  * User Progress Service - Handles user progress and level tracking
  */
 
-import { apiClient } from './api-client'
-import { DATA_SOURCE_CONFIG } from './config'
+import { apiClient } from '../api-client'
+import { DATA_SOURCE_CONFIG } from '../config'
 
 // Import existing mock data
-import { currentLevelData } from './mock-data/CurrentLevel'
-import { weeklyProgressData, generateCompleteWeeklyProgress } from './mock-data/WeeklyProgress'
+import { currentLevelData } from './mocks/CurrentLevel'
+import { weeklyProgressData, generateCompleteWeeklyProgress } from './mocks/WeeklyProgress'
 
 export class UserProgressService {
   /**

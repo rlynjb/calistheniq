@@ -5,7 +5,7 @@ import { CardDescription } from '@/components/ui/card'
 import { ExerciseCard, Modal } from '@/components/ui'
 import { 
   type WeekDay,
-} from '@/lib/data-service/mock-data/WeeklyProgress'
+} from '@/lib/data-service/UserProgressService/mocks/WeeklyProgress'
 import { dataService } from '@/lib/data-service'
 import './WeeklyProgress.css'
 

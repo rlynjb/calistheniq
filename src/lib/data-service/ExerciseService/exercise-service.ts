@@ -2,15 +2,15 @@
  * Exercise Data Service - Handles exercise and workout level data
  */
 
-import { apiClient } from './api-client'
-import { DATA_SOURCE_CONFIG } from './config'
+import { apiClient } from '../api-client'
+import { DATA_SOURCE_CONFIG } from '../config'
 
 // Import existing mock data
-import { workoutLevels } from './mock-data/WorkoutLevels'
+import { workoutLevels } from './mocks'
 
 // Import types
 import type { BaseExercise } from '@/types'
-import type { WorkoutLevels, WorkoutLevel } from './mock-data/WorkoutLevels/types'
+import type { WorkoutLevels, WorkoutLevel } from './mocks/types'
 
 export class ExerciseService {
   /**

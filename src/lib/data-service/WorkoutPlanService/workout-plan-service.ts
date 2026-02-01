@@ -2,8 +2,8 @@
  * Workout Plan Service - Handles workout plans and session logging
  */
 
-import { apiClient } from './api-client'
-import { DATA_SOURCE_CONFIG } from './config'
+import { apiClient } from '../api-client'
+import { DATA_SOURCE_CONFIG } from '../config'
 
 export class WorkoutPlanService {
   /**
@@ -51,18 +51,19 @@ export class WorkoutPlanService {
   }
 
   /**
-   * Log workout session
+   * Log completed workout session
    */
-  static async logWorkoutSession(workoutData: any, userId?: string): Promise<boolean> {
+  static async logWorkoutSession(sessionData: any, userId?: string): Promise<boolean> {
     if (DATA_SOURCE_CONFIG.USE_MOCK_DATA || !DATA_SOURCE_CONFIG.FEATURES.USE_DATABASE_WORKOUT_PLANS) {
-      console.log('Mock: Logged workout session:', workoutData)
+      // Mock logging
+      console.log(`Mock: Logged workout session for user ${userId || 'default'}`, sessionData)
       return Promise.resolve(true)
     }
 
     try {
       // TODO: Replace with actual API endpoint
       const response = await apiClient.post<{ success: boolean }>('/.netlify/functions/workouts/log', {
-        ...workoutData,
+        ...sessionData,
         userId
       })
       return response.data.success

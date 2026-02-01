@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Badge, ExerciseCard } from '@/components/ui'
 import type { BaseExercise } from '@/types'
-import type { WorkoutLevel } from '@/lib/data-service/mock-data/WorkoutLevels/types'
-import type { CurrentUserLevels } from '@/lib/data-service/mock-data/CurrentLevel/types'
+import type { WorkoutLevel } from '@/lib/data-service/ExerciseService/mocks/types'
+import type { CurrentUserLevels } from '@/lib/data-service/UserProgressService/mocks/CurrentLevel/types'
 import './WorkoutLevels.css'
 import { dataService } from "@/lib/data-service";
 

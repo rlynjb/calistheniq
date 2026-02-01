@@ -2,9 +2,9 @@
  * Main Data Service - Unified access point for all data operations
  */
 
-import { ExerciseService } from './exercise-service'
-import { UserProgressService } from './user-progress-service'
-import { WorkoutPlanService } from './workout-plan-service'
+import { ExerciseService } from './ExerciseService'
+import { UserProgressService } from './UserProgressService'
+import { WorkoutPlanService } from './WorkoutPlanService'
 import { apiClient } from './api-client'
 import { DATA_SOURCE_CONFIG } from './config'
 
