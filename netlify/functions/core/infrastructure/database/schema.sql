@@ -1,38 +1,9 @@
-# Database Schema Design for CalisthenIQ
-
-Based on the current data structures in `src/data/*` and `src/types/*`.
-
-## Database Design Requirements Analysis
-
-### Current Data Structures:
-
-1. **Exercise Data** (`WorkoutLevels/mock.ts`):
-
-   - 70+ exercises with metadata
-   - Level progression (0-5: Foundation → Expert)
-   - Categories (Push, Pull, Squat)
-   - Sets, reps, tempo, rest, equipment, notes
-   - Metadata: id, difficulty, tags
-
-2. **User Progress** (`CurrentLevel/mock.ts`):
-
-   - Current levels per category
-   - Movement category tracking
-
-3. **Workout Sessions** (`WeeklyProgress/mock.ts`):
-   - Historical and planned workouts
-   - Exercise combinations
-   - Duration, categories, completion status
-
-## Proposed Database Schema
-
-```sql
 -- ========================================
 -- CORE TABLES
 -- ========================================
 
 -- Users table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email VARCHAR(255) UNIQUE NOT NULL,
   name VARCHAR(100),
@@ -45,7 +16,7 @@ CREATE TABLE users (
 -- ========================================
 
 -- Workout levels (Foundation, Beginner, Novice, etc.)
-CREATE TABLE workout_levels (
+CREATE TABLE IF NOT EXISTS workout_levels (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50) NOT NULL,          -- "Foundation", "Beginner", etc.
   description TEXT,                   -- Level description
@@ -54,14 +25,14 @@ CREATE TABLE workout_levels (
 );
 
 -- Exercise categories
-CREATE TABLE exercise_categories (
+CREATE TABLE IF NOT EXISTS exercise_categories (
   id SERIAL PRIMARY KEY,
   name VARCHAR(20) NOT NULL,          -- "Push", "Pull", "Squat"
   description TEXT
 );
 
 -- Master exercises table - your main exercise library
-CREATE TABLE exercises (
+CREATE TABLE IF NOT EXISTS exercises (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(150) NOT NULL,
   level_id INTEGER REFERENCES workout_levels(id),
@@ -75,7 +46,6 @@ CREATE TABLE exercises (
   default_notes TEXT,                 -- Exercise instructions/tips
 
   -- Exercise metadata
-  difficulty VARCHAR(20),             -- "Foundation", "Beginner", etc.
   tags TEXT[],                        -- ["wall", "band", "assisted"]
 
   created_at TIMESTAMP DEFAULT NOW(),
@@ -87,21 +57,24 @@ CREATE TABLE exercises (
 -- ========================================
 
 -- User's current level in each category
-CREATE TABLE user_current_levels (
+CREATE TABLE IF NOT EXISTS user_current_levels (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   category_id INTEGER REFERENCES exercise_categories(id),
   current_level INTEGER NOT NULL,     -- 0, 1, 2, etc.
+  workout_level_id INTEGER REFERENCES workout_levels(id), -- FK for data integrity
 
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
 
-  UNIQUE(user_id, category_id)
+  UNIQUE(user_id, category_id),
+  -- Ensure current_level matches workout_level.level_order
+  CHECK (current_level >= 0 AND current_level <= 5)
 );
 
 -- User's personalized exercise configurations
 -- This allows users to have custom sets/reps different from defaults
-CREATE TABLE user_exercise_configs (
+CREATE TABLE IF NOT EXISTS user_exercise_configs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   exercise_id UUID REFERENCES exercises(id) ON DELETE CASCADE,
@@ -127,7 +100,7 @@ CREATE TABLE user_exercise_configs (
 -- ========================================
 
 -- Workout sessions (both completed and planned)
-CREATE TABLE workout_sessions (
+CREATE TABLE IF NOT EXISTS workout_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
 
@@ -149,7 +122,7 @@ CREATE TABLE workout_sessions (
 );
 
 -- Individual exercises within a workout session
-CREATE TABLE session_exercises (
+CREATE TABLE IF NOT EXISTS session_exercises (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   session_id UUID REFERENCES workout_sessions(id) ON DELETE CASCADE,
   exercise_id UUID REFERENCES exercises(id),
@@ -175,7 +148,7 @@ CREATE TABLE session_exercises (
 );
 
 -- Individual set logging for detailed tracking
-CREATE TABLE exercise_set_logs (
+CREATE TABLE IF NOT EXISTS exercise_set_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   session_exercise_id UUID REFERENCES session_exercises(id) ON DELETE CASCADE,
 
@@ -203,7 +176,7 @@ CREATE TABLE exercise_set_logs (
 -- ========================================
 
 -- Daily workout summary for weekly view
-CREATE TABLE daily_workout_summary (
+CREATE TABLE IF NOT EXISTS daily_workout_summary (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   workout_date DATE NOT NULL,
@@ -225,33 +198,9 @@ CREATE TABLE daily_workout_summary (
 );
 
 -- ========================================
--- INDEXES FOR PERFORMANCE
+-- INITIAL DATA SETUP
 -- ========================================
 
--- User lookup indexes
-CREATE INDEX idx_user_current_levels_user_id ON user_current_levels(user_id);
-CREATE INDEX idx_user_exercise_configs_user_id ON user_exercise_configs(user_id);
-CREATE INDEX idx_workout_sessions_user_id ON workout_sessions(user_id);
-CREATE INDEX idx_daily_workout_summary_user_id ON daily_workout_summary(user_id);
-
--- Exercise lookup indexes
-CREATE INDEX idx_exercises_level_category ON exercises(level_id, category_id);
-CREATE INDEX idx_exercises_tags ON exercises USING GIN(tags);
-
--- Session lookup indexes
-CREATE INDEX idx_workout_sessions_date_status ON workout_sessions(session_date, status);
-CREATE INDEX idx_session_exercises_session_id ON session_exercises(session_id);
-
--- Weekly progress indexes
-CREATE INDEX idx_daily_workout_summary_date ON daily_workout_summary(workout_date);
-CREATE INDEX idx_daily_workout_summary_user_date ON daily_workout_summary(user_id, workout_date);
-```
-
-## Data Migration from Current Mock Data
-
-### 1. Populate Core Data:
-
-```sql
 -- Insert workout levels
 INSERT INTO workout_levels (name, description, level_order) VALUES
 ('Foundation', 'Stability, control, and knee-friendly movements', 0),
@@ -259,58 +208,34 @@ INSERT INTO workout_levels (name, description, level_order) VALUES
 ('Novice', 'Intermediate progressions', 2),
 ('Intermediate', 'Standard calisthenics exercises', 3),
 ('Advanced', 'High-level skills and strength', 4),
-('Expert', 'Elite calisthenics mastery', 5);
+('Expert', 'Elite calisthenics mastery', 5)
+ON CONFLICT (level_order) DO NOTHING;
 
 -- Insert categories
 INSERT INTO exercise_categories (name, description) VALUES
 ('Push', 'Pushing movements - chest, shoulders, triceps'),
 ('Pull', 'Pulling movements - back, biceps'),
-('Squat', 'Lower body movements - legs, glutes');
-```
+('Squat', 'Lower body movements - legs, glutes')
+ON CONFLICT DO NOTHING;
 
-### 2. Migrate Exercise Data:
+-- ========================================
+-- INDEXES FOR PERFORMANCE
+-- ========================================
 
-- Convert `allExercises` array from `WorkoutLevels/mock.ts`
-- Map level names to level IDs
-- Convert sets arrays to JSONB format
-- Preserve all metadata (tags, equipment, etc.)
+-- User lookup indexes
+CREATE INDEX IF NOT EXISTS idx_user_current_levels_user_id ON user_current_levels(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_exercise_configs_user_id ON user_exercise_configs(user_id);
+CREATE INDEX IF NOT EXISTS idx_workout_sessions_user_id ON workout_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_daily_workout_summary_user_id ON daily_workout_summary(user_id);
 
-### 3. User Progress Migration:
+-- Exercise lookup indexes
+CREATE INDEX IF NOT EXISTS idx_exercises_level_category ON exercises(level_id, category_id);
+CREATE INDEX IF NOT EXISTS idx_exercises_tags ON exercises USING GIN(tags);
 
-- Convert `mockCurrentUserLevels` to `user_current_levels` table
-- Create default user for testing
+-- Session lookup indexes
+CREATE INDEX IF NOT EXISTS idx_workout_sessions_date_status ON workout_sessions(session_date, status);
+CREATE INDEX IF NOT EXISTS idx_session_exercises_session_id ON session_exercises(session_id);
 
-## Key Features Supported:
-
-### ✅ Database Capabilities:
-
-1. **Master Exercise Library**: `exercises` table with all defaults
-2. **Workout Session Management**: `workout_sessions` + `session_exercises` tables
-3. **Progress Tracking**: Update sets, reps, tempo, rest, notes via `session_exercises` and `exercise_set_logs`
-4. **User Progression**: `user_exercise_configs` for current vs default tracking
-
-### ✅ Additional Capabilities:
-
-- Detailed set-by-set logging
-- Progress tracking toward exercise mastery
-- Weekly summary views
-- Flexible exercise configurations per user
-- Historical workout analysis
-- Future workout planning
-
-### ✅ Architecture Benefits:
-
-- Normalized design eliminates data duplication
-- Flexible JSONB for variable set configurations
-- Scalable for multiple users
-- Supports both planned and completed workouts
-- Detailed performance analytics
-- Easy migration from current mock data
-
-## Next Steps:
-
-1. Set up PostgreSQL/Neon database
-2. Run schema creation scripts
-3. Create data migration scripts from current mock data
-4. Update data layer to use database instead of mock files
-5. Implement database connection and query layers
+-- Weekly progress indexes
+CREATE INDEX IF NOT EXISTS idx_daily_workout_summary_date ON daily_workout_summary(workout_date);
+CREATE INDEX IF NOT EXISTS idx_daily_workout_summary_user_date ON daily_workout_summary(user_id, workout_date);

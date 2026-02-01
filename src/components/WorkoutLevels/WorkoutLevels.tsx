@@ -1,13 +1,32 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Badge, ExerciseCard } from '@/components/ui'
-import type { BaseExercise, BaseExerciseSet, WorkoutLevel } from '@/types'
-import { workoutLevels } from '@/data/WorkoutLevels'
-import { currentLevelData } from '@/data/CurrentLevel'
+import type { BaseExercise } from '@/types'
+import type { WorkoutLevel } from '@/lib/data-service/mock-data/WorkoutLevels/types'
+import type { CurrentUserLevels } from '@/lib/data-service/mock-data/CurrentLevel/types'
 import './WorkoutLevels.css'
+import { dataService } from "@/lib/data-service";
 
 export default function WorkoutLevels() {
-  const { currentLevels } = currentLevelData
+  const [ currentLevels, setCurrentLevels ] = useState<CurrentUserLevels>({ Push: 0, Pull: 0, Squat: 0 });
+  const [ levels, setLevels ] = useState<Record<string, WorkoutLevel>>({});
+
+  useEffect(() => {
+    const fetchLevels = async () => {
+      const res = await dataService.exercises.getWorkoutLevels();
+      setLevels(res);
+    };
+    
+    fetchLevels();
+
+    const fetchCurrentLevels = async () => {
+      const res = await dataService.userProgress.getCurrentLevels();
+      setCurrentLevels(res as unknown as CurrentUserLevels);
+    };
+
+    fetchCurrentLevels();
+  }, []);
   
   return (
     <div className="workout-levels">
@@ -34,7 +53,7 @@ export default function WorkoutLevels() {
       </div>
       
       <div className="workout-levels__container">
-        {(Object.entries(workoutLevels) as [string, WorkoutLevel][]).map(([levelKey, level], levelIndex) => {
+        {(Object.entries(levels) as [string, WorkoutLevel][]).map(([levelKey, level], levelIndex) => {
           // Check if this is a current level for any category
           const isCurrentLevel = Object.values(currentLevels).includes(levelIndex)
           
