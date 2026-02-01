@@ -26,7 +26,7 @@ CalisthenIQ will be developed in three distinct phases, each building upon the p
 ### Technical Implementation
 
 ```
-### Project Setup & Infrastructure
+1. Project Setup & Infrastructure
 
 - ✅ Next.js app with Tailwind CSS - [Frontend Setup Guide](implementation/frontend/frontend-setup.md)
 - ✅ Netlify Functions configuration - [Netlify Functions Guide](implementation/backend/netlify-functions-configuration.md)
@@ -76,7 +76,7 @@ CalisthenIQ will be developed in three distinct phases, each building upon the p
   - ✅ Install OpenAI SDK dependencies
   - ⏸️ Basic OpenAI connection testing and validation
 
-### Core Integration
+2. Core Integration
 
 - ⏸️ Database integration (replace in-memory storage)
   - ⏸️ Replace Map<string, SessionContext> with Postgres tables
@@ -89,25 +89,25 @@ CalisthenIQ will be developed in three distinct phases, each building upon the p
   - ⏸️ Response handling & streaming implementation
 - ⏸️ Function calling tools implementation
 
-### Agent Implementation
+3. Agent Implementation
 
 - ⏸️ Intake & Safety Agent + save_profile tool
 - ⏸️ Program Designer Agent + create_session tool
 - ✅ Basic exercise library (static JSON) *(in database)*
 
-### Workout Execution
+4. Workout Execution
 
 - ⏸️ Technique Coach Agent + log_set tool
 - ⏸️ Gamification Agent + award_xp tool
 - ⏸️ Frontend workout card interface
 
-### Integration & Testing
+5. Integration & Testing
 
 - ⏸️ End-to-end user flows
 - ⏸️ Error handling and edge cases
 - ⏸️ Performance optimization
 
-### Polish & Deploy
+6. Polish & Deploy
 
 - ⏸️ UI/UX refinements
 - ⏸️ Documentation
