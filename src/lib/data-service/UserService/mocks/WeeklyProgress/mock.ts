@@ -1,11 +1,7 @@
-// WeeklyProgress Mock Data
-// Raw data types and mock data for weekly progress tracking
+import type { WorkoutSession } from './types'
 
-import type { BaseExercise } from '@/lib/data-service/ExerciseService/mocks/types'
-import type { WorkoutSession, WeekDay, WeeklyProgressData } from './types'
-
-// Sample workout sessions for mock data
-const sampleWorkouts: WorkoutSession[] = [
+// Sample workout sessions for mock data - hardcoded for week of Feb 2-8, 2026
+const MOCK_weeklyWorkouts: WorkoutSession[] = [
   {
     exercises: [
       {
@@ -26,7 +22,7 @@ const sampleWorkouts: WorkoutSession[] = [
     duration: 25,
     categories: ['Push'],
     level: 0,
-    date: new Date('2026-01-12T09:30:00') // Monday
+    date: new Date("2026-02-03T09:30:00.000Z") // Monday, Feb 3, 2026 - 9:30 AM
   },
   {
     exercises: [
@@ -48,7 +44,7 @@ const sampleWorkouts: WorkoutSession[] = [
     duration: 30,
     categories: ['Push', 'Pull'],
     level: 1,
-    date: new Date('2026-01-13T07:00:00') // Tuesday
+    date: new Date("2026-02-04T07:00:00.000Z") // Tuesday, Feb 4, 2026 - 7:00 AM
   },
   {
     exercises: [
@@ -69,7 +65,7 @@ const sampleWorkouts: WorkoutSession[] = [
     duration: 20,
     categories: ['Push', 'Squat'],
     level: 0,
-    date: new Date('2026-01-11T10:15:00') // Saturday
+    date: new Date("2026-02-06T10:15:00.000Z") // Thursday, Feb 6, 2026 - 10:15 AM
   },
   {
     exercises: [
@@ -98,11 +94,11 @@ const sampleWorkouts: WorkoutSession[] = [
     duration: 35,
     categories: ['Push', 'Squat'],
     level: 1,
-    date: new Date('2026-01-11T08:45:00') // Sunday
+    date: new Date("2026-02-07T08:45:00.000Z") // Friday, Feb 7, 2026 - 8:45 AM
   }
 ]
 
-//Today's planned workout
+// Today's planned workout - Sunday, Feb 2, 2026
 const todaysTodayWorkout: WorkoutSession = {
   exercises: [
     {
@@ -132,7 +128,7 @@ const todaysTodayWorkout: WorkoutSession = {
   duration: 30,
   categories: ['Push', 'Squat'],
   level: 1,
-  date: new Date('2026-01-15T18:00:00') // Today - planned for evening
+  date: new Date("2026-02-02T18:00:00.000Z") // Sunday, Feb 2, 2026 - 6:00 PM
 }
 
-export { sampleWorkouts, todaysTodayWorkout }
+export { MOCK_weeklyWorkouts, todaysTodayWorkout }

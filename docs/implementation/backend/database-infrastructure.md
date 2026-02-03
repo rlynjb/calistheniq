@@ -294,7 +294,7 @@ export async function seedExercises() {
 // Core responsibility: User data initialization
 export async function seedUserProgress() {
   const userId = await createOrFindUser();
-  await setUserLevels(userId, mockCurrentUserLevels);
+  await setUserLevels(userId, MOCK_CurrentUserLevel);
 }
 ```
 
@@ -540,7 +540,7 @@ try {
 console.log("🚀 Starting database setup...");
 console.log("✅ Database connected successfully");
 console.log(
-  `✅ Seeded ${successCount}/${allExercises.length} exercises successfully`
+  `✅ Seeded ${successCount}/${allExercises.length} exercises successfully`,
 );
 ```
 
@@ -549,7 +549,7 @@ console.log(
 ```typescript
 if (levels.length === 0) {
   throw new Error(
-    "No workout levels found - database may not be properly seeded"
+    "No workout levels found - database may not be properly seeded",
   );
 }
 ```

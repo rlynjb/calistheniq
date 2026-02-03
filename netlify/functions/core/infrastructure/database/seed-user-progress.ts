@@ -1,5 +1,5 @@
 import { sql } from './connection';
-import { mockCurrentUserLevels } from '../../../../../src/lib/data-service/mock-data/CurrentLevel/mock';
+import { MOCK_CurrentUserLevel } from '../../../../../src/lib/data-service/mock-data/CurrentLevel/mock';
 
 export async function seedUserProgress() {
   try {
@@ -26,7 +26,7 @@ export async function seedUserProgress() {
     console.log('Level mapping:', levelMap);
     
     // Insert user current levels
-    for (const [category, level] of Object.entries(mockCurrentUserLevels)) {
+    for (const [category, level] of Object.entries(MOCK_CurrentUserLevel)) {
       try {
         await sql`
           INSERT INTO user_current_levels (user_id, category_id, current_level, workout_level_id)

@@ -15,14 +15,15 @@ export interface WorkoutSession {
 
 // Individual day in the weekly progress
 export interface WeekDay {
-  date: Date
+  date: Date // ISO date string
   completed: boolean
   isToday: boolean
   completedWorkout?: WorkoutSession // Completed workout data
   todayWorkout?: WorkoutSession // What's planned for today/future
+  isWorkoutDay?: boolean
 }
 
 // Complete weekly progress data structure
 export interface WeeklyProgressData {
-  weekDays: WeekDay[]
+  weekDays?: WeekDay[]
 }

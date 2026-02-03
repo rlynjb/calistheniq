@@ -134,10 +134,10 @@ export async function seedExercises() {
     const categories = await sql`SELECT id, name FROM exercise_categories`;
 
     const levelMap = Object.fromEntries(
-      levels.map((l) => [l.level_order, l.id])
+      levels.map((l) => [l.level_order, l.id]),
     );
     const categoryMap = Object.fromEntries(
-      categories.map((c) => [c.name, c.id])
+      categories.map((c) => [c.name, c.id]),
     );
 
     // Insert exercises
@@ -185,7 +185,7 @@ Create `netlify/functions/core/infrastructure/database/seed-user-progress.ts`:
 
 ```typescript
 import { sql } from "./connection";
-import { mockCurrentUserLevels } from "../../../../../src/lib/data-service/mock-data/CurrentLevel/mock";
+import { MOCK_CurrentUserLevel } from "../../../../../src/lib/data-service/mock-data/CurrentLevel/mock";
 
 export async function seedUserProgress() {
   try {
@@ -205,14 +205,14 @@ export async function seedUserProgress() {
       await sql`SELECT id, level_order FROM workout_levels ORDER BY level_order`;
 
     const categoryMap = Object.fromEntries(
-      categories.map((c) => [c.name, c.id])
+      categories.map((c) => [c.name, c.id]),
     );
     const levelMap = Object.fromEntries(
-      levels.map((l) => [l.level_order, l.id])
+      levels.map((l) => [l.level_order, l.id]),
     );
 
     // Insert user current levels
-    for (const [category, level] of Object.entries(mockCurrentUserLevels)) {
+    for (const [category, level] of Object.entries(MOCK_CurrentUserLevel)) {
       await sql`
         INSERT INTO user_current_levels (user_id, category_id, current_level, workout_level_id)
         VALUES (${user.id}, ${categoryMap[category]}, ${level}, ${levelMap[level]})

@@ -2,29 +2,45 @@
 
 import { useState, useEffect } from 'react'
 import { Badge, ExerciseCard } from '@/components/ui'
-import type { BaseExercise, WorkoutLevel } from '@/lib/data-service/ExerciseService/mocks/types'
-import type { CurrentUserLevels } from '@/lib/data-service/UserService/mocks/CurrentLevel/types'
-import './WorkoutLevels.css'
+
 import { dataService } from "@/lib/data-service";
+import type { BaseExercise, WorkoutLevel } from '@/lib/data-service/ExerciseService/mocks/types'
+import type { UserData } from '@/lib/data-service/UserService/localStorage'
+
+import type { CurrentUserLevels } from '@/lib/data-service/UserService/mocks/CurrentLevel/types'
+import { MOCK_UserData } from '@/lib/data-service/UserService/mocks/UserData';
+
+import './WorkoutLevels.css'
 
 export default function WorkoutLevels() {
+  const [ exercises, setExercises ] = useState<Record<string, WorkoutLevel>>({});
   const [ currentLevels, setCurrentLevels ] = useState<CurrentUserLevels>({ Push: 0, Pull: 0, Squat: 0 });
-  const [ levels, setLevels ] = useState<Record<string, WorkoutLevel>>({});
 
   useEffect(() => {
-    const fetchLevels = async () => {
+    const getExercises = async () => {
       const res = await dataService.exercises.getWorkoutLevels();
-      setLevels(res);
+      setExercises(res);
     };
     
-    fetchLevels();
+    getExercises();
 
-    const fetchCurrentLevels = async () => {
-      const res = await dataService.userProgress.getCurrentLevels();
-      setCurrentLevels(res as unknown as CurrentUserLevels);
+    /**
+     * TODO:
+     * replace this with LevelCalculator logic to determine 
+     * user's current level based on completed workout's sets, reps, etc.
+     */
+    const updateUserData = async () => {
+      dataService.userProgress.updateUserData(MOCK_UserData as UserData);
+    
+    }
+    updateUserData();
+
+    const getUserData = async () => {
+      const userData = await dataService.userProgress.getUserData();
+      setCurrentLevels(userData?.currentLevels || { Push: 0, Pull: 0, Squat: 0 });
     };
 
-    fetchCurrentLevels();
+    getUserData();    
   }, []);
   
   return (
@@ -52,7 +68,7 @@ export default function WorkoutLevels() {
       </div>
       
       <div className="workout-levels__container">
-        {(Object.entries(levels) as [string, WorkoutLevel][]).map(([levelKey, level], levelIndex) => {
+        {(Object.entries(exercises) as [string, WorkoutLevel][]).map(([levelKey, level], levelIndex) => {
           // Check if this is a current level for any category
           const isCurrentLevel = Object.values(currentLevels).includes(levelIndex)
           
@@ -107,7 +123,7 @@ export default function WorkoutLevels() {
       </div>
       
       {/* Level Guidelines */}
-      <div className="workout-levels__guidelines">
+      {/* <div className="workout-levels__guidelines">
         <div className="workout-levels__guidelines-header">
           <div className="workout-levels__guidelines-icon">💡</div>
           <div className="workout-levels__guidelines-title">Progression Guidelines</div>
@@ -120,7 +136,7 @@ export default function WorkoutLevels() {
           <p className="workout-levels__guideline-item">• Rest adequately between workouts (48-72 hours for same muscle groups)</p>
           <p className="workout-levels__guideline-item">• If experiencing knee discomfort, start with Level 0 and progress slowly</p>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

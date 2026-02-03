@@ -1,7 +1,7 @@
 // WeeklyProgress Normalization Functions
 // Business logic for processing weekly progress data
 
-import { sampleWorkouts, todaysTodayWorkout } from './mock'
+import { MOCK_weeklyWorkouts, todaysTodayWorkout } from './mock'
 import type { WeekDay, WeeklyProgressData, WorkoutSession } from './types'
 
 /**
@@ -27,7 +27,7 @@ export function generateWeeklyProgress(): WeekDay[] {
     const isToday = date.toDateString() === today.toDateString()
     
     // Find completed workouts for this day
-    const completedWorkout = sampleWorkouts.find(workout => 
+    const completedWorkout = MOCK_weeklyWorkouts.find(workout => 
       workout.date.toDateString() === date.toDateString() && 
       workout.date <= today
     )

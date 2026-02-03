@@ -9,7 +9,6 @@ Based on the current data structures in `src/data/*` and `src/types/*`.
 ### Current Data Structures:
 
 1. **Exercise Data** (`WorkoutLevels/mock.ts`):
-
    - 70+ exercises with metadata
    - Level progression (0-5: Foundation → Expert)
    - Categories (Push, Pull, Squat)
@@ -17,7 +16,6 @@ Based on the current data structures in `src/data/*` and `src/types/*`.
    - Metadata: id, difficulty, tags
 
 2. **User Progress** (`CurrentLevel/mock.ts`):
-
    - Current levels per category
    - Movement category tracking
 
@@ -281,7 +279,7 @@ INSERT INTO exercise_categories (name, description) VALUES
 
 ### 3. User Progress Migration:
 
-- Convert `mockCurrentUserLevels` to `user_current_levels` table
+- Convert `MOCK_CurrentUserLevel` to `user_current_levels` table
 - Create default user for testing
 
 ## Key Features Supported:

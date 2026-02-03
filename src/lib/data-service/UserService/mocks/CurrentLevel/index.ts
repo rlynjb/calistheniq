@@ -5,9 +5,4 @@
 export * from './types'
 
 // Raw data
-export { mockCurrentUserLevels } from './mock'
-
-// Processed data
-export {
-  currentLevelData
-} from './normalization'
+export { MOCK_CurrentUserLevel } from './mock'
