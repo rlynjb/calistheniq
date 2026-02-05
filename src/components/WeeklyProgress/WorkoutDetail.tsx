@@ -25,24 +25,12 @@ export default function WorkoutDetail({ selectedDay }: WorkoutDetailProps) {
   return (
     <div className="weekly-progress__modal-content">
         <div className="weekly-progress__workout-section weekly-progress__workout-section--completed">
-          <div className="weekly-progress__workout-meta weekly-progress__workout-meta--completed">
-            Completed: {new Date(selectedDay.date).toLocaleString('en-US', { 
-              weekday: 'short', 
-              month: 'short', 
-              day: 'numeric', 
-              hour: 'numeric', 
-              minute: '2-digit',
-              hour12: true 
-            })} | 
-            Duration: {selectedDay.duration}min | 
-            Categories: {(selectedDay.categories ?? []).join(', ')}
-          </div>
           <div className="weekly-progress__exercise-list">
             {selectedDay.exercises.map((exercise, exIndex) => (
               <ExerciseCard 
                 key={exIndex}
                 exercise={exercise}
-                className="weekly-progress__exercise-card weekly-progress__exercise-card--completed"
+                className="weekly-progress__exercise-card"
               />
             ))}
           </div>
@@ -67,7 +55,7 @@ export default function WorkoutDetail({ selectedDay }: WorkoutDetailProps) {
               <ExerciseCard 
                 key={exIndex}
                 exercise={exercise}
-                className="weekly-progress__exercise-card weekly-progress__exercise-card--planned"
+                className="weekly-progress__exercise-card"
               />
             ))}
           </div>
