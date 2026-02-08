@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { WorkoutExerciseCard } from '@/components/ui'
-import { api } from '@/api'
+import { api, exerciseApi } from '@/api'
 import type { BaseExercise, CurrentUserLevels } from '@/api'
 import type { ExtendedWeekDay } from './WeeklyProgress'
 
@@ -103,6 +103,62 @@ export default function WorkoutDetail({ selectedDay, onWorkoutUpdate }: WorkoutD
     }
   }
 
+  // Handle removing a category's exercises
+  const handleRemoveCategory = async (category: Category) => {
+    const userData = await api.user.getUserData()
+    if (!userData?.weeklyProgress) return
+
+    const dayDate = new Date(selectedDay.date).toDateString()
+
+    // Get exercise names for this category to filter them out
+    const updatedProgress = await Promise.all(
+      userData.weeklyProgress.map(async session => {
+        if (new Date(session.date).toDateString() === dayDate) {
+          // Get category info for each exercise to filter by category
+          const exercisesWithCategory = await Promise.all(
+            session.exercises.map(async exercise => {
+              const levelInfo = await exerciseApi.getExerciseLevel(exercise.name)
+              return { exercise, category: levelInfo?.category }
+            })
+          )
+
+          // Keep only exercises NOT in the removed category
+          const filteredExercises = exercisesWithCategory
+            .filter(e => e.category !== category)
+            .map(e => e.exercise)
+
+          // Remove category from categories array
+          const filteredCategories = (session.categories || []).filter(c => c !== category)
+
+          return {
+            ...session,
+            exercises: filteredExercises,
+            categories: filteredCategories
+          }
+        }
+        return session
+      })
+    )
+
+    // Save updated data
+    await api.user.updateUserData({
+      ...userData,
+      weeklyProgress: updatedProgress
+    })
+
+    // Remove from local addedCategories state
+    setAddedCategories(prev => prev.filter(c => c !== category))
+
+    // Clear selection if removing the currently selected category
+    if (selectedCategory === category) {
+      setSelectedCategory(null)
+      setCategoryExercises([])
+    }
+
+    // Notify parent to refresh data
+    onWorkoutUpdate?.()
+  }
+
   const handleExerciseChange = async (updatedExercise: BaseExercise, index: number) => {
     // Get current user data
     const userData = await api.user.getUserData()
@@ -187,17 +243,27 @@ export default function WorkoutDetail({ selectedDay, onWorkoutUpdate }: WorkoutD
           {(['Push', 'Pull', 'Squat'] as Category[]).map((category) => {
             const hasExercises = selectedDay.categories?.includes(category) || addedCategories.includes(category)
             return (
-              <button
-                key={category}
-                className={`workout-detail__category-item workout-detail__category-item--${category.toLowerCase()} ${selectedCategory === category ? 'workout-detail__category-item--active' : ''} ${hasExercises ? 'workout-detail__category-item--disabled' : ''}`}
-                onClick={() => handleCategoryClick(category)}
-                disabled={hasExercises}
-              >
-                <span className="workout-detail__category-name">{category}</span>
-                <span className="workout-detail__category-level">
-                  Level {userLevels?.[category] ?? 0}
-                </span>
-              </button>
+              <div key={category} className="workout-detail__category-row">
+                <button
+                  className={`workout-detail__category-item workout-detail__category-item--${category.toLowerCase()} ${selectedCategory === category ? 'workout-detail__category-item--active' : ''} ${hasExercises ? 'workout-detail__category-item--disabled' : ''}`}
+                  onClick={() => handleCategoryClick(category)}
+                  disabled={hasExercises}
+                >
+                  <span className="workout-detail__category-name">{category}</span>
+                  <span className="workout-detail__category-level">
+                    Level {userLevels?.[category] ?? 0}
+                  </span>
+                </button>
+                {hasExercises && (
+                  <button
+                    className={`workout-detail__category-remove workout-detail__category-remove--${category.toLowerCase()}`}
+                    onClick={() => handleRemoveCategory(category)}
+                    title={`Remove ${category} exercises`}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             )
           })}
         </div>

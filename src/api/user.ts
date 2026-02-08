@@ -18,7 +18,7 @@ export interface WorkoutSession {
   exercises: BaseExercise[]
   categories: ('Push' | 'Pull' | 'Squat')[]
   level: number
-  date: Date
+  date: Date | string
 }
 
 export interface WeekDay {

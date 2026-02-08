@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Modal } from '@/components/ui'
 import { api } from '@/api'
 import type { WeekDay, WorkoutSession } from '@/api'
@@ -10,72 +10,82 @@ import './WeeklyProgress.css'
 
 export type ExtendedWeekDay = WeekDay & Partial<WorkoutSession>
 
+// Generate week days based on current date
+const generateWeekDays = (): WeekDay[] => {
+  const today = new Date()
+  const currentDay = today.getDay() // 0 = Sunday, 6 = Saturday
+  const weekStart = new Date(today)
+  weekStart.setDate(today.getDate() - currentDay) // Go to Sunday
+  weekStart.setHours(0, 0, 0, 0) // Reset to midnight
+
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = new Date(weekStart)
+    date.setDate(weekStart.getDate() + i)
+    const dateISO = date.toISOString()
+    const isToday = date.toDateString() === today.toDateString()
+
+    return {
+      date: new Date(dateISO),
+      isToday,
+      completed: false,
+      completedWorkout: undefined,
+      todayWorkout: undefined
+    }
+  })
+}
+
 export default function WeeklyProgress() {
-  const [weekDays, setWeekDays] = useState<ExtendedWeekDay[]>([]) // extend WeekDay type
+  const [weekDays, setWeekDays] = useState<ExtendedWeekDay[]>([])
   const [selectedDay, setSelectedDay] = useState<ExtendedWeekDay | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  useEffect(() => {
-    // Generate week days based on current date
-    const generateWeekDays = (): WeekDay[] => {
-      const today = new Date()
-      const currentDay = today.getDay() // 0 = Sunday, 6 = Saturday
-      const weekStart = new Date(today)
-      weekStart.setDate(today.getDate() - currentDay) // Go to Sunday
-      weekStart.setHours(0, 0, 0, 0) // Reset to midnight
-      
-      return Array.from({ length: 7 }, (_, i) => {
-        const date = new Date(weekStart)
-        date.setDate(weekStart.getDate() + i)
-        const dateISO = date.toISOString()
-        const isToday = date.toDateString() === today.toDateString()
-        
+  // Fetch user data and merge with generated week
+  const refreshWeeklyProgress = useCallback(async () => {
+    const generatedWeek = generateWeekDays()
+    let fetchedUserData = await api.user.getUserData()
+
+    // Initialize with mock data if no user data exists
+    if (!fetchedUserData) {
+      await api.user.updateUserData(MOCK_UserData)
+      fetchedUserData = MOCK_UserData
+    }
+
+    const weeklyProgress = fetchedUserData?.weeklyProgress
+
+    if (Array.isArray(weeklyProgress) && weeklyProgress.length > 0) {
+      const mergedWeek = generatedWeek.map(day => {
+        const weekDay = day.date.toDateString()
+
+        const workoutDay = weeklyProgress.find(
+          wp => new Date(wp.date).toDateString() === weekDay
+        )
+
         return {
-          date: new Date(dateISO),
-          isToday,
-          completed: false,
-          completedWorkout: undefined,
-          todayWorkout: undefined
+          ...day,
+          isWorkoutDay: workoutDay ? true : false,
+          ...(workoutDay || {}),
+          date: day.date // Keep the date object
         }
       })
-    }
+      setWeekDays(mergedWeek)
 
-    // Fetch user data and merge with generated week
-    const initializeWeeklyProgress = async () => {
-      const generatedWeek = generateWeekDays()
-      let fetchedUserData = await api.user.getUserData()
-
-      // Initialize with mock data if no user data exists
-      if (!fetchedUserData) {
-        await api.user.updateUserData(MOCK_UserData)
-        fetchedUserData = MOCK_UserData
+      // Update selectedDay if it exists to reflect changes
+      if (selectedDay) {
+        const updatedSelectedDay = mergedWeek.find(
+          day => day.date.toDateString() === new Date(selectedDay.date).toDateString()
+        )
+        if (updatedSelectedDay) {
+          setSelectedDay(updatedSelectedDay)
+        }
       }
-
-      const weeklyProgress = fetchedUserData?.weeklyProgress
-
-      if (Array.isArray(weeklyProgress) && weeklyProgress.length > 0) {
-        const mergedWeek = generatedWeek.map(day => {
-          const weekDay = day.date.toDateString();
-
-          const workoutDay = weeklyProgress.find(
-            wp => new Date(wp.date).toDateString() === weekDay
-          )
-
-          return {
-            ...day,
-            isWorkoutDay: workoutDay ? true : false,
-            ...(workoutDay || {}),
-            date: day.date // Keep the ISO string
-          }
-        })
-        setWeekDays(mergedWeek)
-      } else {
-        setWeekDays(generatedWeek)
-      }
+    } else {
+      setWeekDays(generatedWeek)
     }
+  }, [selectedDay])
 
-    initializeWeeklyProgress()
-  }, [])
+  useEffect(() => {
+    refreshWeeklyProgress()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDayClick = (day: WeekDay) => {
     setSelectedDay(day)
@@ -136,7 +146,12 @@ export default function WeeklyProgress() {
         onClose={closeModal}
         title={modalTitle}
       >
-        {selectedDay && <WorkoutDetail selectedDay={selectedDay} />}
+        {selectedDay && (
+          <WorkoutDetail
+            selectedDay={selectedDay}
+            onWorkoutUpdate={refreshWeeklyProgress}
+          />
+        )}
       </Modal>
     </div>
   )
