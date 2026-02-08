@@ -21,7 +21,7 @@ export default function WorkoutExerciseCard({
     exercise.sets.map(set => 'reps' in set && set.reps ? String(set.reps) : `${set.duration}s`)
   )
   const [setCompleted, setSetCompleted] = useState<boolean[]>(
-    exercise.sets.map(() => false)
+    exercise.completedSets || exercise.sets.map(() => false)
   )
   const [tempoValue, setTempoValue] = useState(exercise.tempo || '')
   const [restValue, setRestValue] = useState(exercise.rest !== undefined ? `${exercise.rest}s` : '')
@@ -40,7 +40,29 @@ export default function WorkoutExerciseCard({
   }, [exercise.name])
 
   const toggleSet = (index: number) => {
-    setSetCompleted(prev => prev.map((v, i) => i === index ? !v : v))
+    const newCompleted = setCompleted.map((v, i) => i === index ? !v : v)
+    setSetCompleted(newCompleted)
+
+    // Emit change with completion status
+    if (onExerciseChange) {
+      const updatedSets = setValues.map(val => {
+        if (val.endsWith('s')) {
+          return { duration: parseInt(val) || 0 }
+        }
+        return { reps: parseInt(val) || 0 }
+      })
+
+      const allDone = newCompleted.every(Boolean) && newCompleted.length > 0
+      onExerciseChange({
+        ...exercise,
+        sets: updatedSets,
+        tempo: tempoValue || undefined,
+        rest: restValue ? parseInt(restValue) : undefined,
+        notes: notesValue || undefined,
+        completed: allDone,
+        completedSets: newCompleted
+      })
+    }
   }
 
   const updateSet = (index: number, value: string) => {

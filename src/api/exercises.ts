@@ -17,6 +17,8 @@ export interface BaseExercise {
   equipment?: string
   notes?: string
   sets: BaseExerciseSet[]
+  completed?: boolean
+  completedSets?: boolean[]
 }
 
 export interface ExerciseWithMetadata extends BaseExercise {
