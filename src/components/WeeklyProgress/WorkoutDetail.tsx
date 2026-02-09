@@ -45,14 +45,43 @@ export default function WorkoutDetail({ selectedDay, onWorkoutUpdate }: WorkoutD
 
     try {
       const level = userLevels[category]
-      const exercises = await api.exercises.getExercisesByLevel(level, category)
-      setCategoryExercises(exercises)
+      const originalExercises = await api.exercises.getExercisesByLevel(level, category)
 
-      // Save exercises to userData
+      // Get user data to find previous sessions with same exercises
       const userData = await api.user.getUserData()
       if (!userData) return
 
       const dayDate = new Date(selectedDay.date).toDateString()
+
+      // Find the most recent session (before current date) with saved exercises
+      const previousSessions = (userData.weeklyProgress || [])
+        .filter(session => new Date(session.date).toDateString() !== dayDate)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+      // Map exercises: use saved values from previous session if available
+      const exercises = originalExercises.map(exercise => {
+        // Look for this exercise in previous sessions
+        for (const session of previousSessions) {
+          const savedExercise = session.exercises.find(e => e.name === exercise.name)
+          if (savedExercise) {
+            // Use saved sets, completedSets, tempo, rest, notes from previous session
+            return {
+              ...exercise,
+              sets: savedExercise.sets,
+              completedSets: savedExercise.sets.map(() => false), // Reset completion for new day
+              tempo: savedExercise.tempo,
+              rest: savedExercise.rest,
+              notes: savedExercise.notes,
+              completed: false // Reset completion for new day
+            }
+          }
+        }
+        // No previous data found, use original exercise
+        return exercise
+      })
+
+      setCategoryExercises(exercises)
+
       const existingSession = userData.weeklyProgress?.find(
         session => new Date(session.date).toDateString() === dayDate
       )
@@ -95,6 +124,10 @@ export default function WorkoutDetail({ selectedDay, onWorkoutUpdate }: WorkoutD
 
       // Mark category as added to disable button immediately
       setAddedCategories(prev => [...prev, category])
+
+      // Clear category exercises so they display from user data (selectedDay.exercises)
+      setSelectedCategory(null)
+      setCategoryExercises([])
 
       // Notify parent to refresh data
       onWorkoutUpdate?.()

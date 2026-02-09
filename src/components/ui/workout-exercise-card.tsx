@@ -32,6 +32,25 @@ export default function WorkoutExerciseCard({
   // Original target values from exercise definition (fetched from API)
   const [targetValues, setTargetValues] = useState<string[]>(() => formatSets(exercise.sets))
 
+  // Create a stable key from exercise data for dependency tracking
+  const exerciseKey = JSON.stringify({
+    name: exercise.name,
+    sets: exercise.sets,
+    completedSets: exercise.completedSets,
+    tempo: exercise.tempo,
+    rest: exercise.rest,
+    notes: exercise.notes
+  })
+
+  // Sync state when exercise data changes (e.g., loading from user data)
+  useEffect(() => {
+    setSetValues(formatSets(exercise.sets))
+    setSetCompleted(exercise.completedSets || exercise.sets.map(() => false))
+    setTempoValue(exercise.tempo || '')
+    setRestValue(exercise.rest !== undefined ? `${exercise.rest}s` : '')
+    setNotesValue(exercise.notes || '')
+  }, [exerciseKey]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Fetch level info and original sets on mount
   useEffect(() => {
     const fetchLevelInfo = async () => {

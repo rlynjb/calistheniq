@@ -62,7 +62,7 @@ export default function WeeklyProgress() {
 
         return {
           ...day,
-          isWorkoutDay: workoutDay ? true : false,
+          isWorkoutDay: Boolean(workoutDay?.exercises?.length),
           ...(workoutDay || {}),
           date: day.date // Keep the date object
         }
