@@ -8,9 +8,9 @@ import { allExercises } from './exercises'
 
 // Mock user's current progress levels
 export const MOCK_CurrentUserLevel: CurrentUserLevels = {
-  Push: 2,
+  Push: 1,
   Pull: 1,
-  Squat: 0
+  Squat: 1
 }
 
 // Helper to filter exercises by category and level

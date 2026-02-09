@@ -6,137 +6,137 @@ import type { ExerciseWithMetadata, WorkoutLevels } from '@/api/exercises'
 
 // Comprehensive list of all exercises with metadata
 export const allExercises: ExerciseWithMetadata[] = [
-  // Level 0 - Foundation
-  {
-    id: 'foundation-wall-pushup-band',
-    name: "Wall Push-ups with Band Resistance",
-    sets: [{ reps: 5 }, { reps: 4 }, { reps: 3 }],
-    tempo: "3-2-3-1",
-    rest: 90,
-    equipment: "Mini band around back",
-    level: 0,
-    levelName: "Foundation",
-    category: "Push",
-    difficulty: "Foundation",
-    tags: ["wall", "band", "assisted", "beginner-friendly"]
-  },
-  {
-    id: 'foundation-seated-chest-press',
-    name: "Seated Chest Press (Band)",
-    sets: [{ reps: 8 }, { reps: 6 }, { reps: 5 }],
-    tempo: "2-1-2-1",
-    rest: 60,
-    equipment: "Mini band",
-    level: 0,
-    levelName: "Foundation",
-    category: "Push",
-    difficulty: "Foundation",
-    tags: ["seated", "band", "chest", "stability"]
-  },
-  {
-    id: 'foundation-band-pull-apart',
-    name: "Standing Band Pull-Apart",
-    sets: [{ reps: 10 }, { reps: 8 }, { reps: 6 }],
-    tempo: "2-1-2-1",
-    rest: 45,
-    equipment: "Mini band",
-    level: 0,
-    levelName: "Foundation",
-    category: "Push",
-    difficulty: "Foundation",
-    tags: ["standing", "band", "shoulders", "mobility"]
-  },
-  {
-    id: 'foundation-seated-rows',
-    name: "Seated Band Rows",
-    sets: [{ reps: 8 }, { reps: 6 }, { reps: 5 }],
-    tempo: "2-1-2-1",
-    rest: 60,
-    equipment: "Mini band",
-    level: 0,
-    levelName: "Foundation",
-    category: "Pull",
-    difficulty: "Foundation",
-    tags: ["seated", "band", "rows", "back"]
-  },
-  {
-    id: 'foundation-assisted-dead-hang',
-    name: "Band-Assisted Dead Hang",
-    sets: [{ duration: 15 }, { duration: 12 }, { duration: 10 }],
-    tempo: "hold",
-    rest: 90,
-    equipment: "Mini band for assistance",
-    level: 0,
-    levelName: "Foundation",
-    category: "Pull",
-    difficulty: "Foundation",
-    tags: ["hang", "band", "assisted", "grip", "endurance"]
-  },
-  {
-    id: 'foundation-lat-pulldowns',
-    name: "Lat Pulldowns (Band)",
-    sets: [{ reps: 6 }, { reps: 5 }, { reps: 4 }],
-    tempo: "2-1-2-1",
-    rest: 75,
-    equipment: "Mini band overhead",
-    level: 0,
-    levelName: "Foundation",
-    category: "Pull",
-    difficulty: "Foundation",
-    tags: ["band", "pulldown", "lats", "overhead"]
-  },
-  {
-    id: 'foundation-supported-squats',
-    name: "Supported Squats (Band)",
-    sets: [{ reps: 8 }, { reps: 6 }, { reps: 5 }],
-    tempo: "3-2-3-1",
-    rest: 90,
-    equipment: "Mini band for support",
-    level: 0,
-    levelName: "Foundation",
-    category: "Squat",
-    difficulty: "Foundation",
-    tags: ["squat", "band", "assisted", "knee-friendly"]
-  },
-  {
-    id: 'foundation-seated-leg-extensions',
-    name: "Seated Leg Extensions (Band)",
-    sets: [{ reps: 10 }, { reps: 8 }, { reps: 6 }],
-    tempo: "2-1-2-1",
-    rest: 60,
-    equipment: "Mini band around ankles",
-    level: 0,
-    levelName: "Foundation",
-    category: "Squat",
-    difficulty: "Foundation",
-    tags: ["seated", "band", "quadriceps", "isolation"]
-  },
-  {
-    id: 'foundation-hip-abduction',
-    name: "Standing Hip Abduction (Band)",
-    sets: [{ reps: 12 }, { reps: 10 }, { reps: 8 }],
-    tempo: "2-1-1-1",
-    rest: 45,
-    equipment: "Mini band around ankles",
-    level: 0,
-    levelName: "Foundation",
-    category: "Squat",
-    difficulty: "Foundation",
-    tags: ["standing", "band", "hips", "glutes", "stability"]
-  },
-  {
-    id: 'foundation-glute-bridges',
-    name: "Glute Bridges (Band)",
-    sets: [{ reps: 10 }, { reps: 8 }, { reps: 6 }],
-    tempo: "2-1-2-1",
-    rest: 60,
-    equipment: "Mini band around knees",
-    level: 0,
-    levelName: "Foundation",
-    category: "Squat",
-    difficulty: "Foundation",
-    tags: ["bridge", "band", "glutes", "posterior"]
-  },
+  // Level 0 - Foundation (commented out)
+  // {
+  //   id: 'foundation-wall-pushup-band',
+  //   name: "Wall Push-ups with Band Resistance",
+  //   sets: [{ reps: 5 }, { reps: 4 }, { reps: 3 }],
+  //   tempo: "3-2-3-1",
+  //   rest: 90,
+  //   equipment: "Mini band around back",
+  //   level: 0,
+  //   levelName: "Foundation",
+  //   category: "Push",
+  //   difficulty: "Foundation",
+  //   tags: ["wall", "band", "assisted", "beginner-friendly"]
+  // },
+  // {
+  //   id: 'foundation-seated-chest-press',
+  //   name: "Seated Chest Press (Band)",
+  //   sets: [{ reps: 8 }, { reps: 6 }, { reps: 5 }],
+  //   tempo: "2-1-2-1",
+  //   rest: 60,
+  //   equipment: "Mini band",
+  //   level: 0,
+  //   levelName: "Foundation",
+  //   category: "Push",
+  //   difficulty: "Foundation",
+  //   tags: ["seated", "band", "chest", "stability"]
+  // },
+  // {
+  //   id: 'foundation-band-pull-apart',
+  //   name: "Standing Band Pull-Apart",
+  //   sets: [{ reps: 10 }, { reps: 8 }, { reps: 6 }],
+  //   tempo: "2-1-2-1",
+  //   rest: 45,
+  //   equipment: "Mini band",
+  //   level: 0,
+  //   levelName: "Foundation",
+  //   category: "Push",
+  //   difficulty: "Foundation",
+  //   tags: ["standing", "band", "shoulders", "mobility"]
+  // },
+  // {
+  //   id: 'foundation-seated-rows',
+  //   name: "Seated Band Rows",
+  //   sets: [{ reps: 8 }, { reps: 6 }, { reps: 5 }],
+  //   tempo: "2-1-2-1",
+  //   rest: 60,
+  //   equipment: "Mini band",
+  //   level: 0,
+  //   levelName: "Foundation",
+  //   category: "Pull",
+  //   difficulty: "Foundation",
+  //   tags: ["seated", "band", "rows", "back"]
+  // },
+  // {
+  //   id: 'foundation-assisted-dead-hang',
+  //   name: "Band-Assisted Dead Hang",
+  //   sets: [{ duration: 15 }, { duration: 12 }, { duration: 10 }],
+  //   tempo: "hold",
+  //   rest: 90,
+  //   equipment: "Mini band for assistance",
+  //   level: 0,
+  //   levelName: "Foundation",
+  //   category: "Pull",
+  //   difficulty: "Foundation",
+  //   tags: ["hang", "band", "assisted", "grip", "endurance"]
+  // },
+  // {
+  //   id: 'foundation-lat-pulldowns',
+  //   name: "Lat Pulldowns (Band)",
+  //   sets: [{ reps: 6 }, { reps: 5 }, { reps: 4 }],
+  //   tempo: "2-1-2-1",
+  //   rest: 75,
+  //   equipment: "Mini band overhead",
+  //   level: 0,
+  //   levelName: "Foundation",
+  //   category: "Pull",
+  //   difficulty: "Foundation",
+  //   tags: ["band", "pulldown", "lats", "overhead"]
+  // },
+  // {
+  //   id: 'foundation-supported-squats',
+  //   name: "Supported Squats (Band)",
+  //   sets: [{ reps: 8 }, { reps: 6 }, { reps: 5 }],
+  //   tempo: "3-2-3-1",
+  //   rest: 90,
+  //   equipment: "Mini band for support",
+  //   level: 0,
+  //   levelName: "Foundation",
+  //   category: "Squat",
+  //   difficulty: "Foundation",
+  //   tags: ["squat", "band", "assisted", "knee-friendly"]
+  // },
+  // {
+  //   id: 'foundation-seated-leg-extensions',
+  //   name: "Seated Leg Extensions (Band)",
+  //   sets: [{ reps: 10 }, { reps: 8 }, { reps: 6 }],
+  //   tempo: "2-1-2-1",
+  //   rest: 60,
+  //   equipment: "Mini band around ankles",
+  //   level: 0,
+  //   levelName: "Foundation",
+  //   category: "Squat",
+  //   difficulty: "Foundation",
+  //   tags: ["seated", "band", "quadriceps", "isolation"]
+  // },
+  // {
+  //   id: 'foundation-hip-abduction',
+  //   name: "Standing Hip Abduction (Band)",
+  //   sets: [{ reps: 12 }, { reps: 10 }, { reps: 8 }],
+  //   tempo: "2-1-1-1",
+  //   rest: 45,
+  //   equipment: "Mini band around ankles",
+  //   level: 0,
+  //   levelName: "Foundation",
+  //   category: "Squat",
+  //   difficulty: "Foundation",
+  //   tags: ["standing", "band", "hips", "glutes", "stability"]
+  // },
+  // {
+  //   id: 'foundation-glute-bridges',
+  //   name: "Glute Bridges (Band)",
+  //   sets: [{ reps: 10 }, { reps: 8 }, { reps: 6 }],
+  //   tempo: "2-1-2-1",
+  //   rest: 60,
+  //   equipment: "Mini band around knees",
+  //   level: 0,
+  //   levelName: "Foundation",
+  //   category: "Squat",
+  //   difficulty: "Foundation",
+  //   tags: ["bridge", "band", "glutes", "posterior"]
+  // },
 
   // Level 1 - Beginner
   {
@@ -188,28 +188,40 @@ export const allExercises: ExerciseWithMetadata[] = [
     tags: ["rows", "bodyweight", "horizontal", "back"]
   },
   {
-    id: 'beginner-chair-assisted-squats',
-    name: "Chair Assisted Squats",
-    sets: [{ reps: 10 }, { reps: 8 }, { reps: 6 }],
-    tempo: "2-1-2-1",
-    rest: 60,
+    id: 'beginner-deep-squats',
+    name: "Deep squats",
+    sets: [{ reps: 12 }, { reps: 12 }, { reps: 12 }],
+    tempo: "2-0-1-0",
+    rest: 0,
     level: 1,
     levelName: "Beginner",
     category: "Squat",
     difficulty: "Beginner",
-    tags: ["squat", "assisted", "chair", "bodyweight"]
+    tags: ["squat", "bodyweight"]
   },
   {
-    id: 'beginner-calf-raises',
-    name: "Calf Raises",
-    sets: [{ reps: 15 }, { reps: 12 }, { reps: 10 }],
-    tempo: "2-1-1-1",
-    rest: 45,
+    id: 'beginner-narrow-stance-squats',
+    name: "Narrow stance squats",
+    sets: [{ reps: 12 }, { reps: 12 }, { reps: 12 }],
+    tempo: "2-0-1-0",
+    rest: 0,
     level: 1,
     levelName: "Beginner",
     category: "Squat",
     difficulty: "Beginner",
-    tags: ["calves", "bodyweight", "standing"]
+    tags: ["squat", "bodyweight"]
+  },
+  {
+    id: 'beginner-bodyweight-squats',
+    name: "Bodyweight Squats",
+    sets: [{ reps: 15 }, { reps: 15 }, { reps: 15 }],
+    tempo: "2-0-1-0",
+    rest: 0,
+    level: 1,
+    levelName: "Beginner",
+    category: "Squat",
+    difficulty: "Beginner",
+    tags: ["squat", "bodyweight"]
   },
 
   // Level 2 - Novice
@@ -665,15 +677,15 @@ const toBaseExercise = (ex: ExerciseWithMetadata) => ({
 
 // Workout levels organized by difficulty
 export const workoutLevels: WorkoutLevels = {
-  foundation: {
-    name: "Foundation",
-    description: "Stability, control, and knee-friendly movements",
-    exercises: {
-      Push: allExercises.filter(ex => ex.level === 0 && ex.category === 'Push').map(toBaseExercise),
-      Pull: allExercises.filter(ex => ex.level === 0 && ex.category === 'Pull').map(toBaseExercise),
-      Squat: allExercises.filter(ex => ex.level === 0 && ex.category === 'Squat').map(toBaseExercise)
-    }
-  },
+  // foundation: {
+  //   name: "Foundation",
+  //   description: "Stability, control, and knee-friendly movements",
+  //   exercises: {
+  //     Push: allExercises.filter(ex => ex.level === 0 && ex.category === 'Push').map(toBaseExercise),
+  //     Pull: allExercises.filter(ex => ex.level === 0 && ex.category === 'Pull').map(toBaseExercise),
+  //     Squat: allExercises.filter(ex => ex.level === 0 && ex.category === 'Squat').map(toBaseExercise)
+  //   }
+  // },
   beginner: {
     name: "Beginner",
     exercises: {

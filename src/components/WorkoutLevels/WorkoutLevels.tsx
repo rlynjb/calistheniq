@@ -7,9 +7,18 @@ import type { BaseExercise, WorkoutLevel, UserData, CurrentUserLevels } from '@/
 import { MOCK_UserData } from '@/mocks'
 import './WorkoutLevels.css'
 
+// Map level keys to their actual level numbers
+const LEVEL_MAP: Record<string, number> = {
+  beginner: 1,
+  novice: 2,
+  intermediate: 3,
+  advanced: 4,
+  expert: 5
+}
+
 export default function WorkoutLevels() {
   const [ exercises, setExercises ] = useState<Record<string, WorkoutLevel>>({});
-  const [ currentLevels, setCurrentLevels ] = useState<CurrentUserLevels>({ Push: 0, Pull: 0, Squat: 0 });
+  const [ currentLevels, setCurrentLevels ] = useState<CurrentUserLevels>({ Push: 1, Pull: 1, Squat: 1 });
 
   useEffect(() => {
     const getExercises = async () => {
@@ -62,15 +71,16 @@ export default function WorkoutLevels() {
       </div>
       
       <div className="workout-levels__container">
-        {(Object.entries(exercises) as [string, WorkoutLevel][]).map(([levelKey, level], levelIndex) => {
+        {(Object.entries(exercises) as [string, WorkoutLevel][]).map(([levelKey, level]) => {
+          const levelNum = LEVEL_MAP[levelKey] ?? 1
           // Check if this is a current level for any category
-          const isCurrentLevel = Object.values(currentLevels).includes(levelIndex)
-          
+          const isCurrentLevel = Object.values(currentLevels).includes(levelNum)
+
           return (
             <div key={levelKey} className={`workout-levels__level-card ${isCurrentLevel ? 'workout-levels__level-card--current' : ''}`}>
               <div className="workout-levels__level-header">
                 <Badge variant={isCurrentLevel ? "default" : "outline"} className="workout-levels__level-badge">
-                  Level {levelIndex}
+                  Level {levelNum}
                 </Badge>
                 <h3 className="workout-levels__level-title">{level.name}</h3>
                 {isCurrentLevel && (
@@ -79,15 +89,15 @@ export default function WorkoutLevels() {
                   </Badge>
                 )}
               </div>
-              
+
               {level.description && (
                 <p className="workout-levels__level-description">{level.description}</p>
               )}
-              
+
               <div className="workout-levels__categories-grid">
                 {Object.entries(level.exercises).map(([category, exercises]) => {
                   // Check if this category is at current level
-                  const isCategoryAtCurrentLevel = currentLevels[category as keyof typeof currentLevels] === levelIndex
+                  const isCategoryAtCurrentLevel = currentLevels[category as keyof typeof currentLevels] === levelNum
                   
                   return (
                     <div key={category} className={`workout-levels__category ${isCategoryAtCurrentLevel ? 'workout-levels__category--current' : ''}`}>
