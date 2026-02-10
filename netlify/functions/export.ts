@@ -1,15 +1,40 @@
 /**
  * Netlify Function: Export Data
  *
- * GET /api/export - Export current blob store data as JSON
- * GET /api/export?type=user - Export only user data
- * GET /api/export?type=exercises - Export only exercises data
+ * Exports data from Netlify Blob store as JSON.
+ *
+ * ENDPOINT
+ * --------
+ * GET /api/export - Export user and exercises data from blob store
+ *
+ * HOW IT WORKS
+ * ------------
+ * Data flows: Netlify Blob → JSON output
+ *
+ * INDUSTRY STANDARD: FIXTURES + SNAPSHOTS PATTERN
+ * ------------------------------------------------
+ * Fixtures (Mock Files):
+ *   - Source of truth, version controlled
+ *   - Contains logic (date generation, computed values)
+ *   - Located in: src/mocks/data/
+ *
+ * Snapshots (Exported Data):
+ *   - Captured runtime state from blob storage
+ *   - Pure JSON data for review
+ *   - Created via: curl http://localhost:8888/api/export > snapshot.json
+ *
+ * Workflow:
+ *   1. seed: Push fixtures to blob storage
+ *   2. App modifies data in blob during usage
+ *   3. export: Capture blob state to snapshot file
+ *   4. Developer reviews snapshot, updates fixtures if needed
  *
  * USAGE
  * -----
  * curl http://localhost:8888/api/export
- * curl "http://localhost:8888/api/export?type=user"
- * curl "http://localhost:8888/api/export?type=exercises"
+ *
+ * Save to file:
+ * curl http://localhost:8888/api/export > backup.json
  */
 
 import type { Context } from '@netlify/functions'
@@ -31,22 +56,6 @@ export default async (req: Request, _context: Context) => {
   }
 
   try {
-    const url = new URL(req.url)
-    const type = url.searchParams.get('type')
-
-    // Export user data only
-    if (type === 'user') {
-      const userData = await userDataStore.get()
-      return jsonResponse(userData)
-    }
-
-    // Export exercises only
-    if (type === 'exercises') {
-      const workoutLevels = await exerciseDataStore.getWorkoutLevels()
-      return jsonResponse(workoutLevels)
-    }
-
-    // Export both (default)
     const userData = await userDataStore.get()
     const workoutLevels = await exerciseDataStore.getWorkoutLevels()
 
@@ -64,4 +73,3 @@ export default async (req: Request, _context: Context) => {
     )
   }
 }
-

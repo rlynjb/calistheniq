@@ -1,31 +1,46 @@
 /**
  * Netlify Function: Seed Data
  *
- * POST /api/seed - Initialize blob store with mock data
+ * Populates Netlify Blob store with data from mock files.
  *
- * PREREQUISITES
- * -------------
- * 1. MSW must be disabled: NEXT_PUBLIC_MSW_ENABLED=false
- * 2. Netlify CLI installed: npm install -g netlify-cli
- * 3. Start server: netlify dev
+ * ENDPOINT
+ * --------
+ * POST /api/seed - Seed user and exercises data from mock files
+ *
+ * HOW IT WORKS
+ * ------------
+ * Data flows: Mock files → Netlify Blob → App
+ *
+ * Sources:
+ * - src/mocks/data/user.ts (currentLevels, weeklyProgress)
+ * - src/mocks/data/exercises.ts (workoutLevels)
+ *
+ * INDUSTRY STANDARD: FIXTURES + SNAPSHOTS PATTERN
+ * ------------------------------------------------
+ * Fixtures (Mock Files):
+ *   - Source of truth, version controlled
+ *   - Contains logic (date generation, computed values)
+ *   - Located in: src/mocks/data/
+ *
+ * Snapshots (Exported Data):
+ *   - Captured runtime state from blob storage
+ *   - Pure JSON data for review
+ *   - Created via: curl http://localhost:8888/api/export > snapshot.json
+ *
+ * Workflow:
+ *   1. seed: Push fixtures to blob storage
+ *   2. App modifies data in blob during usage
+ *   3. export: Capture blob state to snapshot file
+ *   4. Developer reviews snapshot, updates fixtures if needed
  *
  * USAGE
  * -----
  * curl -X POST http://localhost:8888/api/seed
  *
- * WHAT GETS SEEDED
- * ----------------
- * User Data (/user/data):
- *   - currentLevels: { Push: 1, Pull: 1, Squat: 1 }
- *   - weeklyProgress: Workouts for upcoming week
- *
- * Workout Levels (/exercises/levels):
- *   - Level 1-5: Beginner through Expert
- *
- * VERIFY
- * ------
- * curl http://localhost:8888/api/user/data
- * curl http://localhost:8888/api/exercises/levels
+ * PREREQUISITES
+ * -------------
+ * 1. MSW disabled: NEXT_PUBLIC_MSW_ENABLED=false
+ * 2. Server running: netlify dev
  */
 
 import type { Context } from '@netlify/functions'
@@ -64,7 +79,7 @@ export default async (req: Request, _context: Context) => {
 
     return jsonResponse({
       success: true,
-      message: 'Seeded from mock data',
+      message: 'Seeded user and exercises from mock data',
       data: { userData, workoutLevels }
     })
 
@@ -76,4 +91,3 @@ export default async (req: Request, _context: Context) => {
     )
   }
 }
-

@@ -86,7 +86,7 @@ export const corsHeaders = {
  * Create a JSON response
  */
 export function jsonResponse(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), {
+  return new Response(JSON.stringify(data, null, 2), {
     status,
     headers: corsHeaders
   })
