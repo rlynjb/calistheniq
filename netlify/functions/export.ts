@@ -1,49 +1,15 @@
 /**
  * Netlify Function: Export Data
  *
- * GET /export - Export current blob store data as JSON
- *
- * =============================================================================
- * COMPLETE WORKFLOW: Mock ↔ Blob ↔ Snapshot
- * =============================================================================
- *
- * 1. SEED FROM MOCK (dynamic dates):
- *    curl -X POST http://localhost:8888/seed
- *    → Uses src/mocks/data (user.ts, exercises.ts) with current week dates
- *
- * 2. SEED FROM SNAPSHOT (static data):
- *    curl -X POST http://localhost:8888/seed?source=snapshot
- *    → Uses src/mocks/data/snapshots/*.json (previously exported data)
- *
- * 3. EXPORT TO SNAPSHOT:
- *    curl http://localhost:8888/export > export.json
- *    cat export.json | jq '.data.userData' > src/mocks/data/snapshots/user-snapshot.json
- *    cat export.json | jq '.data.workoutLevels' > src/mocks/data/snapshots/exercises-snapshot.json
- *
- * =============================================================================
+ * GET /api/export - Export current blob store data as JSON
+ * GET /api/export?type=user - Export only user data
+ * GET /api/export?type=exercises - Export only exercises data
  *
  * USAGE
  * -----
- * curl http://localhost:8888/export
- * # Or open in browser: http://localhost:8888/export
- *
- * RESPONSE
- * --------
- * {
- *   "success": true,
- *   "exportedAt": "2025-02-08T...",
- *   "data": {
- *     "userData": { currentLevels, weeklyProgress },
- *     "workoutLevels": { beginner, novice, ... }
- *   }
- * }
- *
- * WHY SNAPSHOTS?
- * --------------
- * - Mock files (user.ts, exercises.ts) contain logic code that generates data
- * - Snapshots are pure JSON files with static data
- * - Export saves blob data → snapshot JSON (preserves logic in .ts files)
- * - Seed from snapshot restores exact state without regenerating dates
+ * curl http://localhost:8888/api/export
+ * curl "http://localhost:8888/api/export?type=user"
+ * curl "http://localhost:8888/api/export?type=exercises"
  */
 
 import type { Context } from '@netlify/functions'
@@ -65,6 +31,22 @@ export default async (req: Request, _context: Context) => {
   }
 
   try {
+    const url = new URL(req.url)
+    const type = url.searchParams.get('type')
+
+    // Export user data only
+    if (type === 'user') {
+      const userData = await userDataStore.get()
+      return jsonResponse(userData)
+    }
+
+    // Export exercises only
+    if (type === 'exercises') {
+      const workoutLevels = await exerciseDataStore.getWorkoutLevels()
+      return jsonResponse(workoutLevels)
+    }
+
+    // Export both (default)
     const userData = await userDataStore.get()
     const workoutLevels = await exerciseDataStore.getWorkoutLevels()
 
@@ -83,6 +65,3 @@ export default async (req: Request, _context: Context) => {
   }
 }
 
-export const config = {
-  path: '/export'
-}
