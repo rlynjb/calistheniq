@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { Modal } from '@/components/ui'
 import { api } from '@/api'
 import type { WeekDay, WorkoutSession } from '@/api'
-import { MOCK_UserData } from '@/mocks'
 import WorkoutDetail from './WorkoutDetail'
 import './WeeklyProgress.css'
 
@@ -42,14 +41,7 @@ export default function WeeklyProgress() {
   // Fetch user data and merge with generated week
   const refreshWeeklyProgress = useCallback(async () => {
     const generatedWeek = generateWeekDays()
-    let fetchedUserData = await api.user.getUserData()
-
-    // Initialize with mock data if no user data exists
-    if (!fetchedUserData) {
-      await api.user.updateUserData(MOCK_UserData)
-      fetchedUserData = MOCK_UserData
-    }
-
+    const fetchedUserData = await api.user.getUserData()
     const weeklyProgress = fetchedUserData?.weeklyProgress
 
     if (Array.isArray(weeklyProgress) && weeklyProgress.length > 0) {
