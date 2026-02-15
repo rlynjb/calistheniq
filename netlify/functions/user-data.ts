@@ -49,7 +49,7 @@ export default async (req: Request, _context: Context) => {
         return jsonResponse(DEFAULT_USER_DATA)
       }
 
-      // Clean up sessions beyond the current week (Sun-Sat)
+      // Clean up sessions dated in the future (beyond Saturday)
       if (data.weeklyProgress) {
         const now = new Date()
         const endOfWeek = new Date(now)
