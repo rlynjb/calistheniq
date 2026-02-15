@@ -1,6 +1,6 @@
 {
   "success": true,
-  "exportedAt": "2026-02-15T21:57:28.144Z",
+  "exportedAt": "2026-02-15T22:05:50.925Z",
   "data": {
     "userData": {
       "currentLevels": {
@@ -187,7 +187,7 @@
           "date": "2026-02-13T17:00:00.000Z"
         }
       ],
-      "lastUpdated": "2026-02-15T21:57:03.807Z"
+      "lastUpdated": "2026-02-15T22:05:36.344Z"
     },
     "workoutLevels": {
       "beginner": {
@@ -351,9 +351,9 @@
           ]
         },
         "progressionNotes": {
-          "Push": "Focus on controlled negatives — aim for a slow 4-second lowering phase before progressing to full push-ups.",
-          "Pull": "Build grip endurance and scapular awareness. Hold passive hangs for 60s before moving to active pulling.",
-          "Squat": "Prioritize depth and ankle mobility. Keep heels grounded and work toward full range of motion."
+          "Push": "Focus on controlled negatives — aim for a slow 4-second lowering phase before progressing to full push-ups. If you can complete 8 reps for the given sets of negative push-ups, it’s time to progress to Level 2.",
+          "Pull": "Build grip endurance and scapular awareness. Hold passive hangs for 60s before moving to active pulling. Successfully rowing 66-88lbs for the outlined sets/reps and holding a hang for 60 seconds mark readiness for Level 2.",
+          "Squat": "Prioritize depth and ankle mobility. Keep heels grounded and work toward full range of motion. If deep squats are hard, skip them and work on mobility. Go to level 2 once you can do entire routine."
         }
       },
       "novice": {
@@ -517,9 +517,9 @@
           ]
         },
         "progressionNotes": {
-          "Push": "Maintain full range of motion on standard push-ups. Scapula push-ups should feel controlled at the top.",
-          "Pull": "Straighten legs on inverted rows. Scapula pull-ups should show clear retraction and depression.",
-          "Squat": "Introduce single-leg stability with Bulgarian squats. Use a slower tempo to build control."
+          "Push": "Maintain full range of motion on standard push-ups. Scapula push-ups should feel controlled at the top. If you can perform 12 reps of regular push-ups, upgrade to Level 3.",
+          "Pull": "Straighten legs on inverted rows. Scapula pull-ups should show clear retraction and depression. Achieving a nearly horizontal position in Australian pull-ups for the specified sets/reps ushers in progression to Level 3.",
+          "Squat": "Introduce single-leg stability with Bulgarian squats. Use a slower tempo to build control. After completing 6 reps of Bulgarian split squats, move to level 3."
         }
       },
       "intermediate": {
@@ -731,9 +731,9 @@
           ]
         },
         "progressionNotes": {
-          "Push": "Train all push-up variations with consistent tempo. Diamond and wide push-ups build the base for one-arm work.",
-          "Pull": "Band-assisted pull-ups should be strict — no kipping. Reduce band resistance as strength builds.",
-          "Squat": "Cossack squats develop lateral mobility. Bulgarian splits should reach parallel depth on every rep."
+          "Push": "Train all push-up variations with consistent tempo. Diamond and wide push-ups build the base for one-arm work. Once you can complete the specified sets and reps, proceed to Level 4.",
+          "Pull": "Band-assisted pull-ups should be strict — no kipping. Reduce band resistance as strength builds. Accomplishing the specified sets/reps using a thin resistance band indicates readiness for Level 4.",
+          "Squat": "Cossack squats develop lateral mobility. Bulgarian splits should reach parallel depth on every rep. If you can do 6 reps of Cossack squats and the other workouts, start pistol squat variant."
         }
       },
       "advanced": {
@@ -971,9 +971,9 @@
           ]
         },
         "progressionNotes": {
-          "Push": "Archer push-ups train unilateral strength. Keep the straight arm locked and control the full range.",
-          "Pull": "Negative pull-ups should last 10 seconds minimum. Band-assisted reps should be clean with full extension.",
-          "Squat": "Assisted pistol squats build single-leg strength. Focus on a controlled descent before removing assistance."
+          "Push": "Archer push-ups train unilateral strength. Keep the straight arm locked and control the full range. After completing the specified sets and reps, and maintaining a full minute plank, it’s time to attempt level 5.",
+          "Pull": "Negative pull-ups should last 10 seconds minimum. Band-assisted reps should be clean with full extension. Completing 5 single sets of 10 second negatives indicates the ability to perform a pull-up.",
+          "Squat": "Assisted pistol squats build single-leg strength. Focus on a controlled descent before removing assistance. Pick any pistol squats easier variant. After 10 reps (or 4s eccentric squats), it’s time to try an unassisted pistol squat."
         }
       },
       "expert": {
@@ -1242,9 +1242,9 @@
           ]
         },
         "progressionNotes": {
-          "Push": "One-arm push-ups require total body tension. Keep hips square and lower with full control.",
-          "Pull": "Strict pull-ups with no momentum. Aim for chin clearly over the bar on every rep.",
-          "Squat": "Full pistol squats with no assistance. Maintain heel contact and upright torso throughout."
+          "Push": "One-arm push-ups require total body tension. Keep hips square and lower with full control. Once you can complete the whole routine with the specific sets and reps, aim to increase the number of reps in the OAPU.",
+          "Pull": "Strict pull-ups with no momentum. Aim for chin clearly over the bar on every rep. If 3 sets of 3 pull-ups are doable, it’s time to try more. For instance, aim for 3 sets of 4 pull-ups next.",
+          "Squat": "Full pistol squats with no assistance. Maintain heel contact and upright torso throughout. Once you finish the whole level, aim to gradually reach 8 reps of pistol squats."
         }
       }
     }
