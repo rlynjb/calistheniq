@@ -1,6 +1,6 @@
 {
   "success": true,
-  "exportedAt": "2026-02-15T21:34:34.134Z",
+  "exportedAt": "2026-02-15T21:57:28.144Z",
   "data": {
     "userData": {
       "currentLevels": {
@@ -187,7 +187,7 @@
           "date": "2026-02-13T17:00:00.000Z"
         }
       ],
-      "lastUpdated": "2026-02-15T21:34:02.406Z"
+      "lastUpdated": "2026-02-15T21:57:03.807Z"
     },
     "workoutLevels": {
       "beginner": {
