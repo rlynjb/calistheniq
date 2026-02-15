@@ -121,8 +121,11 @@ curl -X POST "http://localhost:9999/.netlify/functions/seed?only=user"
 Save blob data to a JSON file:
 
 ```bash
-# From local
+# From local (Option 1 - netlify dev):
 curl http://localhost:8888/api/export > backup.json
+
+# From local (Option 2 - functions:serve --port 9999):
+curl http://localhost:9999/.netlify/functions/export > backup.json
 
 # From production
 curl https://your-site.netlify.app/api/export > backup.json
@@ -136,8 +139,13 @@ Copy production data to your local environment:
 # Step 1: Export from production
 curl https://your-site.netlify.app/api/export > backup.json
 
-# Step 2: Import to local
+# Step 2: Import to local (Option 1 - netlify dev):
 curl -X POST http://localhost:8888/api/import \
+  -d @backup.json \
+  -H "Content-Type: application/json"
+
+# Step 2: Import to local (Option 2 - functions:serve --port 9999):
+curl -X POST http://localhost:9999/.netlify/functions/import \
   -d @backup.json \
   -H "Content-Type: application/json"
 ```
@@ -147,8 +155,11 @@ curl -X POST http://localhost:8888/api/import \
 Copy local data to production:
 
 ```bash
-# Step 1: Export from local
+# Step 1: Export from local (Option 1 - netlify dev):
 curl http://localhost:8888/api/export > backup.json
+
+# Step 1: Export from local (Option 2 - functions:serve --port 9999):
+curl http://localhost:9999/.netlify/functions/export > backup.json
 
 # Step 2: Import to production
 curl -X POST https://your-site.netlify.app/api/import \
@@ -173,21 +184,27 @@ curl https://your-site.netlify.app/api/export > backup.json
 
 ## Quick Reference
 
+### Option 1: `netlify dev` (port 8888)
+
 ```bash
-# Seed local blob from mock files
-curl -X POST http://localhost:8888/api/seed
+curl -X POST http://localhost:8888/api/seed                                              # Seed
+curl http://localhost:8888/api/export > backup.json                                      # Export
+curl -X POST http://localhost:8888/api/import -d @backup.json -H "Content-Type: application/json"  # Import
+```
 
-# Export local blob to file
-curl http://localhost:8888/api/export > backup.json
+### Option 2: `functions:serve --port 9999`
 
-# Import file to local blob
-curl -X POST http://localhost:8888/api/import -d @backup.json -H "Content-Type: application/json"
+```bash
+curl -X POST http://localhost:9999/.netlify/functions/seed                                              # Seed
+curl http://localhost:9999/.netlify/functions/export > backup.json                                      # Export
+curl -X POST http://localhost:9999/.netlify/functions/import -d @backup.json -H "Content-Type: application/json"  # Import
+```
 
-# Export production blob to file
-curl https://your-site.netlify.app/api/export > backup.json
+### Production
 
-# Import file to production blob
-curl -X POST https://your-site.netlify.app/api/import -d @backup.json -H "Content-Type: application/json"
+```bash
+curl https://your-site.netlify.app/api/export > backup.json                                            # Export
+curl -X POST https://your-site.netlify.app/api/import -d @backup.json -H "Content-Type: application/json"  # Import
 ```
 
 ---

@@ -1,6 +1,6 @@
 {
   "success": true,
-  "exportedAt": "2026-02-14T22:56:15.761Z",
+  "exportedAt": "2026-02-15T21:34:34.134Z",
   "data": {
     "userData": {
       "currentLevels": {
@@ -12,403 +12,122 @@
         {
           "exercises": [
             {
-              "name": "Wall Push-ups",
+              "name": "Negative Push-ups",
               "sets": [
                 {
-                  "reps": 4
+                  "reps": 8
                 },
                 {
-                  "reps": 4
+                  "reps": 8
                 },
                 {
-                  "reps": 4
+                  "reps": 8
                 }
               ],
-              "tempo": "2-1-2-1",
-              "rest": 60,
-              "completedSets": [
-                false,
-                false,
-                false
-              ],
-              "completed": false
+              "tempo": "4-2-0-0",
+              "rest": 60
             },
             {
-              "name": "Incline Push-ups",
+              "name": "Scapula Push-ups",
               "sets": [
                 {
-                  "reps": 4
+                  "reps": 8
                 },
                 {
-                  "reps": 4
+                  "reps": 8
                 },
                 {
-                  "reps": 4
-                }
-              ],
-              "tempo": "2-1-2-1",
-              "rest": 60,
-              "completedSets": [
-                false,
-                false,
-                false
-              ],
-              "completed": false
-            },
-            {
-              "name": "Deep squats",
-              "sets": [
-                {
-                  "reps": 4
+                  "reps": 8
                 },
                 {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
+                  "reps": 8
                 }
               ],
               "tempo": "2-0-1-0",
-              "rest": 0,
-              "completedSets": [
-                false,
-                false,
-                false
-              ],
-              "completed": false
+              "rest": 60
             },
             {
-              "name": "Narrow stance squats",
+              "name": "Plank Hold",
               "sets": [
                 {
-                  "reps": 4
+                  "duration": 60
                 },
                 {
-                  "reps": 4
+                  "duration": 60
                 },
                 {
-                  "reps": 4
+                  "duration": 60
+                },
+                {
+                  "duration": 60
                 }
               ],
-              "tempo": "2-0-1-0",
-              "rest": 0,
-              "completedSets": [
-                false,
-                false,
-                false
-              ],
-              "completed": false
-            },
-            {
-              "name": "Bodyweight Squats",
-              "sets": [
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                }
-              ],
-              "tempo": "2-0-1-0",
-              "rest": 0,
-              "completedSets": [
-                false,
-                false,
-                false
-              ],
-              "completed": false
+              "tempo": "",
+              "rest": 60
             }
           ],
           "categories": [
-            "Push",
-            "Squat"
+            "Push"
           ],
           "level": 1,
-          "date": "2026-02-14T08:00:00.000Z"
+          "date": "2026-02-09T17:00:00.000Z"
         },
         {
           "exercises": [
             {
-              "name": "Wall Push-ups",
+              "name": "TRX Lat Pull-down",
               "sets": [
                 {
-                  "reps": 4
+                  "reps": 8
                 },
                 {
-                  "reps": 4
+                  "reps": 8
                 },
                 {
-                  "reps": 4
+                  "reps": 8
                 }
               ],
-              "tempo": "2-1-2-1",
-              "rest": 60,
-              "completedSets": [
-                false,
-                false,
-                false
-              ],
-              "completed": false
+              "tempo": "",
+              "rest": 0
             },
             {
-              "name": "Incline Push-ups",
+              "name": "TRX Inverted Row (Australian Pull-ups)",
               "sets": [
                 {
-                  "reps": 4
+                  "reps": 15
                 },
                 {
-                  "reps": 4
+                  "reps": 15
                 },
                 {
-                  "reps": 4
-                }
-              ],
-              "tempo": "2-1-2-1",
-              "rest": 60,
-              "completedSets": [
-                false,
-                false,
-                false
-              ],
-              "completed": false
-            },
-            {
-              "name": "Deep squats",
-              "sets": [
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
+                  "reps": 15
                 }
               ],
               "tempo": "2-0-1-0",
-              "rest": 0,
-              "completedSets": [
-                false,
-                false,
-                false
-              ],
-              "completed": false
+              "rest": 0
             },
             {
-              "name": "Narrow stance squats",
+              "name": "TRX Passive Hang",
               "sets": [
                 {
-                  "reps": 4
+                  "duration": 60
                 },
                 {
-                  "reps": 4
+                  "duration": 60
                 },
                 {
-                  "reps": 4
+                  "duration": 60
                 }
               ],
-              "tempo": "2-0-1-0",
-              "rest": 0,
-              "completedSets": [
-                false,
-                false,
-                false
-              ],
-              "completed": false
-            },
-            {
-              "name": "Bodyweight Squats",
-              "sets": [
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                }
-              ],
-              "tempo": "2-0-1-0",
-              "rest": 0,
-              "completedSets": [
-                false,
-                false,
-                false
-              ],
-              "completed": false
+              "tempo": "",
+              "rest": 0
             }
           ],
           "categories": [
-            "Push",
-            "Squat"
+            "Pull"
           ],
           "level": 1,
-          "date": "2026-02-13T08:00:00.000Z"
-        },
-        {
-          "exercises": [
-            {
-              "name": "Wall Push-ups",
-              "sets": [
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                }
-              ],
-              "tempo": "2-1-2-1",
-              "rest": 60,
-              "completedSets": [
-                true,
-                true,
-                true
-              ],
-              "completed": true
-            },
-            {
-              "name": "Incline Push-ups",
-              "sets": [
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                }
-              ],
-              "tempo": "2-1-2-1",
-              "rest": 60,
-              "completedSets": [
-                true,
-                true,
-                true
-              ],
-              "completed": true
-            },
-            {
-              "name": "Dead Hang",
-              "sets": [
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                }
-              ],
-              "tempo": "hold",
-              "rest": 60,
-              "completedSets": [
-                true,
-                true
-              ],
-              "completed": true
-            },
-            {
-              "name": "Inverted Rows (High Bar)",
-              "sets": [
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                }
-              ],
-              "tempo": "2-1-2-1",
-              "rest": 90,
-              "completedSets": [
-                true,
-                true,
-                true
-              ],
-              "completed": true
-            },
-            {
-              "name": "Deep squats",
-              "sets": [
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                }
-              ],
-              "tempo": "2-0-1-0",
-              "rest": 0,
-              "completedSets": [
-                true,
-                true,
-                true
-              ],
-              "completed": true
-            },
-            {
-              "name": "Narrow stance squats",
-              "sets": [
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                }
-              ],
-              "tempo": "2-0-1-0",
-              "rest": 0,
-              "completedSets": [
-                true,
-                true,
-                true
-              ],
-              "completed": true
-            },
-            {
-              "name": "Bodyweight Squats",
-              "sets": [
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                },
-                {
-                  "reps": 4
-                }
-              ],
-              "tempo": "2-0-1-0",
-              "rest": 0,
-              "completedSets": [
-                true,
-                true,
-                true
-              ],
-              "completed": true
-            }
-          ],
-          "categories": [
-            "Push",
-            "Pull",
-            "Squat"
-          ],
-          "level": 1,
-          "date": "2026-02-12T08:00:00.000Z"
+          "date": "2026-02-11T17:00:00.000Z"
         },
         {
           "exercises": [
@@ -416,77 +135,59 @@
               "name": "Deep squats",
               "sets": [
                 {
-                  "reps": 6
+                  "reps": 12
                 },
                 {
-                  "reps": 6
+                  "reps": 12
                 },
                 {
-                  "reps": 6
+                  "reps": 12
                 }
               ],
               "tempo": "2-0-1-0",
-              "rest": 0,
-              "completed": true,
-              "completedSets": [
-                true,
-                true,
-                true
-              ]
+              "rest": 0
             },
             {
               "name": "Narrow stance squats",
               "sets": [
                 {
-                  "reps": 4
+                  "reps": 12
                 },
                 {
-                  "reps": 4
+                  "reps": 12
                 },
                 {
-                  "reps": 4
+                  "reps": 12
                 }
               ],
               "tempo": "2-0-1-0",
-              "rest": 0,
-              "completed": true,
-              "completedSets": [
-                true,
-                true,
-                true
-              ]
+              "rest": 0
             },
             {
               "name": "Bodyweight Squats",
               "sets": [
                 {
-                  "reps": 4
+                  "reps": 15
                 },
                 {
-                  "reps": 4
+                  "reps": 15
                 },
                 {
-                  "reps": 4
+                  "reps": 15
                 }
               ],
               "tempo": "2-0-1-0",
-              "rest": 0,
-              "completed": true,
-              "completedSets": [
-                true,
-                true,
-                true
-              ]
+              "rest": 0
             }
           ],
           "categories": [
             "Squat"
           ],
           "level": 1,
-          "date": "2026-02-08T08:00:00.000Z"
+          "date": "2026-02-13T17:00:00.000Z"
         }
       ],
-      "lastUpdated": "2026-02-14T02:52:46.968Z"
+      "lastUpdated": "2026-02-15T21:34:02.406Z"
     },
     "workoutLevels": {
       "beginner": {
@@ -648,6 +349,11 @@
               "rest": 0
             }
           ]
+        },
+        "progressionNotes": {
+          "Push": "Focus on controlled negatives — aim for a slow 4-second lowering phase before progressing to full push-ups.",
+          "Pull": "Build grip endurance and scapular awareness. Hold passive hangs for 60s before moving to active pulling.",
+          "Squat": "Prioritize depth and ankle mobility. Keep heels grounded and work toward full range of motion."
         }
       },
       "novice": {
@@ -809,6 +515,11 @@
               "rest": 60
             }
           ]
+        },
+        "progressionNotes": {
+          "Push": "Maintain full range of motion on standard push-ups. Scapula push-ups should feel controlled at the top.",
+          "Pull": "Straighten legs on inverted rows. Scapula pull-ups should show clear retraction and depression.",
+          "Squat": "Introduce single-leg stability with Bulgarian squats. Use a slower tempo to build control."
         }
       },
       "intermediate": {
@@ -1018,6 +729,11 @@
               "rest": 60
             }
           ]
+        },
+        "progressionNotes": {
+          "Push": "Train all push-up variations with consistent tempo. Diamond and wide push-ups build the base for one-arm work.",
+          "Pull": "Band-assisted pull-ups should be strict — no kipping. Reduce band resistance as strength builds.",
+          "Squat": "Cossack squats develop lateral mobility. Bulgarian splits should reach parallel depth on every rep."
         }
       },
       "advanced": {
@@ -1253,6 +969,11 @@
               "rest": 60
             }
           ]
+        },
+        "progressionNotes": {
+          "Push": "Archer push-ups train unilateral strength. Keep the straight arm locked and control the full range.",
+          "Pull": "Negative pull-ups should last 10 seconds minimum. Band-assisted reps should be clean with full extension.",
+          "Squat": "Assisted pistol squats build single-leg strength. Focus on a controlled descent before removing assistance."
         }
       },
       "expert": {
@@ -1519,6 +1240,11 @@
               "rest": 75
             }
           ]
+        },
+        "progressionNotes": {
+          "Push": "One-arm push-ups require total body tension. Keep hips square and lower with full control.",
+          "Pull": "Strict pull-ups with no momentum. Aim for chin clearly over the bar on every rep.",
+          "Squat": "Full pistol squats with no assistance. Maintain heel contact and upright torso throughout."
         }
       }
     }
