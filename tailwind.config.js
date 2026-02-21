@@ -51,7 +51,7 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // CalisthenIQ Brand Colors
+        // Contrl Brand Colors
         fitness: {
           50: '#f0f9ff',
           100: '#e0f2fe',

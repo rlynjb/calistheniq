@@ -1,4 +1,4 @@
-# CalisthenIQ
+# Contrl
 
 Calisthenics workout tracker. Users log weekly workouts across Push, Pull, and Squat categories with 5 progressive difficulty levels.
 

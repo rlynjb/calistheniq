@@ -59,7 +59,7 @@
   }
 }
 
-/* Custom CalisthenIQ Styles */
+/* Custom Contrl Styles */
 @layer components {
   .gradient-bg {
     @apply bg-gradient-to-br from-fitness-500 via-fitness-600 to-fitness-700;

@@ -29,7 +29,7 @@ export default function RootLayout({
               <div className="container mx-auto px-4 py-3">
                 <nav className="flex items-center justify-between">
                   <Link href="/" className="font-bold text-xl flex items-center gap-2">
-                    🤸‍♂️ CalisthenIQ
+                    🤸‍♂️ Contrl
                   </Link>
                 </nav>
               </div>

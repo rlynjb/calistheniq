@@ -4,7 +4,7 @@
 const API_BASE = 'http://localhost:8888'
 
 async function testCoachEndpoint() {
-  console.log('🧪 Testing CalisthenIQ API Integration...\n')
+  console.log('🧪 Testing Contrl API Integration...\n')
 
   try {
     // Test 1: Health check

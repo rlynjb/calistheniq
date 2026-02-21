@@ -2,7 +2,7 @@
 
 ## Build & Deploy
 
-CalisthenIQ deploys to Netlify. Pushing to `main` triggers an automatic build.
+Contrl deploys to Netlify. Pushing to `main` triggers an automatic build.
 
 ### Build Command
 
