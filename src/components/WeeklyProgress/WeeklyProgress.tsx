@@ -56,15 +56,6 @@ export default function WeeklyProgress() {
 
   return (
     <div className="weekly-progress">
-      {/* Week header */}
-      <div className="weekly-progress__week-header">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((dayLabel, index) => (
-          <div key={index} className="weekly-progress__day-label">
-            {dayLabel}
-          </div>
-        ))}
-      </div>
-
       <div className="weekly-progress__grid" role="grid" aria-label="Weekly workout calendar">
         {status === 'loading' && weekDays.length === 0 && (
           <p className="weekly-progress__loading">Loading...</p>
