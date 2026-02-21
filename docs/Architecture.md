@@ -1,478 +1,144 @@
-# CalisthenIQ Architecture
+# Architecture
 
-This document outlines the project directory structure and architectural layers for CalisthenIQ, an AI-powered multi-agent calisthenics coaching application.
-
-## Architectural Principles
-
-- **Clean Separation**: Clear boundaries between presentation, orchestration, domain logic, and infrastructure
-- **Multi-Agent Design**: Four specialized agents with distinct responsibilities
-- **Tool-Based Architecture**: Function calling for database operations and domain actions
-- **State Machine Routing**: Deterministic agent selection based on session state
-- **Schema Validation**: Structured JSON contracts for all agent outputs
-
-## Current Implementation Status (Simplified Frontend)
-
-**Phase**: Frontend-focused development with simplified architecture
-**Focus**: Clean UI components with mock data, preparation for backend integration
-
-**Completed**:
-
-- ✅ Single dashboard page with tabbed progress interface
-- ✅ Modular component architecture (WeeklyProgress, WorkoutProgress, CurrentLevel, WorkoutLevels)
-- ✅ Integrated chat interface for AI coach communication
-- ✅ Mock data structures for workout levels and progress tracking
-- ✅ Clean component separation and reusable UI components
-
-**Simplified/Removed**:
-
-- ❌ Separate `/chat` and `/workout` routes (consolidated into main dashboard)
-- ❌ Backend API routes (health check endpoint removed)
-- ❌ Workout-related hooks and components (WorkoutCard, useWorkout)
-- ❌ Complex type definitions (consolidated into TODO for centralization)
-
-**Next Steps**:
-
-- 🔄 Consolidate inline types into centralized type definitions
-- 🔄 Backend integration with Netlify Functions (full multi-agent architecture)
-- 🔄 Database integration for user profiles and workout sessions
-
-## Project Directory Structure
+## System Diagram
 
 ```
-calistheniq/
-├── README.md
-├── package.json
-├── Architecture.md
-├── next.config.js
-├── tailwind.config.js
-├── tsconfig.json
+Browser
+├── Next.js 14 (App Router)
+│   ├── / ─────────────── DashboardPage → WeeklyProgress
+│   └── /workout-levels ─ WorkoutLevelsPage → WorkoutLevels
 │
-├── .env.local.example
-├── .gitignore
-├── .eslintrc.json
+├── useUserData hook ──── central state + write queue
 │
-├── public/
-│   ├── favicon.ico
-│   └── favicon.svg
-│
-├── src/
-│   ├── app/                           # Next.js App Router (Presentation Layer)
-│   │   ├── layout.tsx                 # Root layout with navigation
-│   │   ├── page.tsx                   # Main dashboard page
-│   │   └── globals.css                # Global styles
+├── src/api/ ─────────── API client (fetch wrapper)
 │   │
-│   ├── components/                    # UI Components (Presentation Layer)
-│   │   ├── ui/                        # Base UI components
-│   │   │   ├── button.tsx
-│   │   │   ├── card.tsx
-│   │   │   ├── input.tsx
-│   │   │   └── badge.tsx
-│   │   │
-│   │   ├── chat/
-│   │   │   └── ChatInterface.tsx      # Main chat component
-│   │   │
-│   │   ├── WeeklyProgress.tsx         # Weekly calendar with progress tracking
-│   │   ├── WorkoutProgress.tsx        # Last session & today's workout plan
-│   │   ├── CurrentLevel.tsx           # User's current level across categories
-│   │   └── WorkoutLevels.tsx          # Progressive exercise levels display
-│   │
-│   ├── hooks/                         # React Hooks (Presentation Logic)
-│   │   └── useChat.ts                 # Chat state management
-│   │
-│   ├── lib/                           # Shared Utilities
-│   │   ├── utils.ts                   # General utilities
-│   │   └── constants.ts               # App constants
-│   │
-│   └── types/                         # TypeScript Types
-│       └── index.ts                   # Centralized type definitions (TODO)
-│
-├── netlify/
-│   └── functions/                     # Backend Brain/Hub (Serverless Functions)
-│       │
-│       ├── coach.ts                   # Main Orchestrator Entry Point
-│       ├── coach_background.ts        # Background Processing (Optional)
-│       │
-│       ├── core/                      # Core Backend Logic
-│       │   │
-│       │   ├── orchestration/         # Orchestration Layer
-│       │   │   ├── supervisor.ts      # Main supervisor/router
-│       │   │   ├── state-machine.ts   # State machine logic
-│       │   │   ├── session-manager.ts # Session state management
-│       │   │   └── response-handler.ts # Response formatting & streaming
-│       │   │
-│       │   ├── agents/                # AI Agents Layer
-│       │   │   ├── base/
-│       │   │   │   ├── BaseAgent.ts   # Abstract base agent
-│       │   │   │   └── agent-config.ts # Agent configurations
-│       │   │   │
-│       │   │   ├── intake-safety/
-│       │   │   │   ├── IntakeSafetyAgent.ts
-│       │   │   │   └── intake-prompts.ts
-│       │   │   │
-│       │   │   ├── program-designer/
-│       │   │   │   ├── ProgramDesignerAgent.ts
-│       │   │   │   └── program-prompts.ts
-│       │   │   │
-│       │   │   ├── technique-coach/
-│       │   │   │   ├── TechniqueCoachAgent.ts
-│       │   │   │   └── coaching-prompts.ts
-│       │   │   │
-│       │   │   └── gamification/
-│       │   │       ├── GamificationAgent.ts
-│       │   │       └── gamification-prompts.ts
-│       │   │
-│       │   ├── tools/                 # Function Calling Tools Layer
-│       │   │   ├── index.ts           # Tool registry/exports
-│       │   │   ├── profile-tools.ts   # save_profile, fetch_profile
-│       │   │   ├── session-tools.ts   # create_session, fetch_last_sessions
-│       │   │   ├── logging-tools.ts   # log_set, log_completion
-│       │   │   ├── gamification-tools.ts # award_xp, update_streak
-│       │   │   ├── exercise-tools.ts  # exercise_library_lookup
-│       │   │   ├── rag-tools.ts       # (PHASE 2) RAG-enhanced tools
-│       │   │   ├── semantic-search.ts # (PHASE 2) semantic_exercise_search
-│       │   │   ├── coaching-knowledge.ts # (PHASE 2) coaching_knowledge_lookup
-│       │   │   └── safety-retrieval.ts # (PHASE 2) safety_guidelines_retrieve
-│       │   │
-│       │   ├── domain/                # Domain Logic Layer
-│       │   │   ├── models/
-│       │   │   │   ├── User.ts        # User domain model
-│       │   │   │   ├── Session.ts     # Session domain model
-│       │   │   │   ├── Exercise.ts    # Exercise domain model
-│       │   │   │   ├── WorkoutPlan.ts # Workout plan model
-│       │   │   │   └── Achievement.ts # Achievement model
-│       │   │   │
-│       │   │   ├── services/
-│       │   │   │   ├── ProfileService.ts # User profile business logic
-│       │   │   │   ├── SessionService.ts # Session management logic
-│       │   │   │   ├── WorkoutService.ts # Workout planning logic
-│       │   │   │   ├── SafetyService.ts  # Safety validation logic
-│       │   │   │   ├── ProgressService.ts # Progress tracking logic
-│       │   │   │   └── RAGService.ts     # (PHASE 2) RAG orchestration service
-│       │   │   │
-│       │   │   ├── validators/
-│       │   │   │   ├── schemas.ts     # Zod validation schemas
-│       │   │   │   ├── workout-schema.ts # Workout plan validation
-│       │   │   │   ├── profile-schema.ts # User profile validation
-│       │   │   │   └── safety-schema.ts  # Safety constraint validation
-│       │   │   │
-│       │   │   └── repositories/
-│       │   │       ├── BaseRepository.ts # Abstract repository
-│       │   │       ├── UserRepository.ts # User data operations
-│       │   │       ├── SessionRepository.ts # Session data operations
-│       │   │       ├── ExerciseRepository.ts # Exercise library operations
-│       │   │       ├── AchievementRepository.ts # Achievement operations
-│       │   │       └── VectorRepository.ts # (PHASE 2) Vector search operations
-│       │   │
-│       │   └── infrastructure/        # Infrastructure Layer
-│       │       ├── database/
-│       │       │   ├── connection.ts  # Neon/Postgres connection
-│       │       │   ├── migrations/    # Database schema migrations
-│       │       │   │   ├── 001_initial.sql
-│       │       │   │   ├── 002_sessions.sql
-│       │       │   │   ├── 003_achievements.sql
-│       │       │   │   ├── 004_indexes.sql
-│       │       │   │   └── 005_vector_tables.sql # (PHASE 2) Vector tables
-│       │       │   └── queries/       # Pre-built SQL queries
-│       │       │       ├── users.sql
-│       │       │       ├── sessions.sql
-│       │       │       ├── achievements.sql
-│       │       │       └── vector-search.sql # (PHASE 2) Vector queries
-│       │       │
-│       │       ├── openai/
-│       │       │   ├── client.ts      # OpenAI client configuration
-│       │       │   ├── agents-sdk.ts  # Agents SDK integration
-│       │       │   ├── streaming.ts   # Streaming response handling
-│       │       │   └── embeddings.ts  # (PHASE 2) Embedding generation
-│       │       │
-│       │       ├── vector/            # (PHASE 2) Vector Database Layer
-│       │       │   ├── pgvector.ts    # pgvector integration
-│       │       │   ├── embeddings-manager.ts # Embedding management
-│       │       │   ├── similarity-search.ts  # Vector similarity search
-│       │       │   └── knowledge-ingestion.ts # Knowledge base ingestion
-│       │       │
-│       │       ├── external/
-│       │       │   └── netlify.ts     # Netlify-specific utilities
-│       │       │
-│       │       └── config/
-│       │           ├── environment.ts # Environment variable handling
-│       │           ├── logging.ts     # Logging configuration
-│       │           └── constants.ts   # Backend constants
-│       │
-│       └── data/                      # Static Data & Resources
-│           ├── exercises/
-│           │   ├── exercise-library.json # Exercise database
-│           │   ├── progressions.json     # Exercise progressions
-│           │   ├── equipment-mapping.json # Equipment categories
-│           │   ├── exercise-embeddings.json # (PHASE 2) Pre-computed embeddings
-│           │   └── coaching-cues.json    # (PHASE 2) Coaching knowledge base
-│           │
-│           ├── prompts/
-│           │   ├── system-prompts/       # System-level prompts
-│           │   ├── agent-prompts/        # Agent-specific prompts
-│           │   ├── safety-prompts/       # Safety-related prompts
-│           │   └── rag-prompts/          # (PHASE 2) RAG-enhanced prompts
-│           │
-│           ├── schemas/
-│           │   ├── workout-output.json   # Workout plan JSON schema
-│           │   ├── profile-output.json   # User profile JSON schema
-│           │   ├── session-output.json   # Session log JSON schema
-│           │   └── rag-schemas.json      # (PHASE 2) RAG response schemas
-│           │
-│           └── knowledge/                # (PHASE 2) RAG Knowledge Base
-│               ├── safety-guidelines/    # Medical/safety knowledge
-│               ├── coaching-methodology/ # Coaching best practices
-│               ├── exercise-science/     # Exercise science literature
-│               └── user-patterns/        # Anonymized user success patterns
-│
-├── docs/                              # Documentation
-│   ├── api/
-│   │   ├── endpoints.md               # API documentation
-│   │   └── examples.md                # Usage examples
-│   │
-│   ├── agents/
-│   │   ├── intake-safety.md           # Intake & Safety Agent docs
-│   │   ├── program-designer.md        # Program Designer Agent docs
-│   │   ├── technique-coach.md         # Technique Coach Agent docs
-│   │   └── gamification.md            # Gamification Agent docs
-│   │
-│   └── deployment/
-│       ├── netlify-setup.md           # Netlify deployment guide
-│       ├── database-setup.md          # Database setup instructions
-│       └── environment.md             # Environment configuration
-│
-└── tests/                             # Test Suite
-    ├── unit/
-    │   ├── agents/                    # Agent unit tests
-    │   ├── tools/                     # Tool function tests
-    │   ├── domain/                    # Domain logic tests
-    │   └── components/                # UI component tests
-    │
-    ├── integration/
-    │   ├── api/                       # API integration tests
-    │   ├── database/                  # Database integration tests
-    │   └── agents/                    # Agent integration tests
-    │
-    └── e2e/
-        ├── user-flows/                # End-to-end user flows
-        └── chat-scenarios/            # Chat interaction scenarios
+│   ├── MSW enabled? ──→ In-browser mocks (src/mocks/)
+│   └── MSW disabled? ─→ fetch /api/* ──→ Netlify redirect
+│                                          /.netlify/functions/*
+Netlify Functions (10)
+├── exercises, exercises-levels,
+│   exercises-level, exercises-search ──→ reads from mock imports + blob cache
+├── user-data, user-levels ─────────────→ reads/writes Netlify Blobs
+├── health ─────────────────────────────→ status check
+└── seed, export, import ───────────────→ blob data management
+         │
+    Netlify Blobs
+    ├── store: "user-data"  key: "user-progress"
+    └── store: "exercises"  key: "workout-levels"
 ```
 
-## Layer Descriptions
+## Frontend
 
-### 1. Presentation Layer (`src/app`, `src/components`, `src/hooks`)
+### Pages
 
-**Purpose**: User interface and interaction handling
+| Route | File | Renders |
+|-------|------|---------|
+| `/` | `src/app/page.tsx` | `ProgressPanel` → `WeeklyProgress` |
+| `/workout-levels` | `src/app/workout-levels/page.tsx` | `WorkoutLevels` |
 
-- **App Router**: Next.js 14 App Router with single page dashboard
-- **Components**:
-  - **UI Components**: Base components (button, card, input, badge)
-  - **Dashboard Components**: Progress tracking components (WeeklyProgress, WorkoutProgress, CurrentLevel, WorkoutLevels)
-  - **Chat Interface**: Integrated chat component for AI coach interaction
-- **Hooks**: React hooks for state management (useChat)
-- **Responsibilities**:
-  - Render dashboard with tabbed progress interface
-  - Handle chat interactions with AI coach
-  - Display workout levels and exercise progressions
-  - Manage client-side state for progress tracking
-  - Stream responses from backend (via Netlify Functions)
+`ChatInterface` exists at `src/components/chat/ChatInterface.tsx` but is commented out in `page.tsx`.
 
-**Current Implementation Status**:
-
-- ✅ **Single Page Dashboard**: Consolidated progress interface with tabs
-- ✅ **Component Separation**: Modular components for different progress views
-- ✅ **Chat Integration**: Built-in chat interface within dashboard
-- ✅ **Mock Data**: Local mock data for workout levels and progress
-- 🔄 **Type Consolidation**: Types need to be gathered from inline definitions
-
-### 2. Orchestration Layer (`netlify/functions/core/orchestration/`)
-
-**Purpose**: System coordination and flow control
-
-- **Supervisor**: Main entry point that routes requests to appropriate agents
-- **State Machine**: Determines which agent should handle the current session state
-- **Session Manager**: Manages session lifecycle and state persistence
-- **Response Handler**: Formats responses and handles streaming
-- **Responsibilities**:
-  - Route incoming requests to correct agents
-  - Maintain session state across interactions
-  - Enforce business rules and constraints
-  - Handle response streaming and formatting
-
-### 3. Agents Layer (`netlify/functions/core/agents/`)
-
-**Purpose**: AI-powered decision making and conversation handling
-
-Four specialized agents with distinct responsibilities:
-
-#### A) Intake & Safety Agent
-
-- Collects user profile and safety constraints
-- Validates readiness for exercise
-- Identifies red flags requiring professional consultation
-- **(PHASE 2)** Retrieves medical guidelines for specific conditions via RAG
-- **(PHASE 2)** Performs evidence-based exercise restriction lookups
-- **(PHASE 2)** Pattern matches with similar user profiles for risk assessment
-
-#### B) Program Designer Agent
-
-- Creates personalized workout plans
-- Ensures equipment and time constraints are met
-- Includes progressions and regressions
-- **(PHASE 2)** Uses semantic search for intelligent exercise selection
-- **(PHASE 2)** Retrieves successful program templates for similar users
-- **(PHASE 2)** Optimizes equipment substitutions through knowledge lookup
-
-#### C) Technique Coach Agent
-
-- Provides real-time coaching during workouts
-- Monitors pain levels and adjusts exercises
-- Offers form cues and modifications
-- **(PHASE 2)** Retrieves contextual coaching cues based on user feedback
-- **(PHASE 2)** Accesses detailed regression/progression techniques
-- **(PHASE 2)** Uses pain response protocols from coaching knowledge base
-
-#### D) Gamification Agent
-
-- Awards experience points and tracks streaks
-- Triggers achievement badges
-- Suggests next session focus areas
-- **(PHASE 2)** Accesses diverse achievement templates through RAG
-- **(PHASE 2)** Retrieves context-appropriate motivational content
-- **(PHASE 2)** Personalizes encouragement based on user journey patterns
-
-### 4. Tools Layer (`netlify/functions/core/tools/`)
-
-**Purpose**: Function calling interface for agents
-
-- **Profile Tools**: User profile CRUD operations
-- **Session Tools**: Workout session management
-- **Logging Tools**: Exercise set and completion logging
-- **Gamification Tools**: XP, streaks, and achievement management
-- **Exercise Tools**: Exercise library lookups and filtering
-- **(PHASE 2) RAG Tools**: Semantic search and knowledge retrieval
-  - `semantic_exercise_search(query, constraints)`: Natural language exercise search
-  - `coaching_knowledge_lookup(context, user_feedback)`: Contextual coaching cues
-  - `safety_guidelines_retrieve(conditions, exercises)`: Medical safety guidelines
-  - `progression_recommendations(current_exercise, user_history)`: Smart progressions
-
-### 5. Domain Layer (`netlify/functions/core/domain/`)
-
-**Purpose**: Business logic and domain models
-
-- **Models**: Core domain entities (User, Session, Exercise, etc.)
-- **Services**: Business logic implementation
-- **Validators**: Schema validation using Zod
-- **Repositories**: Data access patterns and abstractions
-- **(PHASE 2) RAG Service**: Orchestrates retrieval across different knowledge bases
-- **(PHASE 2) Vector Repository**: Handles vector search operations and similarity matching
-- **Responsibilities**:
-  - Define core business entities
-  - Implement domain-specific logic
-  - Validate data integrity
-  - Abstract data access patterns
-  - **(PHASE 2)** Semantic search and knowledge retrieval coordination
-
-### 6. Infrastructure Layer (`netlify/functions/core/infrastructure/`)
-
-**Purpose**: External system integration and technical implementation
-
-- **Database**: Postgres/Neon connection and query management
-- **OpenAI**: Agents SDK integration and streaming
-- **(PHASE 2) Vector Database**: pgvector integration for semantic search
-- **(PHASE 2) Embeddings**: OpenAI embedding generation and management
-- **External**: Third-party service integrations
-- **Config**: Environment and system configuration
-- **Responsibilities**:
-  - Manage database connections and migrations
-  - Handle OpenAI API communication
-  - **(PHASE 2)** Vector database operations and similarity search
-  - **(PHASE 2)** Knowledge base ingestion and embedding generation
-  - Configure external service integrations
-  - Manage environment variables and secrets
-
-### 7. Static Data & Resources (`netlify/functions/data/`)
-
-**Purpose**: Static data and configuration
-
-- **Exercise Library**: Comprehensive exercise database with tags
-- **Prompts**: System and agent-specific prompt templates
-- **Schemas**: JSON schemas for output validation
-- **(PHASE 2) Knowledge Base**: Structured knowledge for RAG retrieval
-  - Safety guidelines and medical contraindications
-  - Coaching methodology and best practices
-  - Exercise science literature and evidence
-  - User success patterns (anonymized)
-- **(PHASE 2) Pre-computed Embeddings**: Cached embeddings for performance
-- **Responsibilities**:
-  - Provide exercise metadata and progressions
-  - Store prompt templates for agents
-  - Define output structure contracts
-  - **(PHASE 2)** Maintain vectorized knowledge bases for semantic search
-  - **(PHASE 2)** Provide contextual coaching and safety information
-
-## Key Architectural Benefits
-
-### Clean Separation of Concerns
-
-- **Presentation** handles UI/UX without business logic
-- **Orchestration** manages flow without knowing agent internals
-- **Agents** focus on AI decision-making without infrastructure concerns
-- **Domain** contains pure business logic
-- **Infrastructure** handles external systems
-
-### **(PHASE 2) RAG Architecture Benefits**
-
-- **Semantic Understanding**: Move beyond keyword matching to intent-based responses
-- **Dynamic Knowledge**: Access vast coaching knowledge without hardcoding rules
-- **Contextual Coaching**: Provide personalized guidance based on accumulated expertise
-- **Safety Intelligence**: Comprehensive contraindication checking through medical knowledge
-- **Adaptive Learning**: System improves through expanded knowledge base ingestion
-
-### RAG Technical Stack (PHASE 2)
+### Component Tree (Dashboard)
 
 ```
-Vector Database:
-- Primary: pgvector with Neon (integrated with existing DB)
-- Alternative: Pinecone/Weaviate for dedicated vector operations
-
-Embedding Generation:
-- OpenAI text-embedding-3-large for semantic understanding
-- Batch processing for knowledge base ingestion
-- Incremental updates for new content
-
-Knowledge Sources:
-- Exercise database (500+ exercises with rich metadata)
-- Coaching methodology database
-- Safety and contraindication guidelines
-- User pattern analysis (anonymized)
-- Exercise science literature
-
-Retrieval Pipeline:
-1. Query embedding generation
-2. Vector similarity search
-3. Context ranking and filtering
-4. Knowledge synthesis for agent consumption
+DashboardPage
+└── ProgressPanel
+    └── WeeklyProgress          ← consumes useUserData()
+        ├── 7-day calendar grid
+        └── Modal
+            └── WorkoutDetail   ← receives mutation callbacks as props
+                └── WorkoutExerciseCard[]  ← uncontrolled after mount
 ```
 
-### Scalability & Maintainability
+### State Management: `useUserData` Hook
 
-- Each layer can be modified independently
-- New agents can be added without changing orchestration
-- Tools can be extended without affecting agents
-- Infrastructure can be swapped without domain changes
+Source: `src/hooks/useUserData.ts`
 
-### Testing Strategy
+Single hook owns all user state. No external state library.
 
-- **Unit Tests**: Individual functions and components
-- **Integration Tests**: Layer interactions
-- **E2E Tests**: Complete user workflows
-- **Agent Tests**: AI behavior validation
+**Returned state:**
+- `userData` — raw `UserData` from API
+- `currentLevels` — `{ Push: number, Pull: number, Squat: number }`
+- `weekDays` — 7-element `ExtendedWeekDay[]` (generated week merged with `weeklyProgress`)
+- `status` — `'idle' | 'loading' | 'error' | 'success'`
+- `saveStatus` — `'idle' | 'saving' | 'saved' | 'error'`
 
-### Development Workflow
+**Returned mutations:**
+- `addCategoryToDay(date, category, exercises, level)` — async, optimistic
+- `removeCategoryFromDay(date, category)` — async, optimistic
+- `updateExercise(date, index, exercise)` — **sync** (debounced 600ms before API call)
+- `levelUp(category, newLevel)` — async
+- `refreshAll()` — re-fetches everything from API
 
-1. **Frontend Development**: Work on UI components independently
-2. **Agent Development**: Develop and test agents with mock tools
-3. **Integration Development**: Connect layers with proper error handling
-4. **Infrastructure Setup**: Configure databases and external services
+### Key Technical Decisions
 
-This architecture ensures that CalisthenIQ remains maintainable, testable, and scalable while providing clear boundaries between different system responsibilities.
+**Write queue (promise-based mutex)**
+All async mutations are serialized via `writeQueueRef.current = writeQueueRef.current.then(fn)`. This prevents concurrent read-modify-write races when the user rapidly toggles checkboxes or adds categories.
+
+**Optimistic updates**
+Every mutation updates `weekDays` state immediately via `setWeekDays(prev => ...)` before the API call. On API failure, `refreshAll()` reverts to server truth.
+
+**Debounced exercise saves**
+`updateExercise` updates local state synchronously, stores the pending change in `pendingExerciseRef`, and resets a 600ms timer. Only when the timer fires does `flushExerciseUpdate()` enqueue the API call. This batches rapid edits (reps, checkboxes) into a single network round-trip.
+
+**Derived `selectedDay`**
+`WeeklyProgress` stores `selectedDayDate: string | null` and derives the actual `selectedDay` object via `useMemo(() => weekDays.find(...), [weekDays, selectedDayDate])`. This avoids stale closures — when a mutation updates `weekDays`, the derived value automatically reflects the change.
+
+**Uncontrolled-after-mount `WorkoutExerciseCard`**
+The card initializes local state from props and never syncs back from props. The parent uses React `key={exercise.name-index}` to force a remount when exercise identity changes. This prevents `useEffect` state resets from overwriting in-progress user input.
+
+### API Client
+
+Source: `src/api/client.ts`
+
+`ApiClient` class wrapping `fetch` with:
+- Configurable base URL (`NEXT_PUBLIC_API_BASE_URL`, default `''`)
+- Configurable timeout (`NEXT_PUBLIC_API_TIMEOUT`, default `10000`)
+- `AbortController` per request
+- Methods: `get`, `post`, `put`, `delete`
+- Returns `ApiResponse<T>` with `{ data, success, message?, error? }`
+- Throws `ApiError` with `{ message, status?, code? }`
+
+### MSW Integration
+
+Source: `src/mocks/MSWProvider.tsx`, `src/mocks/handlers.ts`
+
+`MSWProvider` wraps the app in `layout.tsx`. On mount, if `NODE_ENV === 'development'` and `NEXT_PUBLIC_MSW_ENABLED === 'true'`, it starts the MSW service worker. The worker intercepts all `fetch` calls matching `*/exercises/*`, `*/user/*`, and `*/health` patterns.
+
+MSW handlers mirror the exact logic of the Netlify Functions (same filtering, same response shapes) using in-memory state initialized from `src/mocks/data/`.
+
+## Backend
+
+### Blob Storage Abstraction
+
+Source: `netlify/functions/core/infrastructure/blob/store.ts`
+
+Two stores, two keys:
+
+| Store name | Key | Contents |
+|------------|-----|----------|
+| `user-data` | `user-progress` | `UserData` (levels + weeklyProgress) |
+| `exercises` | `workout-levels` | `WorkoutLevels` (exercises by difficulty) |
+
+Wrapper functions: `userDataStore.get()`, `userDataStore.set()`, `exerciseDataStore.getWorkoutLevels()`, etc.
+
+Also exports shared response helpers: `jsonResponse()`, `errorResponse()`, `handleCors()`.
+
+### Exercise Functions Data Source
+
+The 4 exercise functions (`exercises.ts`, `exercises-search.ts`, `exercises-level.ts`) import `allExercises` directly from `src/mocks/data/exercises.ts` at **bundle time**. They do not read from blob storage. `exercises-levels.ts` tries blob first, falls back to the imported `workoutLevels`.
+
+### CORS
+
+All functions handle `OPTIONS` preflight and return `Access-Control-Allow-Origin: *` on every response via the shared `corsHeaders` object.
+
+## Installed but Unused Dependencies
+
+| Package | Intended use | Status |
+|---------|-------------|--------|
+| `@openai/agents`, `openai` | AI coaching agents | Not imported by any `.ts` file |
+| `@neondatabase/serverless`, `pg` | Postgres database | Not imported; blob storage is used instead |
+| `zod` | Schema validation | Not imported |
+| `dotenv` | Env loading | Not imported (Next.js handles this) |
+
+The `db:*` scripts in `package.json` reference `netlify/functions/core/infrastructure/database/` which **does not exist**. These scripts are dead.
