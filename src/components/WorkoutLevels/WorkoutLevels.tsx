@@ -5,6 +5,7 @@ import { Badge, ExerciseCard } from '@/components/ui'
 import { api } from '@/api'
 import type { BaseExercise, WorkoutLevel, UserData, CurrentUserLevels } from '@/api'
 import { MOCK_UserData } from '@/mocks'
+import CurrentLevelsOverview from '@/components/CurrentLevelsOverview'
 import './WorkoutLevels.css'
 
 // Map level keys to their actual level numbers
@@ -53,22 +54,7 @@ export default function WorkoutLevels() {
         Progressive calisthenics exercises organized by difficulty levels
       </div>
       
-      {/* Current Levels Overview */}
-      <div className="workout-levels__overview">
-        <div className="workout-levels__overview-header">
-          <div className="workout-levels__overview-title">Your Current Levels</div>
-        </div>
-        <div className="workout-levels__overview-grid">
-          {Object.entries(currentLevels).map(([category, level]) => (
-            <div key={category} className={`workout-levels__overview-item workout-levels__overview-item--${category.toLowerCase()}`}>
-              <div className="workout-levels__overview-category">{category}</div>
-              <Badge variant="default" className={`workout-levels__overview-badge workout-levels__overview-badge--${category.toLowerCase()}`}>
-                Level {level}
-              </Badge>
-            </div>
-          ))}
-        </div>
-      </div>
+      <CurrentLevelsOverview currentLevels={currentLevels} />
       
       <div className="workout-levels__container">
         {(Object.entries(exercises) as [string, WorkoutLevel][]).map(([levelKey, level]) => {

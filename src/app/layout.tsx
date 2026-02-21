@@ -31,6 +31,12 @@ export default function RootLayout({
                   <Link href="/" className="font-bold text-xl flex items-center gap-2">
                     contrl
                   </Link>
+                  <Link
+                    href="/workout-levels"
+                    className="px-3 py-1.5 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:bg-secondary/80 transition-colors"
+                  >
+                    Workout Levels
+                  </Link>
                 </nav>
               </div>
             </header>
