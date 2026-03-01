@@ -5,19 +5,13 @@
  *
  * Usage:
  *   import { api } from '@/api'
- *   const levels = await api.exercises.getWorkoutLevels()
- *   const user = await api.user.getUserData()
+ *   await api.healthCheck()
  */
 
-import { exerciseApi } from './exercises'
-import { userApi } from './user'
 import { apiClient } from './client'
 
 // Main API object
 export const api = {
-  exercises: exerciseApi,
-  user: userApi,
-
   async healthCheck(): Promise<boolean> {
     try {
       await apiClient.get('/health')
@@ -29,8 +23,6 @@ export const api = {
 }
 
 // Named exports for direct imports
-export { exerciseApi } from './exercises'
-export { userApi } from './user'
 export { apiClient } from './client'
 
 // Type exports

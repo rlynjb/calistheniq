@@ -2,8 +2,6 @@
  * Exercise API
  */
 
-import { apiClient } from './client'
-
 // Types
 export interface BaseExerciseSet {
   reps?: number
@@ -59,41 +57,3 @@ export interface ExerciseLevelInfo {
   originalSets?: BaseExerciseSet[]
 }
 
-// API functions
-export const exerciseApi = {
-  async getWorkoutLevels(): Promise<WorkoutLevels> {
-    const response = await apiClient.get<WorkoutLevels>('/exercises/levels')
-    return response.data
-  },
-
-  async getExercisesByLevel(level: number, category?: string): Promise<BaseExercise[]> {
-    const params: Record<string, string> = { level: level.toString() }
-    if (category) params.category = category
-
-    const response = await apiClient.get<BaseExercise[]>('/exercises', params)
-    return response.data
-  },
-
-  async searchExercises(query: string): Promise<BaseExercise[]> {
-    const response = await apiClient.get<BaseExercise[]>('/exercises/search', {
-      q: query
-    })
-    return response.data
-  },
-
-  async getExerciseLevel(name: string): Promise<ExerciseLevelInfo | null> {
-    const response = await apiClient.get<ExerciseLevelInfo | null>(
-      '/exercises/level',
-      { name }
-    )
-    return response.data
-  },
-
-  async addExercise(exercise: BaseExercise): Promise<{ success: boolean; exercise?: BaseExercise }> {
-    const response = await apiClient.post<{ success: boolean; exercise?: BaseExercise }>(
-      '/exercises',
-      exercise
-    )
-    return response.data
-  }
-}
