@@ -1,0 +1,29 @@
+/* ── Block: node-badge ── */
+
+.node-badge {
+  @apply flex flex-col items-center gap-0.5;
+}
+
+.node-badge__circle {
+  @apply w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold font-mono border-2 transition-all;
+}
+
+.node-badge__circle--locked {
+  @apply bg-tron-surface border-tron-border text-tron-muted opacity-40;
+}
+
+.node-badge__circle--open {
+  @apply bg-tron-surface border-tron-primary/40 text-tron-primary;
+}
+
+.node-badge__circle--in-progress {
+  @apply bg-tron-primary-dim border-tron-primary text-tron-primary shadow-glow-cyan;
+}
+
+.node-badge__circle--passed {
+  @apply bg-tron-success-dim border-tron-success text-tron-success shadow-glow-emerald;
+}
+
+.node-badge__counter {
+  @apply text-[10px] font-mono text-tron-warning;
+}

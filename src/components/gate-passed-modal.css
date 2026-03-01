@@ -1,0 +1,49 @@
+/* ── Block: gate-modal ── */
+
+.gate-modal {
+  @apply fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm;
+}
+
+.gate-modal__card {
+  @apply mx-4 w-full max-w-sm rounded-2xl border border-tron-primary/40 bg-tron-surface p-8 text-center animate-glow-burst;
+}
+
+.gate-modal__badge-row {
+  @apply flex justify-center mb-4;
+}
+
+.gate-modal__badge-override {
+  @apply text-sm px-4 py-1;
+}
+
+.gate-modal__title {
+  @apply text-2xl font-bold tracking-widest text-tron-primary mb-2;
+}
+
+.gate-modal__levels {
+  @apply flex items-center justify-center gap-3 mb-6;
+}
+
+.gate-modal__level {
+  @apply text-center;
+}
+
+.gate-modal__level-num--old {
+  @apply text-lg font-mono text-tron-muted;
+}
+
+.gate-modal__level-num--new {
+  @apply text-lg font-mono text-tron-primary font-bold;
+}
+
+.gate-modal__level-name--old {
+  @apply text-[10px] text-tron-muted;
+}
+
+.gate-modal__level-name--new {
+  @apply text-[10px] text-tron-primary;
+}
+
+.gate-modal__arrow {
+  @apply text-tron-primary;
+}

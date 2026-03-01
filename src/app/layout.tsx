@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Chakra_Petch, Share_Tech_Mono } from 'next/font/google'
 import './globals.css'
+import './app-shell.css'
 import { MSWProvider } from '@/mocks'
 import { BottomNav } from '@/components/ui/BottomNav'
 
@@ -46,12 +47,12 @@ export default function RootLayout({
     <html lang="en" className={`dark ${chakraPetch.variable} ${shareTechMono.variable}`} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <MSWProvider>
-          <header className="sticky top-0 z-40 mx-auto w-full max-w-[480px] border-b border-tron-border bg-tron-bg/95 backdrop-blur-sm px-5 py-3">
-            <span className="font-display text-[15px] font-extrabold tracking-widest text-tron-text">
+          <header className="app-shell__header">
+            <span className="app-shell__wordmark">
               contrl
             </span>
           </header>
-          <main className="mx-auto w-full max-w-[480px] pb-20">
+          <main className="app-shell__main">
             {children}
           </main>
           <BottomNav />

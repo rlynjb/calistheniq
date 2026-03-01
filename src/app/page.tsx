@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { useGameState } from '@/hooks/useGameState'
-import type { Category, Exercise, ExerciseEntry, WorkoutSession } from '@/types'
+import type { Category, Exercise, ExerciseEntry, ExerciseFormState, DraftSession, WorkoutSession } from '@/types'
 import { CATEGORIES } from '@/types'
 import type { LogSessionResult } from '@/hooks/useGameState'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
@@ -13,6 +13,7 @@ import { GatePassedModal } from '@/components/GatePassedModal'
 import { LEVEL_NAMES } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import exerciseData from '@/data/exercises.json'
+import './home.css'
 
 const typedExercises = exerciseData as Exercise[]
 
@@ -20,43 +21,52 @@ export default function HomePage() {
   const {
     status, user, categoryDoneThisWeek, weekComplete,
     completedThisWeek, streak, sessions, getGateForCategory, logSession,
+    saveDraft, loadDraft,
   } = useGameState()
 
   const [expandedCategory, setExpandedCategory] = useState<Category | null>(null)
+  const [activeDraft, setActiveDraft] = useState<DraftSession | null>(null)
   const [result, setResult] = useState<LogSessionResult | null>(null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [levelUpInfo, setLevelUpInfo] = useState<{
     category: Category; oldLevel: number; newLevel: number
   } | null>(null)
+  const loadingCatRef = useRef<string | null>(null)
 
   if (status === 'loading') {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center text-tron-muted text-sm font-mono">
-        Loading...
-      </div>
-    )
+    return <div className="loading-state">Loading...</div>
   }
 
   if (status === 'error' || !user) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-tron-muted text-sm font-mono">
+      <div className="loading-state flex-col gap-3">
         <p>Failed to load data</p>
       </div>
     )
   }
 
-  const handleToggleCategory = (cat: Category) => {
+  const handleToggleCategory = async (cat: Category) => {
     if (expandedCategory === cat) {
       setExpandedCategory(null)
+      setActiveDraft(null)
       setResult(null)
+      loadingCatRef.current = null
       return
     }
     if (categoryDoneThisWeek[cat]) return
+    loadingCatRef.current = cat
+    const draft = await loadDraft(cat, user.levels[cat])
+    if (loadingCatRef.current !== cat) return
+    setActiveDraft(draft)
     setExpandedCategory(cat)
     setResult(null)
     setSaving(false)
     setSaveError(null)
+  }
+
+  const handleSaveDraft = (draft: DraftSession) => {
+    saveDraft(draft).catch(() => {})
   }
 
   const handleSave = async (session: WorkoutSession) => {
@@ -64,6 +74,7 @@ export default function HomePage() {
     setSaveError(null)
     try {
       const res = await logSession(session)
+      setActiveDraft(null)
       setResult(res)
       if (res.leveledUp && res.newLevel) {
         setLevelUpInfo({
@@ -87,19 +98,19 @@ export default function HomePage() {
   const remaining = 3 - completedThisWeek
 
   return (
-    <div className="px-4 py-6 space-y-6">
+    <div className="home-page">
       {/* Header: streak + week progress */}
-      <div className="flex items-center justify-between">
+      <div className="home-page__header">
         <div>
-          <h1 className="text-lg font-bold tracking-wide text-tron-text">This Week</h1>
-          <p className="text-xs text-tron-muted mt-0.5">
+          <h1 className="home-page__title">This Week</h1>
+          <p className="home-page__subtitle">
             {completedThisWeek}/3 sessions
           </p>
         </div>
         {streak > 0 && (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-tron-warning-dim border border-tron-warning/20">
-            <span className="text-tron-warning text-sm font-bold">{streak}</span>
-            <span className="text-tron-warning/70 text-[10px] font-medium">week streak</span>
+          <div className="streak-badge">
+            <span className="streak-badge__count">{streak}</span>
+            <span className="streak-badge__label">week streak</span>
           </div>
         )}
       </div>
@@ -112,14 +123,14 @@ export default function HomePage() {
           label={weekComplete ? 'Week complete!' : `${completedThisWeek} of 3`}
         />
         {!weekComplete && (
-          <p className="text-[11px] text-tron-muted mt-1">
+          <p className="home-page__remaining">
             {remaining} session{remaining !== 1 ? 's' : ''} remaining
           </p>
         )}
       </div>
 
       {/* Category rows */}
-      <div className="space-y-3">
+      <div className="home-page__categories">
         {CATEGORIES.map(cat => {
           const done = categoryDoneThisWeek[cat]
           const level = user.levels[cat]
@@ -133,27 +144,27 @@ export default function HomePage() {
             <GlowCard
               key={cat}
               glow={isDimmed ? 'none' : isExpanded ? cat : 'none'}
-              className={cn('p-0', isDimmed && 'opacity-60')}
+              className={cn('p-0', isDimmed && 'category-row--dimmed')}
             >
               {/* Tappable category header */}
               <div
                 className={cn(
-                  'p-4',
-                  !isDimmed && 'cursor-pointer',
+                  'category-row__header',
+                  !isDimmed && 'category-row__header--clickable',
                 )}
                 onClick={() => { if (!isDimmed) handleToggleCategory(cat) }}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                <div className="category-row__top">
+                  <div className="category-row__info">
                     <CategoryBadge category={cat} />
                     <div>
-                      <p className="text-sm font-semibold text-tron-text">
+                      <p className="category-row__level">
                         Level {level}
-                        <span className="text-tron-muted font-normal ml-1.5 text-xs">
+                        <span className="category-row__level-name">
                           {LEVEL_NAMES[level] ?? ''}
                         </span>
                       </p>
-                      <p className="text-[11px] text-tron-muted mt-0.5">
+                      <p className="category-row__status">
                         {isDimmed
                           ? '✓ Done this week'
                           : isExpanded
@@ -162,9 +173,9 @@ export default function HomePage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center">
+                  <div className="category-row__actions">
                     {isDimmed ? (
-                      <span className="text-tron-success text-sm">✓</span>
+                      <span className="category-row__check">✓</span>
                     ) : (
                       <ChevronIcon expanded={isExpanded} />
                     )}
@@ -174,21 +185,23 @@ export default function HomePage() {
 
               {/* Expanded: exercise form */}
               {isExpanded && !showResult && (
-                <div className="border-t border-tron-border">
+                <div className="category-row__divider">
                   <InlineExerciseForm
                     category={cat}
                     level={level}
                     sessions={sessions}
                     saving={saving}
                     saveError={saveError}
+                    draft={activeDraft}
                     onSave={handleSave}
+                    onSaveDraft={handleSaveDraft}
                   />
                 </div>
               )}
 
               {/* Expanded: inline result */}
               {isExpanded && showResult && result && (
-                <div className="border-t border-tron-border">
+                <div className="category-row__divider">
                   <InlineResult
                     result={result}
                     onDone={handleDone}
@@ -202,7 +215,7 @@ export default function HomePage() {
 
       {/* Week complete banner (only when nothing expanded) */}
       {weekComplete && !expandedCategory && (
-        <div className="rounded-xl border border-tron-success/30 bg-tron-success-dim py-3.5 text-center text-sm font-semibold text-tron-success">
+        <div className="home-page__week-banner">
           All sessions logged this week!
         </div>
       )}
@@ -234,8 +247,8 @@ function ChevronIcon({ expanded }: { expanded: boolean }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={cn(
-        'text-tron-muted transition-transform duration-200',
-        expanded && 'rotate-180'
+        'chevron-icon',
+        expanded && 'chevron-icon--expanded'
       )}
     >
       <polyline points="6 9 12 15 18 9" />
@@ -251,14 +264,18 @@ function InlineExerciseForm({
   sessions,
   saving,
   saveError,
+  draft,
   onSave,
+  onSaveDraft,
 }: {
   category: Category
   level: number
   sessions: WorkoutSession[]
   saving: boolean
   saveError: string | null
+  draft: DraftSession | null
   onSave: (session: WorkoutSession) => void
+  onSaveDraft: (draft: DraftSession) => void
 }) {
   const levelExercises = useMemo(
     () => typedExercises.filter(e => e.category === category && e.level === level),
@@ -272,8 +289,15 @@ function InlineExerciseForm({
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0] ?? null
   }, [sessions, category, level])
 
-  const [exerciseState, setExerciseState] = useState(() =>
-    levelExercises.map(ex => {
+  // Restore from draft if exercise IDs still match current library
+  const validDraft = draft &&
+    draft.exercises.length === levelExercises.length &&
+    draft.exercises.every((d, i) => d.exerciseId === levelExercises[i].id)
+    ? draft : null
+
+  const [exerciseState, setExerciseState] = useState<ExerciseFormState[]>(() => {
+    if (validDraft) return validDraft.exercises
+    return levelExercises.map(ex => {
       const lastEntry = lastSession?.exercises.find(e => e.exerciseId === ex.id)
       return {
         exerciseId: ex.id,
@@ -288,9 +312,31 @@ function InlineExerciseForm({
           : undefined,
       }
     })
-  )
+  })
 
-  const [notes, setNotes] = useState('')
+  const [notes, setNotes] = useState(validDraft?.notes ?? '')
+
+  // ── Auto-save draft to blob storage on every interaction ──
+  const isFirstRender = useRef(true)
+  const saveDraftRef = useRef(onSaveDraft)
+  saveDraftRef.current = onSaveDraft
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    const timer = setTimeout(() => {
+      saveDraftRef.current({
+        category,
+        level,
+        exercises: exerciseState,
+        notes,
+        savedAt: new Date().toISOString(),
+      })
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [exerciseState, notes, category, level])
 
   const toggleSet = (exIdx: number, setIdx: number) => {
     setExerciseState(prev => {
@@ -360,7 +406,7 @@ function InlineExerciseForm({
   }
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="exercise-form">
       {levelExercises.map((ex, exIdx) => {
         const state = exerciseState[exIdx]
         const isHold = ex.isHold
@@ -369,25 +415,25 @@ function InlineExerciseForm({
 
         return (
           <div key={ex.id}>
-            <div className="flex items-baseline justify-between mb-1">
-              <p className="text-sm font-semibold text-tron-text">{ex.name}</p>
-              <p className="text-[11px] text-tron-muted font-mono">
+            <div className="exercise-form__ex-header">
+              <p className="exercise-form__ex-name">{ex.name}</p>
+              <p className="exercise-form__ex-target">
                 {ex.targetSets}&times;{isHold ? `${ex.targetHoldSeconds}s` : ex.targetReps}
               </p>
             </div>
 
             {/* Mini set progress */}
-            <div className="flex items-center gap-2 mb-2">
+            <div className="exercise-form__sets-progress">
               <ProgressBar
                 value={ex.targetSets > 0 ? Math.round((checkedCount / ex.targetSets) * 100) : 0}
                 color={checkedCount === ex.targetSets ? 'emerald' : 'muted'}
               />
-              <span className="text-[10px] text-tron-muted font-mono whitespace-nowrap">
+              <span className="exercise-form__sets-count">
                 {checkedCount}/{ex.targetSets} sets
               </span>
             </div>
 
-            <div className="space-y-2">
+            <div className="exercise-form__sets">
               {Array.from({ length: ex.targetSets }).map((_, setIdx) => {
                 const checked = state.checkedSets[setIdx]
                 const actualValue = isHold
@@ -401,13 +447,13 @@ function InlineExerciseForm({
 
                 return (
                   <div key={setIdx}>
-                    <div className="flex items-center gap-3">
+                    <div className="exercise-form__set-row">
                       <SetCheckbox
                         checked={checked}
                         met={met}
                         onChange={() => toggleSet(exIdx, setIdx)}
                       />
-                      <span className="text-[11px] text-tron-muted font-mono w-8">
+                      <span className="exercise-form__set-label">
                         S{setIdx + 1}
                       </span>
                       <input
@@ -419,14 +465,14 @@ function InlineExerciseForm({
                           const v = Math.max(0, parseInt(e.target.value) || 0)
                           updateValue(exIdx, setIdx, v, isHold)
                         }}
-                        className="w-16 rounded border border-tron-border bg-tron-bg px-2 py-1 text-center text-sm text-tron-text font-mono focus:border-tron-primary focus:outline-none"
+                        className="exercise-form__set-input"
                       />
-                      <span className="text-[11px] text-tron-muted">
+                      <span className="exercise-form__set-target">
                         / {targetValue}{isHold ? 's' : ''}
                       </span>
                     </div>
                     {lastValue !== undefined && (
-                      <p className="text-[10px] text-tron-muted/60 ml-[4.25rem] mt-0.5">
+                      <p className="exercise-form__last-value">
                         last: {lastValue}{isHold ? 's' : ''}
                       </p>
                     )}
@@ -445,19 +491,19 @@ function InlineExerciseForm({
         value={notes}
         onChange={e => setNotes(e.target.value)}
         rows={2}
-        className="w-full rounded-lg border border-tron-border bg-tron-bg px-3 py-2 text-sm text-tron-text placeholder:text-tron-muted/50 focus:border-tron-primary focus:outline-none resize-none"
+        className="exercise-form__notes"
       />
 
       {/* Save error */}
       {saveError && (
-        <p className="text-xs text-tron-danger text-center" role="alert">{saveError}</p>
+        <p className="exercise-form__error" role="alert">{saveError}</p>
       )}
 
       {/* Save button */}
       <button
         onClick={handleSave}
         disabled={saving}
-        className="w-full rounded-xl border border-tron-primary/30 bg-tron-primary-dim py-3 text-center text-sm font-semibold text-tron-primary transition-all hover:bg-tron-primary/20 disabled:opacity-50"
+        className="btn-primary"
       >
         {saving ? 'Saving...' : 'Save Session'}
       </button>
@@ -488,33 +534,33 @@ function InlineResult({
           : 'Every rep counts. Keep showing up.'
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="session-result">
       {/* Header + completion */}
-      <div className="text-center space-y-1">
-        <h2 className="text-lg font-bold tracking-wider text-tron-primary">SESSION LOGGED</h2>
-        <p className="text-3xl font-bold font-mono text-tron-text">{pct}%</p>
+      <div className="session-result__header">
+        <h2 className="session-result__title">SESSION LOGGED</h2>
+        <p className="session-result__pct">{pct}%</p>
         <ProgressBar
           value={pct}
           color={pct === 100 ? 'emerald' : pct >= 75 ? 'cyan' : 'amber'}
         />
-        <p className="text-xs text-tron-muted mt-2">{message}</p>
+        <p className="session-result__msg">{message}</p>
       </div>
 
       {/* Gate progress */}
-      <div className="flex items-center justify-between rounded-lg bg-tron-bg p-3">
-        <span className="text-[11px] text-tron-muted">
+      <div className="session-result__gate">
+        <span className="session-result__gate-text">
           {gate.status === 'passed'
             ? 'Gate cleared!'
             : `${gate.consecutivePasses}/3 clean sessions needed`}
         </span>
         {sessionResult.isClean && gate.status !== 'passed' && (
-          <span className="text-[10px] text-tron-success">Clean ✓</span>
+          <span className="session-result__clean-badge">Clean ✓</span>
         )}
       </div>
 
       {/* Per-exercise breakdown */}
       {sessionResult.exerciseResults.length > 0 && (
-        <div className="space-y-2">
+        <div className="session-result__exercises">
           {sessionResult.exerciseResults.map(er => {
             const doneSets = er.actualCheckedSets
             const totalSets = er.targetSets
@@ -523,11 +569,11 @@ function InlineResult({
 
             return (
               <div key={er.exerciseId}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] text-tron-text truncate">{er.exerciseId}</span>
+                <div className="session-result__ex-header">
+                  <span className="session-result__ex-name">{er.exerciseId}</span>
                   <span className={cn(
-                    'text-[10px] font-mono',
-                    er.met ? 'text-tron-success' : 'text-tron-muted'
+                    'session-result__ex-status',
+                    er.met ? 'session-result__ex-status--met' : 'session-result__ex-status--unmet'
                   )}>
                     {er.met ? '✓' : `${setsPct}%`}
                   </span>
@@ -537,7 +583,7 @@ function InlineResult({
                   color={er.met ? 'emerald' : 'muted'}
                 />
                 {gapText && (
-                  <p className="text-[10px] text-tron-muted mt-0.5">{gapText}</p>
+                  <p className="session-result__gap">{gapText}</p>
                 )}
               </div>
             )
@@ -548,7 +594,7 @@ function InlineResult({
       {/* Done button */}
       <button
         onClick={onDone}
-        className="w-full rounded-xl border border-tron-primary/30 bg-tron-primary-dim py-3 text-center text-sm font-semibold text-tron-primary transition-all hover:bg-tron-primary/20"
+        className="btn-primary"
       >
         Done
       </button>

@@ -8,6 +8,8 @@ import { getWeekStart } from '@/lib/week-progress'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { GlowCard } from '@/components/ui/GlowCard'
 import { ProgressBar } from '@/components/ui/ProgressBar'
+import { cn } from '@/lib/utils'
+import './history.css'
 
 export default function HistoryPage() {
   const { status, sessions, streak } = useGameState()
@@ -34,28 +36,24 @@ export default function HistoryPage() {
   }, [sessions])
 
   if (status === 'loading') {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center text-tron-muted text-sm font-mono">
-        Loading...
-      </div>
-    )
+    return <div className="loading-state">Loading...</div>
   }
 
   return (
-    <div className="px-4 py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold tracking-wide text-tron-text">History</h1>
+    <div className="history-page">
+      <div className="history-page__header">
+        <h1 className="history-page__title">History</h1>
         {streak > 0 && (
-          <span className="text-xs text-tron-warning font-mono">{streak} week streak</span>
+          <span className="history-page__streak">{streak} week streak</span>
         )}
       </div>
 
       {weekGroups.length === 0 ? (
-        <div className="text-center text-sm text-tron-muted py-12">
+        <div className="history-page__empty">
           No sessions logged yet. Start training!
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="history-page__weeks">
           {weekGroups.map(group => (
             <WeekGroup key={group.weekStart} {...group} />
           ))}
@@ -65,10 +63,10 @@ export default function HistoryPage() {
   )
 }
 
-const catDotColor: Record<Category, string> = {
-  push: 'bg-cat-push',
-  pull: 'bg-cat-pull',
-  squat: 'bg-cat-squat',
+const catDotMap: Record<Category, string> = {
+  push: 'week-group__dot--done-push',
+  pull: 'week-group__dot--done-pull',
+  squat: 'week-group__dot--done-squat',
 }
 
 function WeekGroup({
@@ -91,24 +89,24 @@ function WeekGroup({
     day: 'numeric',
   })
 
-  // Use canonical CATEGORIES array from types (avoids hardcoding)
   const allCats = CATEGORIES
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
+      <div className="week-group__header">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-tron-text">
+          <span className="week-group__date">
             {weekStartFormatted} — {weekEnd}
           </span>
         </div>
-        <div className="flex gap-1.5">
+        <div className="week-group__dots">
           {allCats.map(cat => (
             <div
               key={cat}
-              className={`w-2.5 h-2.5 rounded-full ${
-                categories.has(cat) ? catDotColor[cat] : 'bg-tron-border'
-              }`}
+              className={cn(
+                'week-group__dot',
+                categories.has(cat) ? catDotMap[cat] : 'week-group__dot--empty'
+              )}
               title={`${cat}: ${categories.has(cat) ? 'done' : 'not done'}`}
               aria-label={`${cat}: ${categories.has(cat) ? 'done' : 'not done'}`}
             />
@@ -116,7 +114,7 @@ function WeekGroup({
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="week-group__sessions">
         {sessions.map(session => (
           <SessionCard key={session.id} session={session} />
         ))}
@@ -144,24 +142,28 @@ function SessionCard({ session }: { session: WorkoutSession }) {
     <GlowCard glow="none" className="p-3">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full text-left"
+        className="session-card__btn"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="session-card__row">
+          <div className="session-card__info">
             <CategoryBadge category={session.category} />
             <div>
-              <p className="text-xs text-tron-text">{dateFormatted}</p>
-              <p className="text-[10px] text-tron-muted">L{session.level}</p>
+              <p className="session-card__date">{dateFormatted}</p>
+              <p className="session-card__level">L{session.level}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className={`text-xs font-mono ${
-              completionPct === 100 ? 'text-tron-success' : 'text-tron-muted'
-            }`}>
+          <div className="session-card__right">
+            <span className={cn(
+              'session-card__pct',
+              completionPct === 100 ? 'session-card__pct--perfect' : 'session-card__pct--partial'
+            )}>
               {completionPct}%
             </span>
             <svg
-              className={`w-3 h-3 text-tron-muted transition-transform ${expanded ? 'rotate-180' : ''}`}
+              className={cn(
+                'session-card__chevron',
+                expanded && 'session-card__chevron--open'
+              )}
               viewBox="0 0 12 12"
             >
               <path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -171,12 +173,15 @@ function SessionCard({ session }: { session: WorkoutSession }) {
       </button>
 
       {expanded && (
-        <div className="mt-3 pt-3 border-t border-tron-border space-y-2">
+        <div className="session-card__detail">
           {session.exercises.map(entry => (
-            <div key={entry.exerciseId} className="space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-tron-text">{entry.exerciseId}</span>
-                <span className={`text-[10px] font-mono ${entry.hitTarget ? 'text-tron-success' : 'text-tron-muted'}`}>
+            <div key={entry.exerciseId} className="session-card__entry">
+              <div className="session-card__entry-header">
+                <span className="session-card__entry-name">{entry.exerciseId}</span>
+                <span className={cn(
+                  'session-card__entry-status',
+                  entry.hitTarget ? 'session-card__entry-status--met' : 'session-card__entry-status--unmet'
+                )}>
                   {entry.hitTarget ? 'Met' : `${entry.actualSets}/${entry.targetSets}`}
                 </span>
               </div>
@@ -187,7 +192,7 @@ function SessionCard({ session }: { session: WorkoutSession }) {
             </div>
           ))}
           {session.notes && (
-            <p className="text-[10px] text-tron-muted italic pt-1">{session.notes}</p>
+            <p className="session-card__notes">{session.notes}</p>
           )}
         </div>
       )}

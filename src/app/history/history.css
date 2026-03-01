@@ -1,0 +1,141 @@
+/* ── Block: history-page ── */
+
+.history-page {
+  @apply px-4 py-6 space-y-6;
+}
+
+.history-page__header {
+  @apply flex items-center justify-between;
+}
+
+.history-page__title {
+  @apply text-lg font-bold tracking-wide text-tron-text;
+}
+
+.history-page__streak {
+  @apply text-xs text-tron-warning font-mono;
+}
+
+.history-page__empty {
+  @apply text-center text-sm text-tron-muted py-12;
+}
+
+.history-page__weeks {
+  @apply space-y-6;
+}
+
+/* ── Block: week-group ── */
+
+.week-group__header {
+  @apply flex items-center justify-between mb-3;
+}
+
+.week-group__date {
+  @apply text-xs font-semibold text-tron-text;
+}
+
+.week-group__dots {
+  @apply flex gap-1.5;
+}
+
+.week-group__dot {
+  @apply w-2.5 h-2.5 rounded-full;
+}
+
+.week-group__dot--done-push {
+  @apply bg-cat-push;
+}
+
+.week-group__dot--done-pull {
+  @apply bg-cat-pull;
+}
+
+.week-group__dot--done-squat {
+  @apply bg-cat-squat;
+}
+
+.week-group__dot--empty {
+  @apply bg-tron-border;
+}
+
+.week-group__sessions {
+  @apply space-y-2;
+}
+
+/* ── Block: session-card ── */
+
+.session-card__btn {
+  @apply w-full text-left;
+}
+
+.session-card__row {
+  @apply flex items-center justify-between;
+}
+
+.session-card__info {
+  @apply flex items-center gap-2;
+}
+
+.session-card__date {
+  @apply text-xs text-tron-text;
+}
+
+.session-card__level {
+  @apply text-[10px] text-tron-muted;
+}
+
+.session-card__right {
+  @apply flex items-center gap-2;
+}
+
+.session-card__pct {
+  @apply text-xs font-mono;
+}
+
+.session-card__pct--perfect {
+  @apply text-tron-success;
+}
+
+.session-card__pct--partial {
+  @apply text-tron-muted;
+}
+
+.session-card__chevron {
+  @apply w-3 h-3 text-tron-muted transition-transform;
+}
+
+.session-card__chevron--open {
+  @apply rotate-180;
+}
+
+.session-card__detail {
+  @apply mt-3 pt-3 border-t border-tron-border space-y-2;
+}
+
+.session-card__entry {
+  @apply space-y-1;
+}
+
+.session-card__entry-header {
+  @apply flex items-center justify-between;
+}
+
+.session-card__entry-name {
+  @apply text-[11px] text-tron-text;
+}
+
+.session-card__entry-status {
+  @apply text-[10px] font-mono;
+}
+
+.session-card__entry-status--met {
+  @apply text-tron-success;
+}
+
+.session-card__entry-status--unmet {
+  @apply text-tron-muted;
+}
+
+.session-card__notes {
+  @apply text-[10px] text-tron-muted italic pt-1;
+}

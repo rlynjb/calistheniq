@@ -81,3 +81,20 @@ export type WeekProgress = {
   weekStart: string              // "2025-03-03" (Monday)
   sessionsCompleted: Record<Category, boolean>
 }
+
+// ── Draft session (auto-saved form state) ────────────────────
+
+export type ExerciseFormState = {
+  exerciseId: string
+  checkedSets: boolean[]
+  actualReps: number[]
+  actualHoldSeconds?: number[]
+}
+
+export type DraftSession = {
+  category: Category
+  level: number
+  exercises: ExerciseFormState[]
+  notes: string
+  savedAt: string
+}

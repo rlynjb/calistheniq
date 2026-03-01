@@ -34,3 +34,27 @@
     @apply bg-tron-bg text-tron-text font-display antialiased;
   }
 }
+
+@layer components {
+  /* === Shared Patterns === */
+
+  .loading-state {
+    @apply flex min-h-[60vh] items-center justify-center text-tron-muted text-sm font-mono;
+  }
+
+  .btn-primary {
+    @apply w-full rounded-xl border border-tron-primary/30 bg-tron-primary-dim py-3 text-center text-sm font-semibold text-tron-primary transition-all hover:bg-tron-primary/20 disabled:opacity-50;
+  }
+
+  .page-title {
+    @apply text-lg font-bold tracking-wide text-tron-text;
+  }
+
+  .page-root {
+    @apply px-4 py-6 space-y-6;
+  }
+
+  .input-focus {
+    @apply focus:border-tron-primary focus:outline-none;
+  }
+}

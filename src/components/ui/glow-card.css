@@ -1,0 +1,37 @@
+/* ── Block: glow-card ── */
+
+.glow-card {
+  @apply rounded-lg border bg-tron-surface p-4;
+}
+
+.glow-card--clickable {
+  @apply cursor-pointer active:scale-[0.98] transition-transform;
+}
+
+.glow-card--cyan {
+  @apply shadow-glow-cyan border-tron-primary/25;
+}
+
+.glow-card--emerald {
+  @apply shadow-glow-emerald border-tron-success/25;
+}
+
+.glow-card--amber {
+  @apply shadow-glow-amber border-tron-warning/25;
+}
+
+.glow-card--push {
+  @apply shadow-glow-push border-cat-push/25;
+}
+
+.glow-card--pull {
+  @apply shadow-glow-pull border-cat-pull/25;
+}
+
+.glow-card--squat {
+  @apply shadow-glow-squat border-cat-squat/25;
+}
+
+.glow-card--none {
+  @apply border-tron-border;
+}

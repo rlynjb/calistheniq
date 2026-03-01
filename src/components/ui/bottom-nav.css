@@ -1,0 +1,21 @@
+/* ── Block: bottom-nav ── */
+
+.bottom-nav {
+  @apply fixed bottom-0 left-0 right-0 z-50 border-t border-tron-border bg-tron-bg/95 backdrop-blur-sm;
+}
+
+.bottom-nav__inner {
+  @apply mx-auto flex max-w-[480px] items-center justify-around py-2;
+}
+
+.bottom-nav__tab {
+  @apply flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors;
+}
+
+.bottom-nav__tab--active {
+  @apply text-tron-primary;
+}
+
+.bottom-nav__tab--inactive {
+  @apply text-tron-muted hover:text-tron-text;
+}

@@ -1,0 +1,219 @@
+/* ── Block: home-page ── */
+
+.home-page {
+  @apply px-4 py-6 space-y-6;
+}
+
+.home-page__header {
+  @apply flex items-center justify-between;
+}
+
+.home-page__title {
+  @apply text-lg font-bold tracking-wide text-tron-text;
+}
+
+.home-page__subtitle {
+  @apply text-xs text-tron-muted mt-0.5;
+}
+
+.home-page__remaining {
+  @apply text-[11px] text-tron-muted mt-1;
+}
+
+.home-page__categories {
+  @apply space-y-3;
+}
+
+.home-page__week-banner {
+  @apply rounded-xl border border-tron-success/30 bg-tron-success-dim py-3.5 text-center text-sm font-semibold text-tron-success;
+}
+
+/* ── Block: streak-badge ── */
+
+.streak-badge {
+  @apply flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-tron-warning-dim border border-tron-warning/20;
+}
+
+.streak-badge__count {
+  @apply text-tron-warning text-sm font-bold;
+}
+
+.streak-badge__label {
+  @apply text-tron-warning/70 text-[10px] font-medium;
+}
+
+/* ── Block: category-row ── */
+
+.category-row__header {
+  @apply p-4;
+}
+
+.category-row__header--clickable {
+  @apply cursor-pointer;
+}
+
+.category-row__top {
+  @apply flex items-center justify-between;
+}
+
+.category-row__info {
+  @apply flex items-center gap-3;
+}
+
+.category-row__level {
+  @apply text-sm font-semibold text-tron-text;
+}
+
+.category-row__level-name {
+  @apply text-tron-muted font-normal ml-1.5 text-xs;
+}
+
+.category-row__status {
+  @apply text-[11px] text-tron-muted mt-0.5;
+}
+
+.category-row__actions {
+  @apply flex items-center;
+}
+
+.category-row__check {
+  @apply text-tron-success text-sm;
+}
+
+.category-row__divider {
+  @apply border-t border-tron-border;
+}
+
+.category-row--dimmed {
+  @apply opacity-60;
+}
+
+/* ── Block: chevron-icon ── */
+
+.chevron-icon {
+  @apply text-tron-muted transition-transform duration-200;
+}
+
+.chevron-icon--expanded {
+  @apply rotate-180;
+}
+
+/* ── Block: exercise-form ── */
+
+.exercise-form {
+  @apply p-4 space-y-4;
+}
+
+.exercise-form__ex-header {
+  @apply flex items-baseline justify-between mb-1;
+}
+
+.exercise-form__ex-name {
+  @apply text-sm font-semibold text-tron-text;
+}
+
+.exercise-form__ex-target {
+  @apply text-[11px] text-tron-muted font-mono;
+}
+
+.exercise-form__sets-progress {
+  @apply flex items-center gap-2 mb-2;
+}
+
+.exercise-form__sets-count {
+  @apply text-[10px] text-tron-muted font-mono whitespace-nowrap;
+}
+
+.exercise-form__sets {
+  @apply space-y-2;
+}
+
+.exercise-form__set-row {
+  @apply flex items-center gap-3;
+}
+
+.exercise-form__set-label {
+  @apply text-[11px] text-tron-muted font-mono w-8;
+}
+
+.exercise-form__set-input {
+  @apply w-16 rounded border border-tron-border bg-tron-bg px-2 py-1 text-center text-sm text-tron-text font-mono focus:border-tron-primary focus:outline-none;
+}
+
+.exercise-form__set-target {
+  @apply text-[11px] text-tron-muted;
+}
+
+.exercise-form__last-value {
+  @apply text-[10px] text-tron-muted/60 ml-[4.25rem] mt-0.5;
+}
+
+.exercise-form__notes {
+  @apply w-full rounded-lg border border-tron-border bg-tron-bg px-3 py-2 text-sm text-tron-text placeholder:text-tron-muted/50 focus:border-tron-primary focus:outline-none resize-none;
+}
+
+.exercise-form__error {
+  @apply text-xs text-tron-danger text-center;
+}
+
+/* ── Block: session-result ── */
+
+.session-result {
+  @apply p-4 space-y-4;
+}
+
+.session-result__header {
+  @apply text-center space-y-1;
+}
+
+.session-result__title {
+  @apply text-lg font-bold tracking-wider text-tron-primary;
+}
+
+.session-result__pct {
+  @apply text-3xl font-bold font-mono text-tron-text;
+}
+
+.session-result__msg {
+  @apply text-xs text-tron-muted mt-2;
+}
+
+.session-result__gate {
+  @apply flex items-center justify-between rounded-lg bg-tron-bg p-3;
+}
+
+.session-result__gate-text {
+  @apply text-[11px] text-tron-muted;
+}
+
+.session-result__clean-badge {
+  @apply text-[10px] text-tron-success;
+}
+
+.session-result__exercises {
+  @apply space-y-2;
+}
+
+.session-result__ex-header {
+  @apply flex items-center justify-between mb-1;
+}
+
+.session-result__ex-name {
+  @apply text-[11px] text-tron-text truncate;
+}
+
+.session-result__ex-status {
+  @apply text-[10px] font-mono;
+}
+
+.session-result__ex-status--met {
+  @apply text-tron-success;
+}
+
+.session-result__ex-status--unmet {
+  @apply text-tron-muted;
+}
+
+.session-result__gap {
+  @apply text-[10px] text-tron-muted mt-0.5;
+}

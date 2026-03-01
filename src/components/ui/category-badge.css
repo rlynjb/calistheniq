@@ -1,0 +1,17 @@
+/* ── Block: category-badge ── */
+
+.category-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border;
+}
+
+.category-badge--push {
+  @apply bg-cat-push/15 text-cat-push border-cat-push/30;
+}
+
+.category-badge--pull {
+  @apply bg-cat-pull/15 text-cat-pull border-cat-pull/30;
+}
+
+.category-badge--squat {
+  @apply bg-cat-squat/15 text-cat-squat border-cat-squat/30;
+}

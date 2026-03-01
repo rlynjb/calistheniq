@@ -1,4 +1,4 @@
-import type { WorkoutSession, GateProgress, WeekProgress, User, Category } from '@/types'
+import type { WorkoutSession, GateProgress, WeekProgress, User, Category, DraftSession } from '@/types'
 import type { StorageProvider } from './provider'
 import { apiClient } from '@/api/client'
 
@@ -88,5 +88,19 @@ export class NetlifyBlobAdapter implements StorageProvider {
 
   async updateUser(user: User): Promise<void> {
     await this.set('user', user)
+  }
+
+  // ── Drafts ──────────────────────────────────────────────
+
+  async saveDraft(draft: DraftSession): Promise<void> {
+    await this.set(`draft:${draft.category}:${draft.level}`, draft)
+  }
+
+  async getDraft(category: Category, level: number): Promise<DraftSession | null> {
+    return this.get<DraftSession>(`draft:${category}:${level}`)
+  }
+
+  async clearDraft(category: Category, level: number): Promise<void> {
+    await this.set(`draft:${category}:${level}`, null)
   }
 }

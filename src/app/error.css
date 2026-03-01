@@ -1,0 +1,13 @@
+/* ── Block: error-page ── */
+
+.error-page {
+  @apply flex min-h-[60vh] flex-col items-center justify-center gap-4 text-sm font-mono;
+}
+
+.error-page__message {
+  @apply text-tron-muted;
+}
+
+.error-page__retry {
+  @apply rounded-lg border border-tron-primary/30 bg-tron-primary-dim px-4 py-2 text-tron-primary transition-colors hover:bg-tron-primary/20;
+}

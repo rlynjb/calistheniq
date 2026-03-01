@@ -1,0 +1,17 @@
+/* ── Block: set-checkbox ── */
+
+.set-checkbox {
+  @apply w-7 h-7 rounded border-2 flex items-center justify-center text-xs font-bold transition-all;
+}
+
+.set-checkbox--unchecked {
+  @apply border-tron-border bg-tron-surface text-tron-muted;
+}
+
+.set-checkbox--met {
+  @apply border-tron-success bg-tron-success-dim text-tron-success;
+}
+
+.set-checkbox--missed {
+  @apply border-tron-muted bg-tron-muted-dim text-tron-muted;
+}

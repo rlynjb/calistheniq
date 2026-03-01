@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import './progress-bar.css'
 
 interface ProgressBarProps {
   value: number      // 0–100
@@ -8,26 +9,19 @@ interface ProgressBarProps {
   className?: string
 }
 
-const colorMap = {
-  cyan: 'bg-tron-primary',
-  emerald: 'bg-tron-success',
-  amber: 'bg-tron-warning',
-  muted: 'bg-tron-muted',
-}
-
 export function ProgressBar({ value, color = 'cyan', label, showPct, className }: ProgressBarProps) {
   const clamped = Math.max(0, Math.min(100, value))
 
   return (
-    <div className={cn('w-full', className)}>
+    <div className={cn('progress-bar', className)}>
       {(label || showPct) && (
-        <div className="flex justify-between text-xs mb-1">
-          {label && <span className="text-tron-text-secondary">{label}</span>}
-          {showPct && <span className="text-tron-text-secondary font-mono">{clamped}%</span>}
+        <div className="progress-bar__header">
+          {label && <span className="progress-bar__label">{label}</span>}
+          {showPct && <span className="progress-bar__pct">{clamped}%</span>}
         </div>
       )}
       <div
-        className="h-2 rounded-full bg-tron-surface-light overflow-hidden"
+        className="progress-bar__track"
         role="progressbar"
         aria-valuenow={clamped}
         aria-valuemin={0}
@@ -35,7 +29,7 @@ export function ProgressBar({ value, color = 'cyan', label, showPct, className }
         aria-label={label ?? `${clamped}%`}
       >
         <div
-          className={cn('h-full rounded-full transition-all duration-300', colorMap[color])}
+          className={cn('progress-bar__fill', `progress-bar__fill--${color}`)}
           style={{ width: `${clamped}%` }}
         />
       </div>

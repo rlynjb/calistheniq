@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import './bottom-nav.css'
 
 const tabs = [
   { href: '/', label: 'Home', icon: HomeIcon },
@@ -14,8 +15,8 @@ export function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-tron-border bg-tron-bg/95 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-[480px] items-center justify-around py-2">
+    <nav className="bottom-nav">
+      <div className="bottom-nav__inner">
         {tabs.map(({ href, label, icon: Icon }) => {
           const active = href === '/' ? pathname === '/' : pathname.startsWith(href)
           return (
@@ -23,10 +24,8 @@ export function BottomNav() {
               key={href}
               href={href}
               className={cn(
-                'flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition-colors',
-                active
-                  ? 'text-tron-primary'
-                  : 'text-tron-muted hover:text-tron-text'
+                'bottom-nav__tab',
+                active ? 'bottom-nav__tab--active' : 'bottom-nav__tab--inactive'
               )}
             >
               <Icon active={active} />

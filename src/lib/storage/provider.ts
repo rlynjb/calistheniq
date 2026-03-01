@@ -1,4 +1,4 @@
-import type { WorkoutSession, GateProgress, WeekProgress, User } from '@/types'
+import type { WorkoutSession, GateProgress, WeekProgress, User, Category, DraftSession } from '@/types'
 
 /**
  * Domain-specific storage interface.
@@ -16,4 +16,8 @@ export interface StorageProvider {
 
   getUser(): Promise<User>
   updateUser(user: User): Promise<void>
+
+  saveDraft(draft: DraftSession): Promise<void>
+  getDraft(category: Category, level: number): Promise<DraftSession | null>
+  clearDraft(category: Category, level: number): Promise<void>
 }

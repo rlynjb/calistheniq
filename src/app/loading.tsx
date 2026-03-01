@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center text-tron-muted text-sm font-mono">
+    <div className="loading-state">
       Loading...
     </div>
   )

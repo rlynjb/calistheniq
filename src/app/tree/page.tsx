@@ -9,7 +9,9 @@ import { NodeBadge } from '@/components/ui/NodeBadge'
 import { getNodeState } from '@/lib/progression'
 import { createGateProgress } from '@/lib/gate-check'
 import { LEVEL_NAMES } from '@/lib/constants'
+import { cn } from '@/lib/utils'
 import exercises from '@/data/exercises.json'
+import './tree.css'
 
 const typedExercises = exercises as Exercise[]
 const MAX_LEVEL = 5
@@ -19,19 +21,11 @@ export default function TreePage() {
   const [expandedNode, setExpandedNode] = useState<string | null>(null)
 
   if (status === 'loading') {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center text-tron-muted text-sm font-mono">
-        Loading...
-      </div>
-    )
+    return <div className="loading-state">Loading...</div>
   }
 
   if (!user) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center text-tron-muted text-sm font-mono">
-        No data
-      </div>
-    )
+    return <div className="loading-state">No data</div>
   }
 
   const toggleNode = (key: string) => {
@@ -42,15 +36,15 @@ export default function TreePage() {
   const levels = Array.from({ length: MAX_LEVEL }, (_, i) => MAX_LEVEL - i)
 
   return (
-    <div className="px-4 py-6 space-y-5">
-      <h1 className="text-lg font-bold tracking-wide text-tron-text">Skill Tree</h1>
+    <div className="skill-tree-page">
+      <h1 className="skill-tree-page__title">Skill Tree</h1>
 
       {/* Column headers */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="skill-tree-page__cat-headers">
         {CATEGORIES.map(cat => (
-          <div key={cat} className="flex flex-col items-center gap-1">
+          <div key={cat} className="skill-tree-page__cat-col">
             <CategoryBadge category={cat} />
-            <span className="text-[10px] text-tron-muted font-mono">
+            <span className="skill-tree-page__cat-level">
               L{user.levels[cat]}
             </span>
           </div>
@@ -58,9 +52,9 @@ export default function TreePage() {
       </div>
 
       {/* Tree grid: each row is a level, each column is a category */}
-      <div className="space-y-0">
+      <div className="skill-tree-page__grid">
         {levels.map(level => (
-          <div key={level} className="grid grid-cols-3 gap-2">
+          <div key={level} className="skill-tree-page__row">
             {CATEGORIES.map(cat => {
               const nodeKey = `${cat}:${level}`
               const userLevel = user.levels[cat]
@@ -72,13 +66,15 @@ export default function TreePage() {
               const hasExercises = levelExercises.length > 0
 
               return (
-                <div key={nodeKey} className="flex flex-col items-center">
+                <div key={nodeKey} className="skill-tree-page__node-cell">
                   <button
                     onClick={() => hasExercises ? toggleNode(nodeKey) : undefined}
                     aria-label={`${cat} level ${level} — ${nodeState}`}
-                    className={`flex flex-col items-center transition-transform ${
-                      hasExercises ? 'active:scale-95' : ''
-                    } ${expandedNode === nodeKey ? 'scale-110' : ''}`}
+                    className={cn(
+                      'skill-tree-page__node-btn',
+                      hasExercises && 'skill-tree-page__node-btn--interactive',
+                      expandedNode === nodeKey && 'skill-tree-page__node-btn--selected',
+                    )}
                     disabled={!hasExercises}
                   >
                     <NodeBadge
@@ -90,11 +86,12 @@ export default function TreePage() {
 
                   {/* Connector line to next level below */}
                   {level > 1 && (
-                    <div className={`w-px h-4 mt-0.5 ${
+                    <div className={cn(
+                      'skill-tree-page__connector',
                       level <= userLevel
-                        ? 'bg-tron-primary/25'
-                        : 'bg-tron-border/30'
-                    }`} />
+                        ? 'skill-tree-page__connector--active'
+                        : 'skill-tree-page__connector--dim'
+                    )} />
                   )}
                 </div>
               )
@@ -135,26 +132,19 @@ function ExpandedDetail({
   )
   const nodeState = getNodeState(gate, userLevels)
 
-  const catBorderMap: Record<Category, string> = {
-    push: 'border-cat-push/30',
-    pull: 'border-cat-pull/30',
-    squat: 'border-cat-squat/30',
-  }
-  const catBorder = catBorderMap[cat]
-
   return (
-    <div className={`rounded-xl border bg-tron-surface p-4 ${catBorder}`}>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
+    <div className={cn('node-detail', `node-detail--${cat}`)}>
+      <div className="node-detail__header">
+        <div className="node-detail__title-row">
           <CategoryBadge category={cat} />
-          <span className="text-sm font-semibold text-tron-text">
+          <span className="node-detail__level">
             Level {level}
           </span>
-          <span className="text-xs text-tron-muted">
+          <span className="node-detail__level-name">
             {LEVEL_NAMES[level]}
           </span>
         </div>
-        <button onClick={onClose} aria-label="Close detail panel" className="text-tron-muted hover:text-tron-text p-1">
+        <button onClick={onClose} aria-label="Close detail panel" className="node-detail__close">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
@@ -162,23 +152,24 @@ function ExpandedDetail({
       </div>
 
       {/* Gate progress indicator */}
-      <div className="mb-3 py-2 px-3 rounded-lg bg-tron-surface-light">
+      <div className="node-detail__gate">
         {nodeState === 'passed' ? (
-          <span className="text-xs text-tron-success font-semibold">Gate cleared</span>
+          <span className="node-detail__gate-text--passed">Gate cleared</span>
         ) : nodeState === 'locked' ? (
-          <span className="text-xs text-tron-muted">Locked — complete previous level first</span>
+          <span className="node-detail__gate-text--locked">Locked — complete previous level first</span>
         ) : (
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-tron-text">Clean sessions</span>
-            <div className="flex gap-1.5">
+          <div className="node-detail__gate-clean">
+            <span className="node-detail__gate-label">Clean sessions</span>
+            <div className="node-detail__dots">
               {[0, 1, 2].map(i => (
                 <div
                   key={i}
-                  className={`w-3 h-3 rounded-full border transition-colors ${
+                  className={cn(
+                    'node-detail__dot',
                     i < gate.consecutivePasses
-                      ? 'bg-tron-primary border-tron-primary'
-                      : 'bg-transparent border-tron-border'
-                  }`}
+                      ? 'node-detail__dot--filled'
+                      : 'node-detail__dot--empty'
+                  )}
                 />
               ))}
             </div>
@@ -187,16 +178,16 @@ function ExpandedDetail({
       </div>
 
       {/* Exercise list with targets */}
-      <div className="space-y-1.5">
+      <div className="node-detail__exercises">
         {levelExercises.map(ex => (
           <div
             key={ex.id}
-            className="flex items-center justify-between text-xs py-1"
+            className="node-detail__ex-row"
           >
-            <span className={nodeState === 'locked' ? 'text-tron-muted' : 'text-tron-text'}>
+            <span className={nodeState === 'locked' ? 'node-detail__ex-name--locked' : 'node-detail__ex-name--active'}>
               {ex.name}
             </span>
-            <span className="text-tron-muted font-mono text-[10px] ml-2 shrink-0">
+            <span className="node-detail__ex-target">
               {ex.isHold
                 ? `${ex.targetSets}×${ex.targetHoldSeconds}s`
                 : `${ex.targetSets}×${ex.targetReps}`}

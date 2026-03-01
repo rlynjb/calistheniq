@@ -7,6 +7,7 @@ import type {
   GateProgress,
   WeekProgress,
   User,
+  DraftSession,
 } from '@/types'
 import { CATEGORIES } from '@/types'
 import { getStorage } from '@/lib/storage'
@@ -49,6 +50,8 @@ export interface UseGameStateReturn {
   completedThisWeek: number
   logSession: (session: WorkoutSession) => Promise<LogSessionResult>
   getGateForCategory: (category: Category) => GateProgress | null
+  saveDraft: (draft: DraftSession) => Promise<void>
+  loadDraft: (category: Category, level: number) => Promise<DraftSession | null>
   reload: () => Promise<void>
 }
 
@@ -185,8 +188,21 @@ export function useGameState(): UseGameStateReturn {
       setWeekProgress(updatedWeek)
     }
 
+    // Clear draft after successful save
+    await storage.clearDraft(session.category, session.level)
+
     return { sessionResult, gateProgress: updatedGate, leveledUp, newLevel }
   }, [gateProgress, user, weekProgress])
+
+  const saveDraft = useCallback(async (draft: DraftSession): Promise<void> => {
+    const storage = getStorage()
+    await storage.saveDraft(draft)
+  }, [])
+
+  const loadDraft = useCallback(async (category: Category, level: number): Promise<DraftSession | null> => {
+    const storage = getStorage()
+    return storage.getDraft(category, level)
+  }, [])
 
   const getGateForCategory = useCallback((category: Category): GateProgress | null => {
     if (!user) return null
@@ -213,6 +229,8 @@ export function useGameState(): UseGameStateReturn {
     completedThisWeek,
     logSession,
     getGateForCategory,
+    saveDraft,
+    loadDraft,
     reload: load,
   }
 }
