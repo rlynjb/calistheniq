@@ -7,6 +7,7 @@ import './bottom-nav.css'
 
 const tabs = [
   { href: '/', label: 'Home', icon: HomeIcon },
+  { href: '/workout', label: 'Workout', icon: WorkoutIcon },
   { href: '/tree', label: 'Tree', icon: TreeIcon },
   { href: '/history', label: 'History', icon: HistoryIcon },
 ] as const
@@ -55,6 +56,15 @@ function TreeIcon({ active }: { active: boolean }) {
       <circle cx="18" cy="19" r="3" />
       <line x1="12" y1="8" x2="6" y2="16" />
       <line x1="12" y1="8" x2="18" y2="16" />
+    </svg>
+  )
+}
+
+function WorkoutIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+      <circle cx="12" cy="13" r="4" />
     </svg>
   )
 }

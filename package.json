@@ -16,6 +16,7 @@
     "sync:from-prod": "npx ts-node scripts/sync-from-blob.ts --url"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.32",
     "@netlify/blobs": "^10.5.0",
     "@netlify/functions": "^2.4.0",
     "@radix-ui/react-slot": "^1.0.2",
