@@ -1,6 +1,6 @@
 import type { WorkoutSession, GateProgress, WeekProgress, User, Category, DraftSession } from '@/types'
 import type { StorageProvider } from './provider'
-import { apiClient } from '@/api/client'
+import { apiClient } from '@/lib/api-client'
 
 /**
  * StorageProvider backed by Netlify Blob via the game-data Netlify Function.

@@ -30,6 +30,10 @@
   @apply flex items-center justify-between mb-3;
 }
 
+.week-group__date-row {
+  @apply flex items-center gap-2;
+}
+
 .week-group__date {
   @apply text-xs font-semibold text-tron-text;
 }

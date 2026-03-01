@@ -3,7 +3,7 @@ import { Chakra_Petch, Share_Tech_Mono } from 'next/font/google'
 import './globals.css'
 import './app-shell.css'
 import { MSWProvider } from '@/mocks'
-import { BottomNav } from '@/components/ui/BottomNav'
+import { BottomNav } from '@/components/layout/BottomNav'
 
 // next/font/google: self-hosted, zero layout shift, no external request
 const chakraPetch = Chakra_Petch({

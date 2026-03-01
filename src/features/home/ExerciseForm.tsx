@@ -1,21 +1,75 @@
+/**
+ * @file Workout logging form — renders set checkboxes, rep/hold inputs,
+ * and a save button for a single category at the user's current level.
+ *
+ * @description
+ * Displays all exercises for the given category/level with per-set
+ * tracking. Each set has a checkbox, a numeric input (reps or seconds),
+ * and the target value. Previous session values are shown below each
+ * set for reference. Form state is managed by {@link useExerciseForm}
+ * and auto-saved as a draft on every interaction.
+ *
+ * @example
+ * <ExerciseForm
+ *   category="push"
+ *   level={2}
+ *   sessions={sessions}
+ *   saving={false}
+ *   saveError={null}
+ *   draft={loadedDraft}
+ *   onSave={handleSave}
+ *   onSaveDraft={handleSaveDraft}
+ * />
+ *
+ * @see {@link useExerciseForm} for form state management and draft auto-saving
+ * @see {@link HomeView} for the parent that controls expansion and saving
+ */
 'use client'
 
 import { SetCheckbox } from '@/components/ui/SetCheckbox'
 import { ProgressBar } from '@/components/ui/ProgressBar'
-import { useExerciseForm } from '@/hooks/useExerciseForm'
+import { useExerciseForm } from './useExerciseForm'
 import type { Category, DraftSession, WorkoutSession } from '@/types'
 
 interface ExerciseFormProps {
+  /** The training discipline being logged. */
   category: Category
+
+  /** The user's current level in this category (1–5). */
   level: number
+
+  /** All previously logged sessions — passed to useExerciseForm for last-session lookup. */
   sessions: WorkoutSession[]
+
+  /** Whether a save operation is currently in flight. Disables the save button. */
   saving: boolean
+
+  /** Error message from a failed save attempt, or null. Displayed above the save button. */
   saveError: string | null
+
+  /**
+   * A previously saved draft to restore from, or null.
+   * Passed to useExerciseForm for form state initialization.
+   */
   draft: DraftSession | null
+
+  /** Callback fired when the user taps "Save Session". Receives a fully assembled WorkoutSession. */
   onSave: (session: WorkoutSession) => void
+
+  /** Callback for persisting draft state. Called by useExerciseForm on a 500ms debounce. */
   onSaveDraft: (draft: DraftSession) => void
 }
 
+/**
+ * Renders the per-set workout logging form for a single category/level.
+ *
+ * @description
+ * Each exercise shows its name, target (e.g., "3x10"), a mini progress
+ * bar, and per-set rows with checkbox + numeric input. Checked sets
+ * are evaluated against the target to determine `hitTarget` when
+ * the session is saved. The form also shows "last: X" hints when
+ * a previous session exists for the same exercise.
+ */
 export function ExerciseForm({
   category,
   level,

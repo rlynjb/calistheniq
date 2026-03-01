@@ -2,7 +2,7 @@
  * Exercise Mock Data
  */
 
-import type { ExerciseWithMetadata, WorkoutLevels } from '@/api/exercises'
+import type { ExerciseWithMetadata, WorkoutLevels } from '@/types/legacy'
 
 // Comprehensive list of all exercises with metadata
 export const allExercises: ExerciseWithMetadata[] = [

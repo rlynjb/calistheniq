@@ -2,8 +2,8 @@
  * User Mock Data
  */
 
-import type { CurrentUserLevels, WorkoutSession } from '@/api/user'
-import type { BaseExercise } from '@/api/exercises'
+import type { CurrentUserLevels, BaseExercise } from '@/types/legacy'
+import type { LegacyWorkoutSession as WorkoutSession } from '@/types/legacy'
 import { allExercises } from './exercises'
 
 // Mock user's current progress levels
