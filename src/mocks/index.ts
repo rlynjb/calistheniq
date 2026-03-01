@@ -14,6 +14,3 @@ export {
   MOCK_CurrentUserLevel,
   MOCK_weeklyWorkouts,
 } from './data'
-
-// Re-export types for convenience
-export type { HttpHandler } from 'msw'

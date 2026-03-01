@@ -94,6 +94,8 @@ export default async (req: Request, _context: Context) => {
         }
       }
 
+      // TODO: Remove auto-level-up — superseded by gate system (useGameState.logSession).
+      // Duplicated in src/mocks/handlers.ts. Kept for backward compat until gate system is fully deployed.
       // Auto-level-up: check if today's exercises meet all targets at current level
       if (data.weeklyProgress?.length && data.currentLevels) {
         const todayStr = new Date().toDateString()

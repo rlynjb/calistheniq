@@ -10,17 +10,10 @@ import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { GlowCard } from '@/components/ui/GlowCard'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SetCheckbox } from '@/components/ui/SetCheckbox'
+import { LEVEL_NAMES } from '@/lib/constants'
 import exercises from '@/data/exercises.json'
 
 const typedExercises = exercises as Exercise[]
-
-const LEVEL_NAMES: Record<number, string> = {
-  1: 'Beginner',
-  2: 'Novice',
-  3: 'Intermediate',
-  4: 'Advanced',
-  5: 'Expert',
-}
 
 type Phase = 'select' | 'log' | 'result'
 
@@ -34,6 +27,7 @@ export default function LogPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(preselected)
   const [result, setResult] = useState<LogSessionResult | null>(null)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   if (status === 'loading' || !user) {
     return (
@@ -50,10 +44,16 @@ export default function LogPage() {
 
   const handleSave = async (session: WorkoutSession) => {
     setSaving(true)
-    const res = await logSession(session)
-    setResult(res)
-    setSaving(false)
-    setPhase('result')
+    setSaveError(null)
+    try {
+      const res = await logSession(session)
+      setResult(res)
+      setPhase('result')
+    } catch {
+      setSaveError('Failed to save session. Please try again.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleLogAnother = () => {
@@ -79,6 +79,7 @@ export default function LogPage() {
         category={selectedCategory}
         level={user.levels[selectedCategory]}
         saving={saving}
+        saveError={saveError}
         onSave={handleSave}
         onBack={() => setPhase('select')}
       />
@@ -165,12 +166,14 @@ function ExerciseForm({
   category,
   level,
   saving,
+  saveError,
   onSave,
   onBack,
 }: {
   category: Category
   level: number
   saving: boolean
+  saveError: string | null
   onSave: (session: WorkoutSession) => void
   onBack: () => void
 }) {
@@ -315,6 +318,7 @@ function ExerciseForm({
                       <input
                         type="number"
                         inputMode="numeric"
+                        aria-label={`${ex.name} set ${setIdx + 1} ${isHold ? 'seconds' : 'reps'}`}
                         value={actualValue}
                         onChange={e => {
                           const v = Math.max(0, parseInt(e.target.value) || 0)
@@ -337,6 +341,7 @@ function ExerciseForm({
       {/* Notes */}
       <div>
         <textarea
+          aria-label="Session notes"
           placeholder="Notes (optional)"
           value={notes}
           onChange={e => setNotes(e.target.value)}
@@ -344,6 +349,11 @@ function ExerciseForm({
           className="w-full rounded-lg border border-tron-border bg-tron-surface px-3 py-2 text-sm text-tron-text placeholder:text-tron-muted/50 focus:border-tron-primary focus:outline-none resize-none"
         />
       </div>
+
+      {/* Save error */}
+      {saveError && (
+        <p className="text-xs text-tron-danger text-center" role="alert">{saveError}</p>
+      )}
 
       {/* Save button */}
       <button

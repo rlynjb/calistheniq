@@ -8,15 +8,8 @@ import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { NodeBadge } from '@/components/ui/NodeBadge'
 import { getNodeState } from '@/lib/progression'
 import { createGateProgress } from '@/lib/gate-check'
+import { LEVEL_NAMES } from '@/lib/constants'
 import exercises from '@/data/exercises.json'
-
-const LEVEL_NAMES: Record<number, string> = {
-  1: 'Beginner',
-  2: 'Novice',
-  3: 'Intermediate',
-  4: 'Advanced',
-  5: 'Expert',
-}
 
 const typedExercises = exercises as Exercise[]
 const MAX_LEVEL = 5
@@ -72,12 +65,7 @@ export default function TreePage() {
               const nodeKey = `${cat}:${level}`
               const userLevel = user.levels[cat]
               const gate = gateProgress[nodeKey] ?? createGateProgress(cat, level, userLevel)
-              const userLevelsMap = {
-                push: cat === 'push' ? userLevel : 0,
-                pull: cat === 'pull' ? userLevel : 0,
-                squat: cat === 'squat' ? userLevel : 0,
-              } as Record<Category, number>
-              const nodeState = getNodeState(gate, userLevelsMap)
+              const nodeState = getNodeState(gate, user.levels)
               const levelExercises = typedExercises.filter(
                 e => e.category === cat && e.level === level
               )
@@ -87,6 +75,7 @@ export default function TreePage() {
                 <div key={nodeKey} className="flex flex-col items-center">
                   <button
                     onClick={() => hasExercises ? toggleNode(nodeKey) : undefined}
+                    aria-label={`${cat} level ${level} — ${nodeState}`}
                     className={`flex flex-col items-center transition-transform ${
                       hasExercises ? 'active:scale-95' : ''
                     } ${expandedNode === nodeKey ? 'scale-110' : ''}`}
@@ -164,7 +153,7 @@ function ExpandedDetail({
             {LEVEL_NAMES[level]}
           </span>
         </div>
-        <button onClick={onClose} className="text-tron-muted hover:text-tron-text p-1">
+        <button onClick={onClose} aria-label="Close detail panel" className="text-tron-muted hover:text-tron-text p-1">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>

@@ -14,6 +14,15 @@ export const APP_VIEWPORT = {
   initialScale: 1,
 }
 
+// Level names (single source of truth — was duplicated in 4 files)
+export const LEVEL_NAMES: Record<number, string> = {
+  1: 'Beginner',
+  2: 'Novice',
+  3: 'Intermediate',
+  4: 'Advanced',
+  5: 'Expert',
+}
+
 // Category color definitions (single source of truth)
 export const CATEGORY_COLORS: Record<string, { color: string; bg: string; border: string; glow: string }> = {
   Push:  { color: "#F97316", bg: "#F9731610", border: "#F9731628", glow: "0 0 24px #F9731635" },

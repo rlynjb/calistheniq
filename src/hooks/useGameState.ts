@@ -75,15 +75,11 @@ export function useGameState(): UseGameStateReturn {
     const currentWeekStart = getWeekStart(new Date())
     let loadedWeek = await storage.getWeekProgress(currentWeekStart)
 
+    // Load sessions once (used for streak computation below)
+    const allSessions = await storage.getSessions()
+
     // Check for week reset — if stored week is from a previous week, archive it
     if (needsWeekReset(loadedWeek, new Date())) {
-      if (loadedWeek && loadedWeek.weekStart !== currentWeekStart) {
-        // Archive the old week
-        const allSessions = await storage.getSessions()
-        const prevWeeks = buildWeekHistory(allSessions)
-        const newStreak = calculateStreak(prevWeeks)
-        setStreak(newStreak)
-      }
       loadedWeek = createWeekProgress(new Date())
       await storage.updateWeekProgress(loadedWeek)
     }
@@ -93,14 +89,14 @@ export function useGameState(): UseGameStateReturn {
     for (const cat of CATEGORIES) {
       const level = loadedUser.levels[cat]
       const gate = await storage.getGateProgress(level, cat)
-      if (gate.status === 'locked' && level <= loadedUser.levels[cat]) {
+      // Gate at the user's current level should never be locked
+      if (gate.status === 'locked') {
         gate.status = 'in-progress'
       }
       gates[gateKey(cat, level)] = gate
     }
 
-    // Load sessions + compute streak from history
-    const allSessions = await storage.getSessions()
+    // Compute streak from session history
     const prevWeeks = buildWeekHistory(allSessions)
     const computedStreak = calculateStreak(prevWeeks)
 

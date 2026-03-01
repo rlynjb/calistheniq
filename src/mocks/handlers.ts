@@ -11,6 +11,15 @@ import type { WorkoutLevels, BaseExercise, BaseExerciseSet, UserData } from '@/a
 const LEVEL_ORDER = ['beginner', 'novice', 'intermediate', 'advanced', 'expert']
 const CATEGORIES = ['Push', 'Pull', 'Squat'] as const
 
+// Strip metadata from ExerciseWithMetadata to BaseExercise (used by two handlers)
+function toBaseExercise({ name, sets, tempo, rest, equipment, notes, category }: typeof allExercises[number]): BaseExercise {
+  return {
+    name, sets, tempo, rest, category,
+    ...(equipment && { equipment }),
+    ...(notes && { notes }),
+  }
+}
+
 // In-memory key-value store for game data (mirrors Netlify Blob game-data store)
 const gameDataStore = new Map<string, unknown>()
 
@@ -47,18 +56,7 @@ export const handlers = [
       exercises = exercises.filter(e => e.category === category)
     }
 
-    // Map to BaseExercise (strip metadata)
-    const baseExercises: BaseExercise[] = exercises.map(({ name, sets, tempo, rest, equipment, notes, category }) => ({
-      name,
-      sets,
-      tempo,
-      rest,
-      category,
-      ...(equipment && { equipment }),
-      ...(notes && { notes })
-    }))
-
-    return HttpResponse.json(baseExercises)
+    return HttpResponse.json(exercises.map(toBaseExercise))
   }),
 
   // GET /.netlify/functions/exercises/search - Search exercises
@@ -71,17 +69,7 @@ export const handlers = [
       e.tags?.some(tag => tag.toLowerCase().includes(query))
     )
 
-    const baseExercises: BaseExercise[] = results.map(({ name, sets, tempo, rest, equipment, notes, category }) => ({
-      name,
-      sets,
-      tempo,
-      rest,
-      category,
-      ...(equipment && { equipment }),
-      ...(notes && { notes })
-    }))
-
-    return HttpResponse.json(baseExercises)
+    return HttpResponse.json(results.map(toBaseExercise))
   }),
 
   // GET /.netlify/functions/exercises/level - Get exercise level info by name
@@ -146,6 +134,8 @@ export const handlers = [
       )
     }
 
+    // TODO: Remove auto-level-up — superseded by gate system (useGameState.logSession).
+    // Duplicated in netlify/functions/user-data.ts. Kept for backward compat until gate system is fully deployed.
     // Auto-level-up check
     if (userData.weeklyProgress?.length && userData.currentLevels) {
       const todayStr = new Date().toDateString()

@@ -2,20 +2,13 @@
 
 import type { Category } from '@/types'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
+import { LEVEL_NAMES } from '@/lib/constants'
 
 interface GatePassedModalProps {
   category: Category
   oldLevel: number
   newLevel: number
   onClose: () => void
-}
-
-const LEVEL_NAMES: Record<number, string> = {
-  1: 'Beginner',
-  2: 'Novice',
-  3: 'Intermediate',
-  4: 'Advanced',
-  5: 'Expert',
 }
 
 export function GatePassedModal({ category, oldLevel, newLevel, onClose }: GatePassedModalProps) {

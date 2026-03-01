@@ -3,24 +3,10 @@
 import Link from 'next/link'
 import { useGameState } from '@/hooks/useGameState'
 import { CATEGORIES } from '@/types'
-import type { Category } from '@/types'
 import { GlowCard } from '@/components/ui/GlowCard'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { ProgressBar } from '@/components/ui/ProgressBar'
-
-const LEVEL_NAMES: Record<number, string> = {
-  1: 'Beginner',
-  2: 'Novice',
-  3: 'Intermediate',
-  4: 'Advanced',
-  5: 'Expert',
-}
-
-const CATEGORY_GLOWS: Record<Category, 'push' | 'pull' | 'squat'> = {
-  push: 'push',
-  pull: 'pull',
-  squat: 'squat',
-}
+import { LEVEL_NAMES } from '@/lib/constants'
 
 export default function HomePage() {
   const {
@@ -85,7 +71,7 @@ export default function HomePage() {
           const passes = gate?.consecutivePasses ?? 0
 
           return (
-            <GlowCard key={cat} glow={done ? CATEGORY_GLOWS[cat] : 'none'} className="p-4">
+            <GlowCard key={cat} glow={done ? cat : 'none'} className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <CategoryBadge category={cat} />
