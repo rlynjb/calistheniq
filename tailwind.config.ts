@@ -3,9 +3,6 @@ import type { Config } from 'tailwindcss'
 const config: Config = {
   darkMode: ['class'],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
   theme: {
@@ -88,8 +85,9 @@ const config: Config = {
         'glow-squat': '0 0 20px rgba(217,70,239,0.3)',
       },
       fontFamily: {
-        display: ['Chakra Petch', 'sans-serif'],
-        mono: ['Share Tech Mono', 'monospace'],
+        // Uses CSS variables set by next/font/google in layout.tsx
+        display: ['var(--font-display)', 'sans-serif'],
+        mono: ['var(--font-mono)', 'monospace'],
       },
       keyframes: {
         'accordion-down': {

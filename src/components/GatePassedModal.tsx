@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import type { Category } from '@/types'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { LEVEL_NAMES } from '@/lib/constants'
@@ -12,10 +13,25 @@ interface GatePassedModalProps {
 }
 
 export function GatePassedModal({ category, oldLevel, newLevel, onClose }: GatePassedModalProps) {
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  // Auto-focus Continue button + close on Escape
+  useEffect(() => {
+    buttonRef.current?.focus()
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [onClose])
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Level up: ${category} advanced to level ${newLevel}`}
     >
       <div
         className="mx-4 w-full max-w-sm rounded-2xl border border-tron-primary/40 bg-tron-surface p-8 text-center animate-glow-burst"
@@ -34,7 +50,7 @@ export function GatePassedModal({ category, oldLevel, newLevel, onClose }: GateP
             <p className="text-lg font-mono text-tron-muted">{oldLevel}</p>
             <p className="text-[10px] text-tron-muted">{LEVEL_NAMES[oldLevel]}</p>
           </div>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-tron-primary">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-tron-primary" aria-hidden="true">
             <path d="M5 12h14m-6-6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <div className="text-center">
@@ -44,6 +60,7 @@ export function GatePassedModal({ category, oldLevel, newLevel, onClose }: GateP
         </div>
 
         <button
+          ref={buttonRef}
           onClick={onClose}
           className="w-full rounded-xl border border-tron-primary/30 bg-tron-primary-dim py-3 text-sm font-semibold text-tron-primary transition-all hover:bg-tron-primary/20"
         >

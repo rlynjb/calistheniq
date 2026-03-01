@@ -135,11 +135,12 @@ function ExpandedDetail({
   )
   const nodeState = getNodeState(gate, userLevels)
 
-  const catBorder = cat === 'push'
-    ? 'border-cat-push/30'
-    : cat === 'pull'
-      ? 'border-cat-pull/30'
-      : 'border-cat-squat/30'
+  const catBorderMap: Record<Category, string> = {
+    push: 'border-cat-push/30',
+    pull: 'border-cat-pull/30',
+    squat: 'border-cat-squat/30',
+  }
+  const catBorder = catBorderMap[cat]
 
   return (
     <div className={`rounded-xl border bg-tron-surface p-4 ${catBorder}`}>

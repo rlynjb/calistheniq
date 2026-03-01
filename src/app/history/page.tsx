@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useGameState } from '@/hooks/useGameState'
 import type { Category, WorkoutSession } from '@/types'
+import { CATEGORIES } from '@/types'
 import { getWeekStart } from '@/lib/week-progress'
 import { CategoryBadge } from '@/components/ui/CategoryBadge'
 import { GlowCard } from '@/components/ui/GlowCard'
@@ -64,6 +65,12 @@ export default function HistoryPage() {
   )
 }
 
+const catDotColor: Record<Category, string> = {
+  push: 'bg-cat-push',
+  pull: 'bg-cat-pull',
+  squat: 'bg-cat-squat',
+}
+
 function WeekGroup({
   weekStart,
   sessions,
@@ -84,7 +91,8 @@ function WeekGroup({
     day: 'numeric',
   })
 
-  const allCats: Category[] = ['push', 'pull', 'squat']
+  // Use canonical CATEGORIES array from types (avoids hardcoding)
+  const allCats = CATEGORIES
 
   return (
     <div>
@@ -99,14 +107,10 @@ function WeekGroup({
             <div
               key={cat}
               className={`w-2.5 h-2.5 rounded-full ${
-                categories.has(cat)
-                  ? cat === 'push'
-                    ? 'bg-cat-push'
-                    : cat === 'pull'
-                      ? 'bg-cat-pull'
-                      : 'bg-cat-squat'
-                  : 'bg-tron-border'
+                categories.has(cat) ? catDotColor[cat] : 'bg-tron-border'
               }`}
+              title={`${cat}: ${categories.has(cat) ? 'done' : 'not done'}`}
+              aria-label={`${cat}: ${categories.has(cat) ? 'done' : 'not done'}`}
             />
           ))}
         </div>

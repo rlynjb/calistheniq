@@ -1,5 +1,3 @@
-'use client'
-
 import { cn } from '@/lib/utils'
 
 interface ProgressBarProps {
@@ -28,7 +26,14 @@ export function ProgressBar({ value, color = 'cyan', label, showPct, className }
           {showPct && <span className="text-tron-text-secondary font-mono">{clamped}%</span>}
         </div>
       )}
-      <div className="h-2 rounded-full bg-tron-surface-light overflow-hidden">
+      <div
+        className="h-2 rounded-full bg-tron-surface-light overflow-hidden"
+        role="progressbar"
+        aria-valuenow={clamped}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={label ?? `${clamped}%`}
+      >
         <div
           className={cn('h-full rounded-full transition-all duration-300', colorMap[color])}
           style={{ width: `${clamped}%` }}
