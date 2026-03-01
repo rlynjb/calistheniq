@@ -95,6 +95,7 @@ export const gameDataStore = {
 
 /**
  * CORS headers for API responses
+ * TODO: Replace '*' with explicit origin list before production deployment.
  */
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

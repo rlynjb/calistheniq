@@ -49,6 +49,7 @@ import {
   handleCors
 } from './core/infrastructure/blob'
 
+// TODO: Add auth check before production — this endpoint overwrites all stored data.
 export default async (req: Request, _context: Context) => {
   if (req.method === 'OPTIONS') {
     return handleCors()
@@ -92,4 +93,8 @@ export default async (req: Request, _context: Context) => {
       500
     )
   }
+}
+
+export const config = {
+  path: '/import'
 }

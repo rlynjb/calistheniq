@@ -11,6 +11,7 @@
     "type-check": "tsc --noEmit",
     "netlify-dev": "netlify dev",
     "netlify-build": "netlify build",
+    "test": "vitest run",
     "sync:from-blob": "npx ts-node scripts/sync-from-blob.ts",
     "sync:from-prod": "npx ts-node scripts/sync-from-blob.ts --url"
   },
@@ -18,19 +19,17 @@
     "@netlify/blobs": "^10.5.0",
     "@netlify/functions": "^2.4.0",
     "@radix-ui/react-slot": "^1.0.2",
-    "@types/node": "^20.8.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "next": "^14.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tailwind-merge": "^2.0.0",
-    "tsx": "^4.21.0",
-    "typescript": "^5.2.0"
+    "tailwind-merge": "^2.0.0"
   },
   "devDependencies": {
+    "@types/node": "^20.8.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
     "autoprefixer": "^10.4.16",
@@ -40,7 +39,10 @@
     "netlify-cli": "^17.0.0",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.21.0",
+    "typescript": "^5.2.0",
+    "vitest": "^4.0.0"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -39,12 +39,13 @@ export default async (req: Request, _context: Context) => {
       e.tags?.some(tag => tag.toLowerCase().includes(query))
     )
 
-    // Map to BaseExercise format (strip metadata)
-    const baseExercises = results.map(({ name, sets, tempo, rest, equipment, notes }) => ({
+    // Map to BaseExercise format (strip metadata) — includes category for consistency with /exercises
+    const baseExercises = results.map(({ name, sets, tempo, rest, equipment, notes, category }) => ({
       name,
       sets,
       tempo,
       rest,
+      category,
       ...(equipment && { equipment }),
       ...(notes && { notes })
     }))

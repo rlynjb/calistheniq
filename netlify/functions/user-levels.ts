@@ -51,8 +51,15 @@ export default async (req: Request, _context: Context) => {
     if (req.method === 'PUT') {
       const body = await req.json() as { category: string; level: number }
 
+      const validCategories = ['Push', 'Pull', 'Squat']
       if (!body.category || typeof body.level !== 'number') {
         return errorResponse('Invalid request: category and level required', 400)
+      }
+      if (!validCategories.includes(body.category)) {
+        return errorResponse(`Invalid category: must be one of ${validCategories.join(', ')}`, 400)
+      }
+      if (body.level < 0 || body.level > 5) {
+        return errorResponse('Invalid level: must be between 0 and 5', 400)
       }
 
       // Get existing data

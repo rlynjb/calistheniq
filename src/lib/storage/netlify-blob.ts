@@ -11,7 +11,9 @@ export class NetlifyBlobAdapter implements StorageProvider {
     try {
       const res = await apiClient.get<T>('/game/data', { key })
       return res.data ?? null
-    } catch {
+    } catch (err) {
+      // TODO: Add structured logging here — silent failures make debugging hard.
+      console.warn('[NetlifyBlobAdapter] get failed for key:', key, err)
       return null
     }
   }

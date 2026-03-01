@@ -1,3 +1,13 @@
+/**
+ * Netlify Function: Game Data
+ *
+ * Generic key-value store for game state (gate progress, week progress, sessions, user).
+ *
+ * GET    /game/data?key=<key> — read value
+ * PUT    /game/data           — write { key, value }
+ * DELETE /game/data?key=<key> — delete key
+ */
+
 import { gameDataStore, jsonResponse, errorResponse, handleCors } from './core/infrastructure/blob'
 
 export default async (request: Request) => {

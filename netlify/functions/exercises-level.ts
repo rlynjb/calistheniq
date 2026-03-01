@@ -30,7 +30,7 @@ export default async (req: Request, _context: Context) => {
     const name = url.searchParams.get('name')
 
     if (!name) {
-      return jsonResponse(null, 400)
+      return errorResponse('Missing name parameter', 400)
     }
 
     // Find exercise by name (case-insensitive)
@@ -39,7 +39,7 @@ export default async (req: Request, _context: Context) => {
     )
 
     if (!exercise) {
-      return jsonResponse(null, 404)
+      return errorResponse('Exercise not found', 404)
     }
 
     // Get level name from workout levels

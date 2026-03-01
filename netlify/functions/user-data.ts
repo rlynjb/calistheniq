@@ -17,7 +17,7 @@ import {
 } from './core/infrastructure/blob'
 import { workoutLevels as fallbackLevels } from '../../src/mocks/data/exercises'
 
-// Type definitions matching src/api types
+// TODO: Share these types with src/api/ to avoid duplication (duplicated in user-levels.ts too).
 interface CurrentUserLevels {
   Push: number
   Pull: number
@@ -59,10 +59,13 @@ interface UserData {
 const LEVEL_ORDER = ['beginner', 'novice', 'intermediate', 'advanced', 'expert']
 const CATEGORIES: (keyof CurrentUserLevels)[] = ['Push', 'Pull', 'Squat']
 
-const DEFAULT_USER_DATA: UserData = {
-  currentLevels: { Push: 0, Pull: 0, Squat: 0 },
-  lastUpdated: new Date().toISOString(),
-  weeklyProgress: []
+// Factory function — avoids cold-start stale timestamp from module-level new Date()
+function defaultUserData(): UserData {
+  return {
+    currentLevels: { Push: 0, Pull: 0, Squat: 0 },
+    lastUpdated: new Date().toISOString(),
+    weeklyProgress: [],
+  }
 }
 
 export default async (req: Request, _context: Context) => {
@@ -77,7 +80,7 @@ export default async (req: Request, _context: Context) => {
       const data = await userDataStore.get<UserData>()
 
       if (!data) {
-        return jsonResponse(DEFAULT_USER_DATA)
+        return jsonResponse(defaultUserData())
       }
 
       // Clean up sessions dated in the future (beyond Saturday)
@@ -157,6 +160,11 @@ export default async (req: Request, _context: Context) => {
     // PUT - Update user data
     if (req.method === 'PUT') {
       const body = await req.json() as UserData
+
+      // Validate required structure
+      if (!body.currentLevels || typeof body.currentLevels !== 'object') {
+        return errorResponse('Invalid body: currentLevels object required', 400)
+      }
 
       const updatedData: UserData = {
         ...body,
