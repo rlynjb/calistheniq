@@ -1,0 +1,1 @@
+Styling approach for this project

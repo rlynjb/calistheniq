@@ -1,0 +1,1 @@
+Component template from existing patterns
