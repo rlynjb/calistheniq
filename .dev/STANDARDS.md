@@ -1,0 +1,1 @@
+Summary of industry standards for web development with Next.js and TypeScript.

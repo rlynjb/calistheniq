@@ -1,0 +1,1 @@
+Coding conventions for Next.js, TypeScript, and Tailwind CSS projects.

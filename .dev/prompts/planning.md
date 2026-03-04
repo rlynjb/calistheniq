@@ -1,0 +1,1 @@
+Template for planning sessions with focus on feature prioritization.
