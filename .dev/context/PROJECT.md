@@ -2,7 +2,7 @@
 
 **Name:** contrl
 **Description:** AI-powered calisthenics coach that guides beginners through safe, progressive bodyweight training with personalized form cues and adaptive programming.
-**Phase:** polish (150 files)
+**Phase:** polish (153 files)
 
 ## Stack
 - Next.js
