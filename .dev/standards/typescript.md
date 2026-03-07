@@ -1,1 +1,1 @@
-TypeScript usage
+TypeScript usage in this project

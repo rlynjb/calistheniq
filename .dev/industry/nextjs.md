@@ -1,1 +1,1 @@
-Next.js best practices
+Best practices for Next.js projects
