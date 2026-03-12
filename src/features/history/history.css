@@ -140,6 +140,10 @@
   @apply text-tron-muted;
 }
 
+.session-card__entry-reps {
+  @apply flex gap-2 text-[10px] font-mono text-tron-muted;
+}
+
 .session-card__notes {
   @apply text-[10px] text-tron-muted italic pt-1;
 }

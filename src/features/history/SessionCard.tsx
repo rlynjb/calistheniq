@@ -103,6 +103,24 @@ export function SessionCard({ session }: SessionCardProps) {
                 value={entry.targetSets > 0 ? Math.round((entry.actualSets / entry.targetSets) * 100) : 0}
                 color={entry.hitTarget ? 'emerald' : 'muted'}
               />
+              <div className="session-card__entry-reps">
+                {entry.actualHoldSeconds
+                  ? entry.checkedSets.map((checked, i) =>
+                      checked && (
+                        <span key={i} className="session-card__entry-rep">
+                          S{i + 1}: {entry.actualHoldSeconds![i]}s/{entry.targetReps || '—'}s
+                        </span>
+                      )
+                    )
+                  : entry.checkedSets.map((checked, i) =>
+                      checked && (
+                        <span key={i} className="session-card__entry-rep">
+                          S{i + 1}: {entry.actualReps[i] ?? 0}/{entry.targetReps}
+                        </span>
+                      )
+                    )
+                }
+              </div>
             </div>
           ))}
           {session.notes && (
