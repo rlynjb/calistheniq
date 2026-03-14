@@ -243,7 +243,7 @@
 /* ── Block: set-camera-hud ── */
 
 .set-camera-hud {
-  @apply absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-4 pb-16 pt-12;
+  @apply absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-4 pb-24 pt-12;
 }
 
 .set-camera-hud__exercise {
