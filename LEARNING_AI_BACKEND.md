@@ -10,9 +10,58 @@ A practical guide anchored in what you've already built with CalisthenIQ. Each s
 
 You're already using serverless functions (`netlify/functions/`), blob storage, and REST endpoints. That's a backend. The concepts below formalize what you're doing intuitively.
 
+### Your Current Backend Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    BROWSER                          │
+│                                                     │
+│  Next.js App                                        │
+│  ┌──────────┐   ┌──────────┐   ┌────────────────┐  │
+│  │ React UI │──▶│ API Layer│──▶│ fetch() calls  │──┼──┐
+│  │ (hooks)  │   │ client.ts│   │ GET/POST       │  │  │
+│  └──────────┘   └──────────┘   └────────────────┘  │  │
+│                                                     │  │
+│  ┌──────────────────────────┐                       │  │
+│  │ MediaPipe (on-device ML) │  ← no backend needed  │  │
+│  └──────────────────────────┘                       │  │
+└─────────────────────────────────────────────────────┘  │
+                                                         │
+                        HTTPS                            │
+                                                         │
+┌─────────────────────────────────────────────────────┐  │
+│                 NETLIFY (Backend)                    │  │
+│                                                     │◀─┘
+│  ┌─────────────────┐    ┌──────────────────────┐    │
+│  │ Serverless Funcs │──▶│ Netlify Blob Storage │    │
+│  │ (Node.js)       │    │ (JSON documents)     │    │
+│  │                 │    │                      │    │
+│  │ /api/user-data  │    │ userData.json        │    │
+│  │ /api/log-session│    │ sessions/[id].json   │    │
+│  │ /api/seed       │    │ exercises.json       │    │
+│  └─────────────────┘    └──────────────────────┘    │
+└─────────────────────────────────────────────────────┘
+```
+
 ### Core Concepts
 
 **Request-Response Cycle**
+
+```
+Client                          Server
+  │                               │
+  │  ── GET /api/user-data ────▶  │  1. Client sends request
+  │                               │  2. Server processes
+  │  ◀── 200 { levels, ... } ──  │  3. Server responds
+  │                               │
+  │  ── POST /api/log-session ─▶  │  1. Client sends data
+  │     { session: {...} }        │  2. Server validates & stores
+  │  ◀── 201 Created ──────────  │  3. Server confirms
+  │                               │
+  │  ── GET /api/missing ──────▶  │  1. Client requests
+  │  ◀── 404 Not Found ────────  │  3. Resource doesn't exist
+```
+
 - HTTP methods (GET, POST, PUT, DELETE) map to CRUD operations
 - Status codes: 200 OK, 201 Created, 400 Bad Request, 401 Unauthorized, 404 Not Found, 500 Server Error
 - Headers, body, query params — you already send these from `src/api/client.ts`
@@ -25,12 +74,56 @@ You're already using serverless functions (`netlify/functions/`), blob storage, 
 - *Practical next step*: tRPC fits your stack naturally (Next.js + TypeScript)
 
 **Databases**
+
+```
+SQL (Relational)                    NoSQL (Document) ← what you use
+┌──────────────────────┐            ┌──────────────────────┐
+│ users                │            │ userData.json         │
+│ ┌────┬───────┬─────┐ │            │ {                     │
+│ │ id │ name  │ lvl │ │            │   "levels": {         │
+│ ├────┼───────┼─────┤ │            │     "pushup": 3,      │
+│ │ 1  │ Rein  │ 3   │ │            │     "squat": 2        │
+│ └────┴───────┴─────┘ │            │   },                  │
+│                      │            │   "sessions": [...],   │
+│ sessions             │            │   "gates": {...}       │
+│ ┌────┬─────┬───────┐ │            │ }                     │
+│ │ id │ uid │ date  │ │            └──────────────────────┘
+│ ├────┼─────┼───────┤ │
+│ │ 1  │ 1   │ 03-14 │ │            Key-Value / Document:
+│ └────┴─────┴───────┘ │            One big JSON blob per user
+│                      │            Simple, flexible, no schema
+│ Structured tables    │            ─────────────────────────
+│ with relationships   │            Your Netlify Blobs work
+│ (foreign keys)       │            this way
+└──────────────────────┘
+```
+
 - SQL (PostgreSQL, MySQL): structured tables, relationships, ACID transactions. Best for structured data like your user levels, sessions, exercise definitions
 - NoSQL (MongoDB, DynamoDB): flexible documents. Similar to your Netlify Blob JSON storage
 - *In your app*: Netlify Blobs store JSON documents — conceptually a key-value/document store
 - *Upgrade path*: Supabase (PostgreSQL + auth + realtime) or PlanetScale (MySQL) for production
 
 **Authentication & Authorization**
+
+```
+                    Authentication              Authorization
+                    "Who are you?"              "What can you do?"
+
+                    ┌─────────────┐             ┌─────────────────┐
+  Login ──────────▶ │ Verify      │ ──────────▶ │ Check           │
+  (email/password   │ Identity    │   Token     │ Permissions     │
+   or OAuth)        │             │   (JWT)     │                 │
+                    └─────────────┘             └─────────────────┘
+
+  JWT Token Structure:
+  ┌──────────────────────────────────────────────┐
+  │ Header    │ { alg: "HS256", typ: "JWT" }     │
+  │ Payload   │ { userId: 123, exp: 17... }      │
+  │ Signature │ HMAC(header + payload, secret)    │
+  └──────────────────────────────────────────────┘
+  Stateless: server doesn't store sessions, just verifies the signature
+```
+
 - Authentication = who are you? (login)
 - Authorization = what can you do? (permissions)
 - JWT (JSON Web Tokens): stateless auth tokens. Most common for APIs
@@ -38,15 +131,49 @@ You're already using serverless functions (`netlify/functions/`), blob storage, 
 - *In your app*: no auth yet — adding Supabase Auth or Clerk would be a strong backend exercise
 
 **Server Architecture Patterns**
-- Monolith: single deployable unit. Simple, good starting point
-- Serverless functions: what you use now (`netlify/functions/`). Pay-per-invocation, auto-scaling
-- Microservices: separate services per domain (user service, workout service). Overkill for most apps
-- Edge functions: run at CDN edge, close to user. Netlify Edge Functions, Vercel Edge Runtime
+
+```
+Monolith                Serverless (You)           Microservices
+┌──────────────┐       ┌──────────────────┐       ┌──────┐ ┌──────┐ ┌──────┐
+│ All code in  │       │ Function A ──┐   │       │ User │ │ Work │ │ Auth │
+│ one process  │       │ Function B ──┤   │       │ Svc  │ │ Svc  │ │ Svc  │
+│              │       │ Function C ──┘   │       │      │ │      │ │      │
+│ Always       │       │                  │       │      │ │      │ │      │
+│ running      │       │ Spin up on       │       └──┬───┘ └──┬───┘ └──┬───┘
+│              │       │ request, die     │          │        │        │
+│ Scale: buy   │       │ after            │          ▼        ▼        ▼
+│ bigger       │       │                  │       ┌──────────────────────┐
+│ server       │       │ Scale: auto      │       │   Message Bus / API  │
+└──────────────┘       └──────────────────┘       │   Gateway            │
+                                                  └──────────────────────┘
+Simple, good           Pay-per-use, auto-         Complex, independent
+starting point         scaling. Your setup.       deployment. Overkill
+                                                  for most apps.
+```
+
 - *Key insight*: serverless is already a production architecture pattern, not a toy
 
 **Caching, Queues, Background Jobs**
-- Cache: store computed results to avoid re-computation (Redis, CDN cache, browser cache)
-- Message queues: decouple producers from consumers (SQS, RabbitMQ). Example: "process workout video" job
+
+```
+Without Cache                    With Cache (Redis/CDN)
+┌──────┐    ┌──────┐             ┌──────┐    ┌───────┐    ┌──────┐
+│Client│──▶│Server│             │Client│──▶│ Cache │──▶│Server│
+│      │◀──│ 200ms│             │      │◀──│  5ms  │    │      │
+└──────┘    └──────┘             └──────┘    └───────┘    └──────┘
+Every request hits               Cache hit = fast         Cache miss =
+the database                     No DB query              fill cache, then respond
+
+Message Queue Pattern
+┌──────────┐    ┌───────────┐    ┌──────────────┐
+│ API call │──▶│  Queue    │──▶│ Worker       │
+│ "process │    │ (SQS,    │    │ (processes   │
+│  video"  │    │  Redis)  │    │  when ready) │
+└──────────┘    └───────────┘    └──────────────┘
+Returns immediately              Runs in background
+User doesn't wait                Can retry on failure
+```
+
 - *In your app*: your 500ms debounce on draft saves is a client-side queue pattern
 
 ### Resources
@@ -66,6 +193,31 @@ You're running a neural network (MediaPipe PoseLandmarker) in the browser, proce
 ### Core Concepts
 
 **Models, Training, and Inference**
+
+```
+TRAINING (Google did this)                 INFERENCE (Your app does this)
+┌─────────────────────────────┐           ┌─────────────────────────────┐
+│                             │           │                             │
+│  Labeled Images             │           │  Live Video Frame           │
+│  ┌─────┐ ┌─────┐ ┌─────┐   │           │  ┌─────────────┐           │
+│  │  🏃  │ │ 🧘  │ │ 💪  │   │           │  │  Camera      │           │
+│  │     │ │     │ │     │   │           │  │  Feed        │           │
+│  │label│ │label│ │label│   │           │  └──────┬──────┘           │
+│  └──┬──┘ └──┬──┘ └──┬──┘   │           │         │                  │
+│     │       │       │      │           │         ▼                  │
+│     ▼       ▼       ▼      │           │  ┌─────────────┐           │
+│  ┌──────────────────────┐  │           │  │ Pre-trained  │           │
+│  │ Neural Network       │  │           │  │ Model        │           │
+│  │ adjusts weights      │  │    ────▶  │  │ (frozen      │           │
+│  │ over millions of     │  │   model   │  │  weights)    │           │
+│  │ iterations           │  │   file    │  └──────┬──────┘           │
+│  └──────────────────────┘  │           │         │                  │
+│                             │           │         ▼                  │
+│  Output: model weights      │           │  33 Landmarks              │
+│  (.tflite file)             │           │  with x, y, z, visibility  │
+└─────────────────────────────┘           └─────────────────────────────┘
+```
+
 - A model is a function: input → output, learned from data
 - Training: feeding labeled data to adjust model weights (you don't do this — Google did it for PoseLandmarker)
 - Inference: running a trained model on new data (this is what your app does every frame)
@@ -78,6 +230,31 @@ You're running a neural network (MediaPipe PoseLandmarker) in the browser, proce
 - *PoseLandmarker was trained supervised*: thousands of images with manually labeled joint positions
 
 **Neural Networks**
+
+```
+Simple Neural Network                    CNN (What PoseLandmarker Uses)
+
+Input    Hidden Layers    Output         ┌─────────────────────────────────┐
+                                         │ Image                           │
+ o ──┐   ┌── o ──┐   ┌── o              │ ┌───┬───┬───┬───┐              │
+     ├──▶│       ├──▶│                   │ │   │   │   │   │              │
+ o ──┤   ├── o ──┤   ├── o              │ ├───┼───┼───┼───┤              │
+     ├──▶│       ├──▶│                   │ │   │   │   │   │  Convolution │
+ o ──┤   ├── o ──┤   ├── o              │ └───┴───┴───┴───┘  layers scan │
+     ├──▶│       ├──▶│                   │         │          with small   │
+ o ──┘   └── o ──┘   └── o              │         ▼          filters      │
+                                         │  Feature Maps                   │
+Each connection has a                    │  (edges, shapes, body parts)    │
+"weight" (learned number).               │         │                       │
+                                         │         ▼                       │
+Input × weights + bias                  │  Dense Layers                   │
+  → activation function                  │  (combine features)             │
+  → next layer                           │         │                       │
+                                         │         ▼                       │
+                                         │  33 Landmark coordinates        │
+                                         └─────────────────────────────────┘
+```
+
 - Layers of interconnected nodes that transform input to output
 - CNNs (Convolutional Neural Networks): specialized for images/video. Used in pose detection
 - Transformers: attention-based architecture. Powers LLMs (GPT, Claude), also used in vision
@@ -91,6 +268,28 @@ You're running a neural network (MediaPipe PoseLandmarker) in the browser, proce
 - Confidence/visibility: how sure the model is about a prediction — you use `landmark.visibility`
 
 **Accuracy vs Performance Tradeoffs**
+
+```
+                    Accuracy
+                       ▲
+                       │
+          Heavy ───────┤ ● best accuracy, 5-10 fps
+                       │
+           Full ───────┤     ● balanced
+                       │
+           Lite ───────┤         ● fastest, 15-30 fps
+                       │
+                       └──────────────────────▶ Speed
+
+Quantization: float32 ──▶ int8
+┌────────────────────┐     ┌──────────────┐
+│ 3.14159265         │     │ 3            │
+│ precise but slow   │     │ less precise │
+│ 4 bytes per weight │     │ but 4x less  │
+│                    │     │ memory, faster│
+└────────────────────┘     └──────────────┘
+```
+
 - Larger models = more accurate but slower
 - Quantization: reduce precision (float32 → int8) for speed. MediaPipe uses this
 - Distillation: train a small model to mimic a large one
@@ -101,11 +300,16 @@ You're running a neural network (MediaPipe PoseLandmarker) in the browser, proce
 Your pose processors (`src/lib/pose/exercises/pushup.ts`) are a textbook example of **signal processing on ML output**:
 
 ```
-Raw video frames
-  → ML model (PoseLandmarker) → 33 landmarks with x,y,z,visibility
-  → Feature extraction (joint angles)
-  → State machine (idle → down → bottom → up → count)
-  → Business logic (rep completed, target reached)
+┌──────────┐    ┌──────────────┐    ┌───────────────┐    ┌──────────────┐    ┌────────────┐
+│  Video   │    │  ML Model    │    │   Feature     │    │    State     │    │  Business  │
+│  Frame   │──▶│ PoseLandmark │──▶│  Extraction   │──▶│   Machine    │──▶│   Logic    │
+│          │    │  er          │    │  (angles)     │    │              │    │            │
+│ 30 fps   │    │ 33 landmarks │    │ elbow: 145°  │    │ idle         │    │ repCount++ │
+│          │    │ x,y,z,vis   │    │ knee: 170°   │    │  ↓ ready     │    │ targetMet? │
+│          │    │              │    │ hip: 160°    │    │  ↓ down      │    │ save()     │
+│          │    │              │    │              │    │  ↓ bottom    │    │            │
+│          │    │              │    │              │    │  ↓ up → +1   │    │            │
+└──────────┘    └──────────────┘    └───────────────┘    └──────────────┘    └────────────┘
 ```
 
 This pipeline pattern (raw data → ML inference → post-processing → business logic) is the same pattern used in:
@@ -130,19 +334,69 @@ Your app uses `@mediapipe/tasks-vision` with PoseLandmarker. Here's what's happe
 ### The MediaPipe Pipeline
 
 ```
-Video frame (HTMLVideoElement)
-  → Image preprocessing (resize, normalize pixel values)
-  → Person detection (find bounding box of human)
-  → Pose estimation (predict 33 keypoint locations within bounding box)
-  → Post-processing (smooth landmarks across frames, calculate visibility)
-  → Output: Landmark[] with normalized x, y, z, visibility
+┌─────────────────────────────────────────────────────────────────┐
+│                     MediaPipe Pipeline                          │
+│                                                                 │
+│  ┌──────────┐   ┌──────────────┐   ┌──────────────┐            │
+│  │  Video   │   │    Image     │   │   Person     │            │
+│  │  Frame   │──▶│ Preprocess   │──▶│  Detection   │            │
+│  │          │   │              │   │              │            │
+│  │ 1920x1080│   │ resize to    │   │ find human   │            │
+│  │ RGB      │   │ 256x256      │   │ bounding box │            │
+│  └──────────┘   │ normalize    │   └──────┬───────┘            │
+│                 │ 0.0 - 1.0    │          │                    │
+│                 └──────────────┘          │                    │
+│                                          ▼                    │
+│                 ┌──────────────┐   ┌──────────────┐            │
+│                 │   Output     │   │    Pose      │            │
+│                 │              │◀──│  Estimation   │            │
+│                 │ Landmark[]   │   │              │            │
+│                 │ 33 points    │   │ CNN predicts │            │
+│                 │ x,y,z,vis   │   │ 33 keypoints │            │
+│                 │ normalized   │   │ within bbox  │            │
+│                 │ [0..1]       │   │              │            │
+│                 └──────────────┘   └──────────────┘            │
+└─────────────────────────────────────────────────────────────────┘
+
+The 33 Landmarks:
+          0 (nose)
+         / \
+    11 ─┤   ├─ 12        (shoulders)
+    13 ─┤   ├─ 14        (elbows)
+    15 ─┤   ├─ 16        (wrists)
+        │   │
+    23 ─┤   ├─ 24        (hips)
+    25 ─┤   ├─ 26        (knees)
+    27 ─┤   ├─ 28        (ankles)
+
+Your app uses these indices in SKELETON_CONNECTIONS
+to draw the overlay and calculate joint angles.
 ```
 
 ### Delegates: How Inference Runs
 
-- **CPU delegate**: pure JavaScript/WASM. Works everywhere, slowest
-- **GPU delegate (WebGL)**: uses GPU shaders for matrix math. 2-5x faster
-- **WASM SIMD**: uses CPU vector instructions. Good middle ground
+```
+┌─────────────────────────────────────────────────┐
+│              Inference Delegates                 │
+│                                                  │
+│  CPU (WASM)          GPU (WebGL)    WASM SIMD    │
+│  ┌─────────┐        ┌─────────┐   ┌─────────┐  │
+│  │ JS/WASM │        │ WebGL   │   │ WASM +  │  │
+│  │         │        │ Shaders │   │ Vector  │  │
+│  │ ~60ms   │        │         │   │ Ops     │  │
+│  │ per     │        │ ~15ms   │   │         │  │
+│  │ frame   │        │ per     │   │ ~30ms   │  │
+│  │         │        │ frame   │   │ per     │  │
+│  │ Works   │        │         │   │ frame   │  │
+│  │ every-  │        │ Needs   │   │         │  │
+│  │ where   │        │ WebGL2  │   │ Needs   │  │
+│  │         │        │         │   │ SIMD    │  │
+│  └─────────┘        └─────────┘   └─────────┘  │
+│  Slowest,            Fastest,      Good          │
+│  most compatible     GPU required  middle ground │
+└─────────────────────────────────────────────────┘
+```
+
 - *In your app*: `PoseDetector.create()` in `src/lib/pose/mediapipe.ts` loads the WASM runtime
 
 ### Model Variants
@@ -153,14 +407,34 @@ Video frame (HTMLVideoElement)
 
 ### On-Device vs Cloud Inference
 
-| Aspect | On-Device (Your App) | Cloud API |
-|--------|---------------------|-----------|
-| Latency | ~30ms per frame | 100-500ms network round trip |
-| Privacy | Video never leaves device | Video sent to server |
-| Cost | Free (user's CPU/GPU) | Pay per API call |
-| Model size | Limited by download size | Unlimited |
-| Offline | Works offline | Requires internet |
-| Accuracy | Constrained by device | Best available models |
+```
+ON-DEVICE (Your App)                     CLOUD API
+┌──────────────────────┐                ┌──────────────────────┐
+│  Browser / Phone     │                │  Browser / Phone     │
+│  ┌────────────────┐  │                │                      │
+│  │ Video ──▶ Model│  │                │  Video ──┐           │
+│  │        ◀── 33  │  │                │          │ upload    │
+│  │       landmarks│  │                │          ▼           │
+│  └────────────────┘  │                │  ┌──────────────┐    │
+│                      │                │  │   Internet   │    │
+│  Latency: ~30ms     │                │  └──────┬───────┘    │
+│  Privacy: stays      │                │         │            │
+│    on device         │                │         ▼            │
+│  Cost: FREE          │                │  ┌──────────────┐    │
+│  Offline: YES        │                │  │ Cloud Server │    │
+│  Model size: limited │                │  │ Big Model    │    │
+│                      │                │  │ 100-500ms    │    │
+└──────────────────────┘                │  └──────┬───────┘    │
+                                        │         │            │
+                                        │    ◀────┘ results    │
+                                        │                      │
+                                        │  Latency: 100-500ms  │
+                                        │  Privacy: data sent  │
+                                        │  Cost: per API call  │
+                                        │  Offline: NO         │
+                                        │  Model size: any     │
+                                        └──────────────────────┘
+```
 
 *Your app chose on-device for good reasons*: real-time pose detection needs <50ms latency, privacy-sensitive (body video), and zero marginal cost per user.
 
@@ -198,6 +472,30 @@ AI product engineering is about integrating ML capabilities into products — no
 - **OpenAI GPT API**: broad ecosystem, function calling, vision
 - **Google Gemini API**: multimodal (text + image + video), long context (1M+ tokens)
 - **Open-source (Llama, Mistral)**: self-hosted, no API costs, full control
+
+**How an LLM API Call Works**
+
+```
+Your App                              LLM Provider (e.g. Anthropic)
+┌────────────────────────┐            ┌────────────────────────────┐
+│                        │            │                            │
+│ const response = await │            │  ┌──────────────────────┐  │
+│   anthropic.messages   │            │  │ 1. Tokenize input    │  │
+│     .create({          │  ────────▶ │  │ 2. Run transformer   │  │
+│       model: "claude", │   POST     │  │    (billions of      │  │
+│       system: "You are │   HTTPS    │  │     matrix ops)      │  │
+│         a fitness      │            │  │ 3. Sample next token │  │
+│         coach",        │            │  │ 4. Repeat until done │  │
+│       messages: [      │            │  └──────────────────────┘  │
+│         { role: "user",│            │                            │
+│           content:     │            │  Tokens In:  ~$3/million   │
+│           "Analyze my  │            │  Tokens Out: ~$15/million  │
+│            workout" }  │  ◀──────── │                            │
+│       ]                │  Response  │  "Based on your session    │
+│     })                 │  (stream)  │   data, you improved..."  │
+│                        │            │                            │
+└────────────────────────┘            └────────────────────────────┘
+```
 
 **Key API Concepts**
 - System prompt: persistent instructions that shape behavior
@@ -240,11 +538,33 @@ Return a JSON object with: { score: number, feedback: string, improvements: stri
 The most common AI product pattern. Instead of the LLM knowing everything, you retrieve relevant context and include it in the prompt.
 
 ```
-User asks: "How do I improve my pushup form?"
-  → Search your exercise database for pushup-related content
-  → Retrieve user's recent pushup session data
-  → Include both as context in the LLM prompt
-  → LLM generates personalized advice
+┌─────────────────────────────────────────────────────────────┐
+│                    RAG Pipeline                              │
+│                                                              │
+│  User: "How do I improve my pushup form?"                   │
+│         │                                                    │
+│         ▼                                                    │
+│  ┌─────────────┐     ┌──────────────────────────────────┐   │
+│  │  Embedding   │     │  Vector Database                 │   │
+│  │  Model       │     │  ┌──────┐ ┌──────┐ ┌──────┐     │   │
+│  │              │────▶│  │ doc1 │ │ doc2 │ │ doc3 │     │   │
+│  │  query ──▶   │     │  │ 0.92 │ │ 0.31 │ │ 0.87 │     │   │
+│  │  [0.2, 0.8,  │     │  │match │ │      │ │match │     │   │
+│  │   0.1, ...]  │     │  └──────┘ └──────┘ └──────┘     │   │
+│  └─────────────┘     └──────────────┬───────────────────┘   │
+│                                      │ top matches           │
+│                                      ▼                       │
+│  ┌───────────────────────────────────────────────────────┐   │
+│  │  LLM Prompt                                           │   │
+│  │                                                       │   │
+│  │  Context: [pushup guide doc, user's last 5 sessions]  │   │
+│  │  Question: "How do I improve my pushup form?"         │   │
+│  │                                                       │   │
+│  │  ──▶ "Based on your recent sessions, your elbow       │   │
+│  │       angle averages 120°. Aim for 90° at the         │   │
+│  │       bottom position. Try tempo pushups..."          │   │
+│  └───────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 **Components**:
@@ -255,29 +575,72 @@ User asks: "How do I improve my pushup form?"
 
 ### Tool Use / Function Calling
 
-LLMs can call functions you define. The model decides when and how to call them.
-
-```typescript
-// You define available tools
-const tools = [{
-  name: "get_user_workout_history",
-  description: "Get the user's recent workout sessions",
-  parameters: { days: { type: "number" } }
-}]
-
-// Model decides to call it
-// Response: { tool_call: "get_user_workout_history", args: { days: 7 } }
-
-// You execute the function and return results to the model
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   Tool Use Flow                              │
+│                                                              │
+│  You define tools:                                           │
+│  ┌────────────────────────────────────────────┐              │
+│  │ { name: "get_workout_history",             │              │
+│  │   description: "Get recent sessions",      │              │
+│  │   parameters: { days: number } }           │              │
+│  └────────────────────────────────────────────┘              │
+│                                                              │
+│  ┌────────┐         ┌─────────┐         ┌────────┐          │
+│  │  User  │         │   LLM   │         │ Your   │          │
+│  │        │         │         │         │ API    │          │
+│  └───┬────┘         └────┬────┘         └───┬────┘          │
+│      │                   │                  │               │
+│      │ "How am I doing?" │                  │               │
+│      │──────────────────▶│                  │               │
+│      │                   │                  │               │
+│      │                   │ tool_call:       │               │
+│      │                   │ get_workout_     │               │
+│      │                   │ history(days:7)  │               │
+│      │                   │─────────────────▶│               │
+│      │                   │                  │               │
+│      │                   │  [session data]  │               │
+│      │                   │◀─────────────────│               │
+│      │                   │                  │               │
+│      │ "You did 3        │                  │               │
+│      │  sessions this    │                  │               │
+│      │  week, up from 2" │                  │               │
+│      │◀──────────────────│                  │               │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 *In your app*: imagine an AI coach that can call `getUserData()`, analyze workout patterns, and give personalized advice using your existing API layer.
 
 ### Agent Architectures
 
-Agents are LLMs that can take actions in a loop:
 ```
-Observe → Think → Act → Observe → Think → Act → ... → Done
+┌─────────────────────────────────────────────────────────────┐
+│                    Agent Loop (ReAct)                         │
+│                                                              │
+│   ┌──────────┐                                               │
+│   │  Start   │                                               │
+│   └────┬─────┘                                               │
+│        │                                                     │
+│        ▼                                                     │
+│   ┌──────────┐     ┌──────────┐     ┌──────────┐            │
+│   │ Observe  │────▶│  Think   │────▶│   Act    │            │
+│   │          │     │          │     │          │            │
+│   │ read     │     │ reason   │     │ call     │            │
+│   │ context  │     │ about    │     │ tool or  │            │
+│   │          │     │ next     │     │ respond  │            │
+│   │          │     │ step     │     │          │            │
+│   └──────────┘     └──────────┘     └─────┬────┘            │
+│        ▲                                   │                 │
+│        │           ┌──────────┐            │                 │
+│        │           │  Done?   │◀───────────┘                 │
+│        │           └────┬─────┘                              │
+│        │      No        │        Yes                         │
+│        └────────────────┘         │                          │
+│                              ┌────▼─────┐                    │
+│                              │  Return  │                    │
+│                              │  Answer  │                    │
+│                              └──────────┘                    │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 **Patterns**:
@@ -293,16 +656,57 @@ Observe → Think → Act → Observe → Think → Act → ... → Done
 
 ### Evaluation & Testing AI Systems
 
-Unlike traditional testing, AI outputs are non-deterministic:
-- **Assertion-based**: check structure (is it valid JSON? does it have required fields?)
-- **LLM-as-judge**: use another LLM to evaluate quality
-- **Human evaluation**: gold standard but expensive
-- **Regression testing**: save good outputs, compare future runs
-- **A/B testing**: compare model versions on real user traffic
+```
+Traditional Testing                AI Testing
+┌─────────────────────┐           ┌─────────────────────────────┐
+│                     │           │                             │
+│ assert(add(2,3)===5)│           │ Is the response helpful?    │
+│                     │           │ Is it factually correct?    │
+│ Deterministic:      │           │ Does it match the tone?     │
+│ same input =        │           │                             │
+│ same output         │           │ Non-deterministic:          │
+│ ALWAYS              │           │ same input =                │
+│                     │           │ SIMILAR but different output│
+│ Pass / Fail         │           │                             │
+│                     │           │ Score: 0.0 - 1.0            │
+│                     │           │ (averaged over many runs)   │
+└─────────────────────┘           └─────────────────────────────┘
+
+Evaluation Methods:
+┌─────────────┐  ┌───────────────┐  ┌──────────────┐  ┌──────────┐
+│ Assertion   │  │ LLM-as-Judge  │  │ Human Eval   │  │ A/B Test │
+│             │  │               │  │              │  │          │
+│ Is it valid │  │ Another LLM   │  │ Real users   │  │ Compare  │
+│ JSON?       │  │ scores the    │  │ rate quality │  │ v1 vs v2 │
+│ Has all     │  │ output on     │  │              │  │ on live  │
+│ fields?     │  │ criteria      │  │ Gold standard│  │ traffic  │
+│             │  │               │  │ but expensive│  │          │
+│ Cheapest    │  │ Scalable      │  │              │  │          │
+└─────────────┘  └───────────────┘  └──────────────┘  └──────────┘
+```
 
 ### MLOps Basics
 
-The lifecycle of ML in production:
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   ML Lifecycle in Production                  │
+│                                                              │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐ │
+│  │  Build   │──▶│  Test    │──▶│  Deploy  │──▶│ Monitor  │ │
+│  │          │   │          │   │          │   │          │ │
+│  │ Select   │   │ Evaluate │   │ Ship to  │   │ Track    │ │
+│  │ model    │   │ quality  │   │ prod     │   │ latency  │ │
+│  │ Design   │   │ Run      │   │ Feature  │   │ cost     │ │
+│  │ prompts  │   │ evals    │   │ flags    │   │ errors   │ │
+│  │          │   │ Compare  │   │ Canary   │   │ quality  │ │
+│  │          │   │ versions │   │ rollout  │   │ drift    │ │
+│  └──────────┘   └──────────┘   └──────────┘   └──────────┘ │
+│       ▲                                            │        │
+│       │            Feedback Loop                   │        │
+│       └────────────────────────────────────────────┘        │
+└─────────────────────────────────────────────────────────────┘
+```
+
 - Model selection and benchmarking
 - Prompt versioning (treat prompts like code)
 - Monitoring: track latency, cost, error rates, user satisfaction
@@ -325,21 +729,65 @@ These projects build on your existing CalisthenIQ codebase, progressively adding
 ### Project 1: AI Workout Coach (LLM Integration)
 **Skills**: LLM API, prompt engineering, streaming, Vercel AI SDK
 
-Add an AI coach endpoint that analyzes workout history and gives advice:
+```
+┌─────────────────────────────────────────────┐
+│  CalisthenIQ + AI Coach                      │
+│                                              │
+│  ┌──────────────────────────────┐            │
+│  │  Home Page (existing)        │            │
+│  │  ┌────────────────────────┐  │            │
+│  │  │ Pushup  L3  [■■■□□]   │  │            │
+│  │  │ Squat   L2  [■■□□□]   │  │            │
+│  │  └────────────────────────┘  │            │
+│  │                              │            │
+│  │  ┌────────────────────────┐  │            │
+│  │  │ AI Coach (new)         │  │            │
+│  │  │                        │  │            │
+│  │  │ "Great session! Your   │  │            │
+│  │  │  pushup consistency    │  │            │
+│  │  │  improved 20% this     │  │            │
+│  │  │  week. Try adding a    │  │            │
+│  │  │  1-sec pause at the    │  │            │
+│  │  │  bottom to build       │  │            │
+│  │  │  strength."            │  │            │
+│  │  │                [Ask] ▶ │  │            │
+│  │  └────────────────────────┘  │            │
+│  └──────────────────────────────┘            │
+└─────────────────────────────────────────────┘
+```
+
 - Create a Next.js API route that calls Claude API
 - Pass user's session history as context
 - Stream the response to a chat UI
 - Use structured output for actionable suggestions
 
-```
-"You completed 8/10 pushups across 3 sets. Your consistency is improving —
-last week you averaged 6. Focus on controlled descent for the remaining 2 reps."
-```
-
 ### Project 2: Exercise Form Scoring (On-Device ML + LLM)
 **Skills**: feature engineering, custom ML pipeline, prompt engineering
 
-Use your existing landmark data to score exercise form:
+```
+During Camera Session:
+
+┌─────────────────────────────────┐
+│  Camera Feed                     │
+│  ┌─────────────────────────┐    │
+│  │                         │    │
+│  │   Skeleton Overlay      │    │
+│  │   + Angle Annotations   │    │
+│  │                         │    │
+│  │      elbow: 92°  ✓      │    │
+│  │      back: 175°  ✓      │    │
+│  │      depth: 85%  ⚠      │    │
+│  │                         │    │
+│  └─────────────────────────┘    │
+│                                  │
+│  Form Score: 87%                 │
+│  Rep 4 / 10                      │
+│  "Go a bit deeper on the next"  │
+│                                  │
+│  [Done]  [Cancel]                │
+└─────────────────────────────────┘
+```
+
 - Extract joint angles per frame from landmarks (you already compute these)
 - Define "ideal" angle ranges for each exercise phase
 - Score deviation from ideal as a percentage
@@ -348,11 +796,25 @@ Use your existing landmark data to score exercise form:
 ### Project 3: Supabase Backend Migration
 **Skills**: SQL, auth, real-time, row-level security
 
-Replace Netlify Blobs with Supabase:
-- Design a relational schema (users, sessions, exercises, sets)
-- Add Supabase Auth (email + social login)
-- Use Row Level Security for per-user data isolation
-- Add real-time subscriptions for live workout updates
+```
+Current                              After Migration
+┌────────────────┐                  ┌────────────────────────┐
+│ Netlify Blobs  │                  │ Supabase               │
+│                │                  │                        │
+│ userData.json  │    ──────▶      │ ┌──────────────────┐   │
+│ (one big blob) │                  │ │ users            │   │
+│                │                  │ │ sessions         │   │
+│ No auth        │                  │ │ exercises        │   │
+│ No relations   │                  │ │ sets             │   │
+│ No queries     │                  │ │ gates            │   │
+│                │                  │ └──────────────────┘   │
+│                │                  │                        │
+│                │                  │ + Auth (email/Google)  │
+│                │                  │ + Row Level Security   │
+│                │                  │ + Realtime updates     │
+│                │                  │ + SQL queries          │
+└────────────────┘                  └────────────────────────┘
+```
 
 ### Project 4: Workout Video Analysis (Cloud AI)
 **Skills**: cloud inference, multimodal AI, async processing
@@ -366,47 +828,115 @@ Record workout clips and analyze with a vision model:
 ### Project 5: Custom Exercise Detection Model
 **Skills**: data collection, model training, TFLite, edge deployment
 
-Train a model to classify exercise type from landmarks:
-- Collect landmark data during workouts (you already have this pipeline)
-- Label sequences (pushup, squat, plank, rest)
-- Train a small classifier (TensorFlow.js or Python → TFLite)
-- Deploy alongside PoseLandmarker for automatic exercise detection
+```
+┌─────────────────────────────────────────────────────────┐
+│  Custom Model Training Pipeline                          │
+│                                                          │
+│  1. COLLECT          2. LABEL           3. TRAIN         │
+│  ┌──────────┐       ┌──────────┐       ┌──────────┐    │
+│  │ Record   │       │ Tag each │       │ Train    │    │
+│  │ landmark │──────▶│ sequence │──────▶│ small    │    │
+│  │ sequences│       │          │       │ model    │    │
+│  │ during   │       │ "pushup" │       │          │    │
+│  │ workouts │       │ "squat"  │       │ TF.js or │    │
+│  │          │       │ "plank"  │       │ Python   │    │
+│  │ (you have│       │ "rest"   │       │          │    │
+│  │  this!)  │       │          │       │          │    │
+│  └──────────┘       └──────────┘       └────┬─────┘    │
+│                                              │          │
+│  4. EXPORT           5. DEPLOY               │          │
+│  ┌──────────┐       ┌──────────┐             │          │
+│  │ Convert  │       │ Load in  │◀────────────┘          │
+│  │ to TFLite│──────▶│ browser  │                        │
+│  │ (.tflite)│       │ alongside│                        │
+│  │          │       │ Pose     │                        │
+│  │          │       │ Landmark │                        │
+│  │          │       │ er       │                        │
+│  └──────────┘       └──────────┘                        │
+│                                                          │
+│  Result: Auto-detect which exercise the user is doing    │
+│  without them having to select it!                       │
+└─────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## Part 6: Recommended Learning Order
 
-### Phase 1: Backend Foundations (2-4 weeks)
-1. Add Supabase to this app (auth + database)
-2. Migrate from Netlify Blobs to PostgreSQL tables
-3. Learn SQL basics through your own data model
-
-### Phase 2: LLM Integration (2-4 weeks)
-1. Get Claude API key, make first API call from a Next.js route
-2. Add Vercel AI SDK, build a streaming chat component
-3. Connect it to your workout data for personalized coaching
-
-### Phase 3: AI Product Patterns (4-8 weeks)
-1. Implement tool use (LLM calls your existing API functions)
-2. Build a RAG system over exercise knowledge base
-3. Add evaluation: measure if AI coach advice is helpful
-
-### Phase 4: Advanced ML (ongoing)
-1. Deep dive into how PoseLandmarker works internally
-2. Experiment with custom model training (form quality classifier)
-3. Explore multimodal AI (video analysis with Gemini/Claude Vision)
+```
+YOU ARE HERE
+     │
+     ▼
+┌──────────────────────────────────────────────────────┐
+│  Phase 1: Backend Foundations (2-4 weeks)             │
+│  ┌────────────────────────────────────────────────┐  │
+│  │ ✦ Add Supabase (auth + database)              │  │
+│  │ ✦ Migrate Netlify Blobs → PostgreSQL          │  │
+│  │ ✦ Learn SQL through your own data model       │  │
+│  └────────────────────────────────────────────────┘  │
+└──────────────────────┬───────────────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────────────┐
+│  Phase 2: LLM Integration (2-4 weeks)                │
+│  ┌────────────────────────────────────────────────┐  │
+│  │ ✦ Get Claude API key, first API call          │  │
+│  │ ✦ Add Vercel AI SDK, streaming chat           │  │
+│  │ ✦ Connect to workout data for AI coaching     │  │
+│  └────────────────────────────────────────────────┘  │
+└──────────────────────┬───────────────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────────────┐
+│  Phase 3: AI Product Patterns (4-8 weeks)            │
+│  ┌────────────────────────────────────────────────┐  │
+│  │ ✦ Implement tool use (LLM calls your APIs)    │  │
+│  │ ✦ Build RAG over exercise knowledge base      │  │
+│  │ ✦ Add evaluation: measure AI coach quality    │  │
+│  └────────────────────────────────────────────────┘  │
+└──────────────────────┬───────────────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────────────┐
+│  Phase 4: Advanced ML (ongoing)                      │
+│  ┌────────────────────────────────────────────────┐  │
+│  │ ✦ Deep dive into PoseLandmarker internals     │  │
+│  │ ✦ Custom model training (form classifier)     │  │
+│  │ ✦ Multimodal AI (video analysis)              │  │
+│  └────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────┘
+                       │
+                       ▼
+              AI PRODUCT ENGINEER
+```
 
 ---
 
 ## Key Mindset Shifts
 
-| Front-End Thinking | AI Product Thinking |
-|---|---|
-| Deterministic: same input → same output | Probabilistic: same input → similar but different output |
-| Test with assertions | Test with evaluations and statistical measures |
-| Debug with console.log | Debug with prompt iteration and tracing |
-| Ship pixel-perfect UI | Ship "good enough" with guardrails and fallbacks |
-| Optimize bundle size | Optimize token usage and latency |
-| User sees exactly what you built | User sees what the model generates |
+```
+┌──────────────────────────┐        ┌──────────────────────────┐
+│   FRONT-END THINKING     │        │   AI PRODUCT THINKING    │
+│                          │        │                          │
+│  Deterministic           │        │  Probabilistic           │
+│  same input = same       │   ──▶  │  same input = similar    │
+│  output ALWAYS           │        │  but different output    │
+│                          │        │                          │
+│  Test with assertions    │   ──▶  │  Test with evaluations   │
+│  expect(x).toBe(y)      │        │  score(output) > 0.8     │
+│                          │        │                          │
+│  Debug with console.log  │   ──▶  │  Debug with prompt       │
+│                          │        │  iteration and tracing   │
+│                          │        │                          │
+│  Ship pixel-perfect UI   │   ──▶  │  Ship "good enough"      │
+│                          │        │  with guardrails         │
+│                          │        │                          │
+│  Optimize bundle size    │   ──▶  │  Optimize token usage    │
+│                          │        │  and latency             │
+│                          │        │                          │
+│  User sees exactly       │   ──▶  │  User sees what the      │
+│  what you built          │        │  model generates         │
+└──────────────────────────┘        └──────────────────────────┘
+```
 
 The biggest advantage you have: **you already build products**. Most ML engineers can train models but struggle to ship user-facing products. You're coming from the product side and adding AI capabilities — that's exactly what the industry needs.
