@@ -1,0 +1,41 @@
+/* ── Block: camera-view ── */
+
+.camera-view {
+  @apply relative flex-1 overflow-hidden bg-black;
+}
+
+.camera-view__video {
+  @apply h-full w-full object-cover;
+}
+
+.camera-view__canvas {
+  @apply absolute inset-0 h-full w-full;
+}
+
+.camera-view__loading {
+  @apply absolute inset-0 flex flex-col items-center justify-center gap-3 bg-tron-bg text-tron-muted text-sm font-mono;
+}
+
+.camera-view__error {
+  @apply absolute inset-0 flex flex-col items-center justify-center gap-4 bg-tron-bg px-6 text-center;
+}
+
+.camera-view__error-title {
+  @apply text-sm font-semibold text-tron-danger;
+}
+
+.camera-view__error-msg {
+  @apply text-xs text-tron-muted;
+}
+
+.camera-view__confidence {
+  @apply absolute top-3 right-3 rounded-full px-2 py-0.5 text-[10px] font-mono backdrop-blur-sm;
+}
+
+.camera-view__confidence--good {
+  @apply bg-tron-success/20 text-tron-success;
+}
+
+.camera-view__confidence--low {
+  @apply bg-tron-warning/20 text-tron-warning;
+}

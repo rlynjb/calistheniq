@@ -5,7 +5,7 @@ import type { Landmark } from '@/lib/pose/landmarks'
 import { PoseDetector } from '@/lib/pose/mediapipe'
 import { SkeletonOverlay } from './SkeletonOverlay'
 import { cn } from '@/lib/utils'
-import Link from 'next/link'
+import './camera-view.css'
 
 interface CameraViewProps {
   /** Called on each frame with detected pose landmarks. */
@@ -46,7 +46,7 @@ export function CameraView({ onLandmarks, children }: CameraViewProps) {
       try {
         // Request camera
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+          video: { facingMode: 'user', width: { ideal: window.screen.width }, height: { ideal: window.screen.height - 140 } },
           audio: false,
         })
 
@@ -130,9 +130,6 @@ export function CameraView({ onLandmarks, children }: CameraViewProps) {
             Camera access is needed for automatic rep counting.
             Please enable camera permissions in your browser settings.
           </p>
-          <Link href="/" className="camera-view__error-link">
-            Log manually on Home instead
-          </Link>
         </div>
       </div>
     )
@@ -146,9 +143,6 @@ export function CameraView({ onLandmarks, children }: CameraViewProps) {
           <p className="camera-view__error-msg">
             Could not access camera or load pose detection model.
           </p>
-          <Link href="/" className="camera-view__error-link">
-            Log manually on Home instead
-          </Link>
         </div>
       </div>
     )

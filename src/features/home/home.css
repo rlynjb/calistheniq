@@ -124,8 +124,20 @@
   @apply text-[10px] text-tron-muted font-mono whitespace-nowrap;
 }
 
+.exercise-form__sets-layout {
+  @apply flex gap-3;
+}
+
 .exercise-form__sets {
-  @apply space-y-2;
+  @apply space-y-2 flex-1 min-w-0;
+}
+
+.exercise-form__camera-btn {
+  @apply flex items-center justify-center w-10 rounded-lg border border-tron-border text-tron-muted hover:text-tron-primary hover:border-tron-primary transition-colors self-stretch;
+}
+
+.exercise-form__camera-btn:disabled {
+  @apply opacity-30 cursor-not-allowed hover:text-tron-muted hover:border-tron-border;
 }
 
 .exercise-form__set-row {
@@ -216,4 +228,84 @@
 
 .session-result__gap {
   @apply text-[10px] text-tron-muted mt-0.5;
+}
+
+/* ── Block: set-camera-overlay ── */
+
+.set-camera-overlay {
+  @apply fixed inset-0 z-50 flex flex-col bg-black;
+}
+
+.set-camera-overlay__camera {
+  @apply relative flex-1;
+}
+
+/* ── Block: set-camera-hud ── */
+
+.set-camera-hud {
+  @apply absolute inset-x-0 bottom-0 flex flex-col items-center gap-2 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-4 pb-6 pt-12;
+}
+
+.set-camera-hud__exercise {
+  @apply text-sm font-semibold text-tron-text;
+}
+
+.set-camera-hud__countdown {
+  @apply text-8xl font-bold font-mono text-tron-primary tabular-nums;
+}
+
+.set-camera-hud__countdown-label {
+  @apply text-sm text-tron-muted;
+}
+
+.set-camera-hud__count {
+  @apply text-6xl font-bold font-mono text-tron-primary tabular-nums;
+}
+
+.set-camera-hud__timer {
+  @apply text-5xl font-bold font-mono text-tron-primary tabular-nums;
+}
+
+.set-camera-hud__value--reached {
+  @apply text-tron-success;
+}
+
+.set-camera-hud__target {
+  @apply text-xs text-tron-muted font-mono;
+}
+
+.set-camera-hud__set-label {
+  @apply text-sm text-tron-muted;
+}
+
+.set-camera-hud__holding {
+  @apply text-xs font-mono;
+}
+
+.set-camera-hud__holding--active {
+  @apply text-tron-success;
+}
+
+.set-camera-hud__holding--broken {
+  @apply text-tron-warning;
+}
+
+.set-camera-hud__actions {
+  @apply mt-2 flex items-center gap-3;
+}
+
+.set-camera-hud__btn {
+  @apply rounded-lg border px-4 py-2 text-xs font-semibold transition-colors;
+}
+
+.set-camera-hud__btn--start {
+  @apply border-tron-primary/30 bg-tron-primary-dim text-tron-primary hover:bg-tron-primary/20;
+}
+
+.set-camera-hud__btn--done {
+  @apply border-tron-success/30 bg-tron-success-dim text-tron-success hover:bg-tron-success/20;
+}
+
+.set-camera-hud__btn--cancel {
+  @apply border-tron-border bg-tron-surface text-tron-muted hover:text-tron-text;
 }

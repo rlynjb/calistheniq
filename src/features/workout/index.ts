@@ -1,1 +1,0 @@
-export { WorkoutView } from './WorkoutView'

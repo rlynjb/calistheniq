@@ -26,8 +26,10 @@
  */
 'use client'
 
+import { useState } from 'react'
 import { SetCheckbox } from '@/components/ui/SetCheckbox'
 import { ProgressBar } from '@/components/ui/ProgressBar'
+import { SetCameraOverlay } from './SetCameraOverlay'
 import { useExerciseForm } from './useExerciseForm'
 import type { Category, DraftSession, WorkoutSession } from '@/types'
 
@@ -95,6 +97,30 @@ export function ExerciseForm({
     onSave(buildSession())
   }
 
+  const [cameraTarget, setCameraTarget] = useState<{
+    exIdx: number; setIdx: number
+  } | null>(null)
+
+  const handleCameraClick = (exIdx: number) => {
+    const state = exerciseState[exIdx]
+    const firstUnchecked = state.checkedSets.findIndex(checked => !checked)
+    if (firstUnchecked === -1) return
+    setCameraTarget({ exIdx, setIdx: firstUnchecked })
+  }
+
+  const handleCameraComplete = (value: number) => {
+    if (!cameraTarget) return
+    const { exIdx, setIdx } = cameraTarget
+    const ex = levelExercises[exIdx]
+    updateValue(exIdx, setIdx, value, ex.isHold)
+    toggleSet(exIdx, setIdx)
+    setCameraTarget(null)
+  }
+
+  const handleCameraClose = () => {
+    setCameraTarget(null)
+  }
+
   return (
     <div className="exercise-form">
       {levelExercises.map((ex, exIdx) => {
@@ -123,52 +149,66 @@ export function ExerciseForm({
               </span>
             </div>
 
-            <div className="exercise-form__sets">
-              {Array.from({ length: ex.targetSets }).map((_, setIdx) => {
-                const checked = state.checkedSets[setIdx]
-                const actualValue = isHold
-                  ? (state.actualHoldSeconds?.[setIdx] ?? 0)
-                  : state.actualReps[setIdx]
-                const targetValue = isHold ? (ex.targetHoldSeconds ?? 0) : ex.targetReps
-                const met = actualValue >= targetValue
-                const lastValue = isHold
-                  ? lastEntry?.actualHoldSeconds?.[setIdx]
-                  : lastEntry?.actualReps?.[setIdx]
+            <div className="exercise-form__sets-layout">
+              <div className="exercise-form__sets">
+                {Array.from({ length: ex.targetSets }).map((_, setIdx) => {
+                  const checked = state.checkedSets[setIdx]
+                  const actualValue = isHold
+                    ? (state.actualHoldSeconds?.[setIdx] ?? 0)
+                    : state.actualReps[setIdx]
+                  const targetValue = isHold ? (ex.targetHoldSeconds ?? 0) : ex.targetReps
+                  const met = actualValue >= targetValue
+                  const lastValue = isHold
+                    ? lastEntry?.actualHoldSeconds?.[setIdx]
+                    : lastEntry?.actualReps?.[setIdx]
 
-                return (
-                  <div key={setIdx}>
-                    <div className="exercise-form__set-row">
-                      <SetCheckbox
-                        checked={checked}
-                        met={met}
-                        onChange={() => toggleSet(exIdx, setIdx)}
-                      />
-                      <span className="exercise-form__set-label">
-                        S{setIdx + 1}
-                      </span>
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        aria-label={`${ex.name} set ${setIdx + 1} ${isHold ? 'seconds' : 'reps'}`}
-                        value={actualValue}
-                        onChange={e => {
-                          const v = Math.max(0, parseInt(e.target.value) || 0)
-                          updateValue(exIdx, setIdx, v, isHold)
-                        }}
-                        className="exercise-form__set-input"
-                      />
-                      <span className="exercise-form__set-target">
-                        / {targetValue}{isHold ? 's' : ''}
-                      </span>
+                  return (
+                    <div key={setIdx}>
+                      <div className="exercise-form__set-row">
+                        <SetCheckbox
+                          checked={checked}
+                          met={met}
+                          onChange={() => toggleSet(exIdx, setIdx)}
+                        />
+                        <span className="exercise-form__set-label">
+                          S{setIdx + 1}
+                        </span>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          aria-label={`${ex.name} set ${setIdx + 1} ${isHold ? 'seconds' : 'reps'}`}
+                          value={actualValue}
+                          onChange={e => {
+                            const v = Math.max(0, parseInt(e.target.value) || 0)
+                            updateValue(exIdx, setIdx, v, isHold)
+                          }}
+                          className="exercise-form__set-input"
+                        />
+                        <span className="exercise-form__set-target">
+                          / {targetValue}{isHold ? 's' : ''}
+                        </span>
+                      </div>
+                      {lastValue !== undefined && (
+                        <p className="exercise-form__last-value">
+                          last: {lastValue}{isHold ? 's' : ''}
+                        </p>
+                      )}
                     </div>
-                    {lastValue !== undefined && (
-                      <p className="exercise-form__last-value">
-                        last: {lastValue}{isHold ? 's' : ''}
-                      </p>
-                    )}
-                  </div>
-                )
-              })}
+                  )
+                })}
+              </div>
+              <button
+                type="button"
+                className="exercise-form__camera-btn"
+                aria-label={`Use camera for ${ex.name}`}
+                onClick={() => handleCameraClick(exIdx)}
+                disabled={state.checkedSets.every(Boolean)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+              </button>
             </div>
           </div>
         )
@@ -197,6 +237,22 @@ export function ExerciseForm({
       >
         {saving ? 'Saving...' : 'Save Session'}
       </button>
+
+      {/* Camera overlay */}
+      {cameraTarget && (
+        <SetCameraOverlay
+          category={category}
+          exercise={levelExercises[cameraTarget.exIdx]}
+          setIndex={cameraTarget.setIdx}
+          targetValue={
+            levelExercises[cameraTarget.exIdx].isHold
+              ? (levelExercises[cameraTarget.exIdx].targetHoldSeconds ?? 0)
+              : levelExercises[cameraTarget.exIdx].targetReps
+          }
+          onComplete={handleCameraComplete}
+          onClose={handleCameraClose}
+        />
+      )}
     </div>
   )
 }
