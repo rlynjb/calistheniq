@@ -5,7 +5,7 @@
 }
 
 .camera-view__video {
-  @apply h-full w-full object-cover;
+  @apply h-full w-full object-contain;
 }
 
 .camera-view__canvas {
