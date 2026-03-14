@@ -46,7 +46,7 @@ export function CameraView({ onLandmarks, children }: CameraViewProps) {
       try {
         // Request camera
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 480 }, height: { ideal: 900 } },
+          video: { facingMode: 'user' },
           audio: false,
         })
 
