@@ -25,7 +25,8 @@ export function CameraView({ onLandmarks, children }: CameraViewProps) {
 
   const [cameraState, setCameraState] = useState<CameraState>('loading')
   const [landmarks, setLandmarks] = useState<Landmark[]>([])
-  const [dimensions, setDimensions] = useState({ width: 480, height: 640 })
+  const [containerSize, setContainerSize] = useState({ width: 480, height: 640 })
+  const [videoSize, setVideoSize] = useState({ width: 640, height: 480 })
   const [confidence, setConfidence] = useState(0)
 
   const handleLandmarks = useCallback((lms: Landmark[]) => {
@@ -66,7 +67,7 @@ export function CameraView({ onLandmarks, children }: CameraViewProps) {
         // Get actual video dimensions
         const vw = video.videoWidth || 640
         const vh = video.videoHeight || 480
-        setDimensions({ width: vw, height: vh })
+        setVideoSize({ width: vw, height: vh })
 
         // Initialize pose detector
         const detector = await PoseDetector.create({
@@ -111,7 +112,7 @@ export function CameraView({ onLandmarks, children }: CameraViewProps) {
 
     const observer = new ResizeObserver(entries => {
       for (const entry of entries) {
-        setDimensions({
+        setContainerSize({
           width: entry.contentRect.width,
           height: entry.contentRect.height,
         })
@@ -168,8 +169,10 @@ export function CameraView({ onLandmarks, children }: CameraViewProps) {
       {cameraState === 'ready' && landmarks.length > 0 && (
         <SkeletonOverlay
           landmarks={landmarks}
-          width={dimensions.width}
-          height={dimensions.height}
+          containerWidth={containerSize.width}
+          containerHeight={containerSize.height}
+          videoWidth={videoSize.width}
+          videoHeight={videoSize.height}
         />
       )}
 
