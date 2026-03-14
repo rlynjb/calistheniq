@@ -1,7 +1,7 @@
 /* ── Block: camera-view ── */
 
 .camera-view {
-  @apply relative flex-1 overflow-hidden bg-black;
+  @apply relative flex-1 h-full overflow-hidden bg-black;
 }
 
 .camera-view__video {
