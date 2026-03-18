@@ -177,7 +177,7 @@ export function ExerciseForm({
                           type="number"
                           inputMode="numeric"
                           aria-label={`${ex.name} set ${setIdx + 1} ${isHold ? 'seconds' : 'reps'}`}
-                          value={actualValue}
+                          value={actualValue || ''}
                           onChange={e => {
                             const v = Math.max(0, parseInt(e.target.value) || 0)
                             updateValue(exIdx, setIdx, v, isHold)
